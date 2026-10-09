@@ -8,7 +8,9 @@ extends "res://tools/shots/characters_base.gd"
 
 func build() -> void:
 	make_environment(Color("3a4a46"), 0.32, 0.035, Color("0d1211"))
-	make_camera(Vector3(0.1, 1.62, 3.2), Vector3(0.25, 1.5, -4.0), 72.0)
+	make_camera(Vector3(0.1, 1.62, 3.2), Vector3(0.25, 1.45, -4.0), 60.0)
+	# the player's flashlight, from just below the camera
+	spot(Vector3(0.25, 1.45, 3.1), Vector3(-0.2, 1.1, -2.0), Color("f2e8d0"), 2.2, 12.0, 24.0, true)
 	tile_floor(Vector3(0, 0, -3), Vector2(6, 16))
 	box(Vector3(0, 3.25, -3), Vector3(6, 0.1, 16), Color("1c201f"))         # ceiling
 	box(Vector3(0, 1.6, -10.2), Vector3(6, 3.2, 0.2), Color("232826"))       # far wall
@@ -23,8 +25,8 @@ func build() -> void:
 	fluorescent(Vector3(0.1, 3.15, -7.5), 1.2, 6.0)
 	omni(Vector3(0.2, 1.4, -8.8), Color("8fa0a0"), 0.5, 4.0)
 	var time := arg_float("time", 0.4)
-	add_character(arg_str("employee", "employee_dale"), Vector3(-0.62, 0, 1.75), 180.0, "idle", time)
-	add_character("monster", Vector3(0.42, 0, -1.55), -10.0, arg_str("monster_anim", "idle"), time)
+	add_character(arg_str("employee", "employee_dale"), Vector3(-0.55, 0, 1.6), 180.0, "idle", time)
+	add_character("monster", Vector3(0.42, 0, -1.0), -10.0, arg_str("monster_anim", "idle"), time)
 	_vignette()
 
 

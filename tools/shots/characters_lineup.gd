@@ -11,7 +11,7 @@ func build() -> void:
 	var back := arg_bool("back", false)
 	var anim := arg_str("anim", "idle")
 	var time := arg_float("time", 0.3)
-	var yaw := 180.0 if back else 0.0
+	var yaw := 0.0  # models face +Z; the back view moves the camera instead
 	var cam_z := -6.2 if back else 6.2
 	make_camera(Vector3(0.0, 1.45, cam_z), Vector3(0.0, 1.2, 0.0), 45.0)
 	tile_floor(Vector3(0, 0, 0), Vector2(14, 10))

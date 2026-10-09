@@ -4,6 +4,7 @@ Regenerates every character from nothing (no hand-edited data):
 
     blender -b -P art_source/blender/characters/build_characters.py
     blender -b -P art_source/blender/characters/build_characters.py -- --only monster manager
+        (--only: quick iteration, exports just those GLBs and does not rewrite the .blend)
 
 Writes
     assets/models/characters/employee_dale.glb, employee_rita.glb, employee_marcus.glb,
@@ -593,7 +594,7 @@ EMPLOYEE_PROPS = {
     "pelvis": [(0.95, 0.192, 0.124), (0.87, 0.19, 0.12), (0.80, 0.178, 0.104)],
     "thigh_w": (0.088, 0.092, 0.073, 0.077),
     "shin_w": (0.071, 0.074, 0.062, 0.064),
-    "head": [(1.515, 0.062, 0.068, -0.012), (1.555, 0.088, 0.098, -0.004), (1.615, 0.099, 0.108, 0.0),
+    "head": [(1.515, 0.07, 0.08, -0.012), (1.555, 0.09, 0.1, -0.004), (1.615, 0.099, 0.108, 0.0),
              (1.695, 0.100, 0.112, 0.004), (1.755, 0.082, 0.096, 0.006), (1.775, 0.05, 0.06, 0.006)],
     "sleeve_end": 0.62,     # fraction of the upper arm covered by the sleeve
     "sleeve_w": (0.074, 0.078),
@@ -750,7 +751,7 @@ def paint_employee_face(r, spec, pal, rng):
                 r.dot(x, int(rng.integers(0, 7)), mul(hair, 1.6))
 
 
-def paint_head_side(r, spec, pal, rng, facing_front_left=True):
+def paint_head_side(r, spec, pal, rng):
     """Side of the head, s = 0 at the face. Ear in the middle, hair behind/above."""
     skin = pal["skin"]
     paint_skin(r, skin, rng, base=0.40, blotch=0.2)
@@ -764,7 +765,7 @@ def paint_head_side(r, spec, pal, rng, facing_front_left=True):
             r.dot(int(rng.integers(w // 3, w)), int(rng.integers(0, h - 6)), mul(hair, 1.5))
     else:
         r.rect(w // 3, 0, w - w // 3, h // 2 + 2, hair)
-        r.rect(w // 2, h // 2 + 2, w // 2, 4, hair)
+        r.rect(w // 2, h // 2 + 2, w // 2, int(h * 0.3), hair)   # behind the ear, down to the nape
         r.rect(w // 3 - 2, h // 3, 2, 6, hair)  # sideburn
     # Ear.
     ex = w // 2 - 3
@@ -783,12 +784,16 @@ def paint_head_back(r, spec, pal, rng):
         for _ in range(16):
             r.dot(int(rng.integers(0, r.w)), int(rng.integers(0, r.h - 3)), mul(hair, 1.5))
     else:
-        r.rect(0, 0, r.w, int(r.h * 0.62), hair)
+        # short hair down to the nape, slightly ragged hairline, neck skin below
+        line = int(r.h * 0.8)
+        r.rect(0, 0, r.w, line, hair)
         for x in range(r.w):
             if rng.random() < 0.5:
-                r.dot(x, int(r.h * 0.62), hair)
+                r.dot(x, line, hair)
+            if x in (0, 1, r.w - 2, r.w - 1):
+                r.rect(x, line, 1, 2, hair)
         for _ in range(10):
-            r.dot(int(rng.integers(0, r.w)), int(rng.integers(0, int(r.h * 0.6))), mul(hair, 1.35))
+            r.dot(int(rng.integers(0, r.w)), int(rng.integers(0, line)), mul(hair, 1.35))
 
 
 def ring_at(rings, z):
@@ -1200,7 +1205,7 @@ def make_specs():
         brow=col("#1E1612"), mouth=col("#7A4038"),
         extra_head=[head], extra_paint=[paint], extra_regions=[("hair_tie", 4, 4)],
         props={"head_top": 1.775,
-               "head": [(1.52, 0.052, 0.062, -0.014), (1.555, 0.079, 0.094, -0.005), (1.615, 0.096, 0.106, 0.0),
+               "head": [(1.52, 0.06, 0.072, -0.014), (1.555, 0.081, 0.096, -0.005), (1.615, 0.096, 0.106, 0.0),
                         (1.695, 0.098, 0.11, 0.004), (1.755, 0.08, 0.095, 0.006), (1.775, 0.05, 0.06, 0.006)],
                # slightly narrower shoulders and waist than the men
                "torso": [(z, hx * 0.94, hy * 0.97, cy) for z, hx, hy, cy in EMPLOYEE_PROPS["torso"]],
@@ -1272,7 +1277,7 @@ def manager_spec():
             "thigh_w": (0.094, 0.098, 0.078, 0.082),
             "shoulder": (0.215, 0.0, 1.40),
             "elbow": (0.27, 0.02, 1.14), "wrist": (0.285, 0.0, 0.89), "hand_end": (0.29, -0.005, 0.775),
-            "head": [(1.515, 0.072, 0.072, -0.016), (1.555, 0.097, 0.100, -0.006), (1.615, 0.103, 0.110, 0.0),
+            "head": [(1.515, 0.084, 0.084, -0.016), (1.555, 0.099, 0.102, -0.006), (1.615, 0.103, 0.110, 0.0),
                      (1.695, 0.100, 0.112, 0.004), (1.760, 0.084, 0.098, 0.008), (1.785, 0.055, 0.065, 0.008)],
             "sleeve_end": 0.70, "sleeve_w": (0.08, 0.084),
         },
@@ -1537,6 +1542,13 @@ def paint_monster_atlas(atlas, rng):
     atlas["m_mouth"].fill(MON["mouth"])
     atlas["m_mouth"].rect(0, 0, 8, 2, MON["lip_dark"])
     paint_monster_skin(atlas["m_skin"], rng, base=0.36)
+    # forearms and shins: mottled skin darkening into dirty, blood-dark hands and feet (no gore)
+    r = atlas["m_limb_low"]
+    paint_monster_skin(r, rng, base=0.40)
+    g = r.grad_y()[..., None]
+    v = r.view
+    v[:] = lerp(v, MON["blotch"][None, None, :], np.clip((g - 0.35) * 1.2, 0.0, 0.55))
+    v[:] = lerp(v, MON["finger"][None, None, :], np.clip((g - 0.7) * 2.0, 0.0, 0.6))
     r = atlas["m_belly"]
     paint_monster_skin(r, rng, base=0.2)
     v = r.view
@@ -1652,7 +1664,7 @@ def build_monster(scene):
         ("m_shirt_front", 32, 32), ("m_shirt_back", 32, 32), ("m_shirt_side", 16, 32), ("m_sleeve", 16, 16),
         ("m_shorts", 32, 16), ("m_shorts_leg", 16, 24), ("m_hand", 16, 24), ("m_claw", 8, 8),
         ("m_foot", 16, 16), ("m_ear_in", 16, 32), ("m_ear_out", 16, 32), ("m_badge", 24, 9),
-        ("m_badge_edge", 4, 4), ("m_collar", 16, 8),
+        ("m_badge_edge", 4, 4), ("m_collar", 16, 8), ("m_limb_low", 16, 24),
     ]
     atlas = Atlas("monster_tex", regions, 97)
     paint_monster_atlas(atlas, rng)
@@ -1745,7 +1757,7 @@ def build_monster(scene):
         # shin: knobbly knee to the raised heel
         B.loft([knee + Vector((0, -0.02, 0.03)), knee + (heel - knee) * 0.5, heel + Vector((0, 0.0, -0.02))],
                [sec_ellipse(0.08, 0.075, 7), sec_ellipse(0.062, 0.064, 7), sec_ellipse(0.054, 0.058, 7)],
-               "shin." + side, skin)
+               "shin." + side, {"all": "m_limb_low"})
         # long digitigrade foot: heel high, ball and splayed toes on the floor
         ball = Vector((toe.x, toe.y + 0.13, 0.045))
         B.loft([heel + Vector((0, 0.02, 0.02)), ball, Vector((toe.x, toe.y, 0.03)), Vector((toe.x, toe.y - 0.045, 0.02))],
@@ -1765,7 +1777,7 @@ def build_monster(scene):
         fd = (wr - el).normalized()
         B.loft([el - fd * 0.03, el + (wr - el) * 0.5, wr + fd * 0.02],
                [sec_ellipse(0.06, 0.06, 7), sec_ellipse(0.048, 0.046, 7), sec_ellipse(0.042, 0.038, 7)],
-               "forearm." + side, skin)
+               "forearm." + side, {"all": "m_limb_low"})
         # hand: palm facing back, long fingers fanned across the front view, claws hooking forward
         hd = (he - wr).normalized()
         M = align_matrix(hd, wr)
