@@ -17,6 +17,7 @@ const FLEE_SIGHT_RANGE := 15.0
 const FLEE_MAX_TIME := 15.0
 const PANIC_LINE_COOLDOWN := 20.0
 const REACH_DISTANCE := 2.5              ## close enough to a station to work it
+const UNREACHABLE_SKIP := 30.0           ## ignore a task it could not reach this long
 const ARRIVE_DISTANCE := 0.6
 const EYE_HEIGHT := 1.6
 const STEP_WALK := 1.0
@@ -45,6 +46,8 @@ var current_task: TaskData
 var rng := RandomNumberGenerator.new()
 
 var _timer := 0.0
+var _clock := 0.0
+var _skip_until := {}                    ## TaskData -> _clock time it may be tried again
 var _wander_left := 0.0
 var _chatter_left := 0.0
 var _panic_cooldown := 0.0
@@ -53,6 +56,8 @@ var _target := Vector3.ZERO
 var _speed := WALK_SPEED
 var _face_point: Variant = null
 var _yaw := 0.0
+var _stuck_time := 0.0
+var _stuck_check_pos := Vector3.ZERO
 var _step_distance := 0.0
 var _nav_ok := false
 var _model: Node3D
@@ -89,6 +94,7 @@ func _physics_process(delta: float) -> void:
 ## One AI step. Tests may turn physics processing off and call this directly.
 func tick(delta: float) -> void:
 	state_time += delta
+	_clock += delta
 	_panic_cooldown = maxf(_panic_cooldown - delta, 0.0)
 	_nav_ok = AiNav.is_ready(_agent.get_navigation_map(), global_position)
 	if state != FLEEING and _sees_true_monster():
@@ -116,6 +122,8 @@ func choose_task() -> TaskData:
 		if task == null or not task.is_open() or not is_instance_valid(task.station):
 			continue
 		if task.claimed_by != null and task.claimed_by != self and is_instance_valid(task.claimed_by):
+			continue
+		if _skip_until.get(task, 0.0) > _clock:
 			continue
 		var key := Vector2(0.0 if task.is_manager_task else 1.0, global_position.distance_to(_work_position(task)))
 		if key.x < best_key.x or (key.x == best_key.x and key.y < best_key.y):
@@ -189,6 +197,7 @@ func _tick_to_task(_delta: float) -> void:
 	if _flat_distance(global_position, _work_position(current_task)) <= REACH_DISTANCE:
 		_set_state(WORKING)
 	else:
+		_skip_until[current_task] = _clock + UNREACHABLE_SKIP
 		_drop_task()   # cannot reach it; let someone else try
 		_set_state(CHOOSE)
 		_timer = _roll(IDLE_RECHECK)
@@ -344,6 +353,7 @@ func _move(delta: float) -> void:
 	velocity.z = horizontal.z
 	velocity.y = 0.0 if is_on_floor() else velocity.y - GRAVITY * delta
 	move_and_slide()
+	_check_stuck(delta, horizontal)
 	var look := horizontal
 	if _face_point != null:
 		look = (_face_point as Vector3) - global_position
@@ -351,6 +361,20 @@ func _move(delta: float) -> void:
 	if look.length() > 0.01:
 		_yaw = lerp_angle(_yaw, atan2(look.x, look.z), clampf(TURN_SPEED * delta, 0.0, 1.0))
 		look_at(global_position + Vector3(sin(_yaw), 0.0, cos(_yaw)), Vector3.UP, true)
+
+
+## Gives up on a target it cannot make progress toward (treated as arrived).
+func _check_stuck(delta: float, horizontal: Vector3) -> void:
+	if horizontal.length() < 0.1:
+		_stuck_time = 0.0
+		_stuck_check_pos = global_position
+		return
+	_stuck_time += delta
+	if _stuck_time >= 2.0:
+		if global_position.distance_to(_stuck_check_pos) < 0.3:
+			_moving = false
+		_stuck_time = 0.0
+		_stuck_check_pos = global_position
 
 
 func _snap_to_nav(point: Vector3) -> Vector3:

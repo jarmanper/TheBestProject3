@@ -184,6 +184,8 @@ func test_winded_searches_when_player_out_of_sight() -> void:
 func test_sighting_staged_at_two_am_when_unsighted() -> void:
 	var player: Player = world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
 	var monster := _spawn_monster(Vector3(0, 0, 25))   # behind the player
+	for at in [Vector3(0, 0, -28), Vector3(15, 0, -15), Vector3(-15, 0, -15), Vector3(0, 0, 20)]:
+		world.add_marker(&"patrol_point", at)
 	world.bake_navigation()
 	await world.settle_navigation()
 	_set_hour(1)
@@ -200,9 +202,11 @@ func test_sighting_staged_at_two_am_when_unsighted() -> void:
 	await _run(monster, STEP)
 	assert_eq(events.count("sighted"), 1, "monster_sighted emitted")
 	assert_eq(GameState.stats.get("monster_sightings", 0), 1)
-	# Holds ~3 s, then walks out of view and goes back to roaming.
+	# Holds ~3 s, then walks out of view (away from the player) and goes back to roaming.
 	await _run(monster, 3.2)
 	assert_eq(monster._phase, 1, "leaving after the hold")
+	var flat := func(point: Vector3) -> float: return Vector2(point.x, point.z).length()
+	assert_true(flat.call(monster._target) > flat.call(monster.global_position), "walks away from the player")
 
 
 func test_no_staged_sighting_when_already_sighted() -> void:

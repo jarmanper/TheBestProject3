@@ -109,6 +109,24 @@ func test_works_hold_time_times_four_then_completes() -> void:
 	assert_eq(dale.current_task, null)
 
 
+func test_skips_a_task_it_cannot_reach() -> void:
+	var walled: TaskStation = world.add_station(Vector3(6, 0, 0), &"storage", "Behind walls")
+	for side in [Vector3(2.5, 1.5, 0), Vector3(-2.5, 1.5, 0)]:
+		world.add_box(Vector3(6, 0, 0) + side, Vector3(0.3, 3.0, 5.3))
+	for side in [Vector3(0, 1.5, 2.5), Vector3(0, 1.5, -2.5)]:
+		world.add_box(Vector3(6, 0, 0) + side, Vector3(5.3, 3.0, 0.3))
+	var open_station: TaskStation = world.add_station(Vector3(-10, 0, 0), &"produce", "In the open")
+	var walled_task: TaskData = source.add_task(walled, false)
+	var open_task: TaskData = source.add_task(open_station, false)
+	world.bake_navigation()
+	await world.settle_navigation()
+	var dale := _spawn("DALE", Vector3.ZERO)
+	assert_eq(dale.choose_task(), walled_task, "nearest first")
+	var took: float = await _run_until(dale, func() -> bool: return dale.current_task == open_task, 40.0)
+	assert_true(took > 0.0, "gave up on the walled-in task and took the other one")
+	assert_eq(walled_task.claimed_by, null, "released the claim")
+
+
 func test_drops_task_the_player_finished_first() -> void:
 	var station: TaskStation = world.add_station(Vector3(10, 0, 0), &"aisle_1", "Mop")
 	var task: TaskData = source.add_task(station, false)

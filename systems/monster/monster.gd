@@ -256,9 +256,10 @@ func try_mimic_lure() -> bool:
 	return true
 
 
-## Takes a coworker the player cannot see and who is far from the player.
+## Takes a coworker the player cannot see who is far from the player. Only an
+## unseen, roaming monster does it: it then stands in their place wearing their face.
 func try_abduction() -> bool:
-	if rules.abductions >= MAX_ABDUCTIONS:
+	if rules.abductions >= MAX_ABDUCTIONS or state != DISGUISED_ROAM or _in_view:
 		return false
 	var victims: Array[Coworker] = []
 	for node in get_tree().get_nodes_in_group(&"coworker"):
@@ -276,11 +277,9 @@ func try_abduction() -> bool:
 	_note_missing(victim_name)
 	Events.coworker_missing.emit(victim_name)
 	GameState.add_stat("coworkers_lost")
-	# It was there: when nobody can see either place, it takes the victim's place and face.
-	if state in CALM_STATES and not _in_view and not _is_visible_at(spot, HEIGHT_DISGUISED):
-		_set_disguise(_identity_for(victim_name))
-		_teleport(_snap_to_nav(spot))
-		_set_state(DISGUISED_ROAM)
+	_set_disguise(_identity_for(victim_name))
+	_teleport(_snap_to_nav(spot))
+	_set_state(DISGUISED_ROAM)
 	return true
 
 
@@ -383,9 +382,11 @@ func _tick_rules(delta: float) -> void:
 	# Rule 3: make sure the player has seen it at least once by the deadline.
 	if rules.should_stage_sighting(hour) and try_stage_sighting():
 		return
+	if state != DISGUISED_ROAM:
+		return
 	if rules.abduction_due() and not try_abduction():
 		rules.delay_abduction(ABDUCT_RETRY)
-	if state == DISGUISED_ROAM and rules.mimic_due():
+	elif rules.mimic_due():
 		if try_mimic_lure():
 			rules.mimic_done()
 		else:
@@ -699,7 +700,7 @@ func _tick_sighting(delta: float) -> void:
 
 
 func _leave_view() -> void:
-	var spot: Variant = _find_hidden_point()
+	var spot: Variant = _find_escape_point()
 	_go_to(spot if spot != null else _pick_far_point(), DISGUISED_SPEED)
 
 
@@ -779,17 +780,28 @@ func _pick_roam_point() -> Vector3:
 	return _snap_to_nav(global_position + _random_flat_dir() * 4.0)
 
 
-## A far place from the player (patrol points and zone centres), random among the farthest.
+## Retreat: a place far from the player, reached by heading away from them.
 func _pick_far_point() -> Vector3:
 	var from := _player.global_position if _player != null else global_position
-	var points := _candidate_points()
+	var points := _away_points()
 	if points.is_empty():
 		return _snap_to_nav(global_position + (global_position - from).normalized() * 10.0)
 	points.sort_custom(func(a: Vector3, b: Vector3) -> bool: return _flat_distance(a, from) > _flat_distance(b, from))
 	return _snap_to_nav(points[rng.randi() % mini(3, points.size())])
 
 
-## A place the player cannot see, preferring far from them. null if none.
+## Leaving a sighting: the nearest place the player cannot see, away from them. null if none.
+func _find_escape_point() -> Variant:
+	var points := _away_points()
+	points.sort_custom(func(a: Vector3, b: Vector3) -> bool: return _flat_distance(a, global_position) < _flat_distance(b, global_position))
+	for point in points:
+		var snapped := _snap_to_nav(point)
+		if _flat_distance(snapped, global_position) > 1.0 and not _is_visible_at(snapped, _height()):
+			return snapped
+	return null
+
+
+## A place the player cannot see, preferring far from them (teleport target). null if none.
 func _find_hidden_point() -> Variant:
 	var from := _player.global_position if _player != null else global_position
 	var points := _candidate_points()
@@ -799,6 +811,27 @@ func _find_hidden_point() -> Variant:
 		if not _is_visible_at(snapped, HEIGHT_TRUE):
 			return snapped
 	return null
+
+
+## Candidate places that lead away from the player: farther from them than the
+## monster is now and not in their direction (more than 60 degrees off it).
+func _away_points() -> Array[Vector3]:
+	var points := _candidate_points()
+	if _player == null:
+		return points
+	var to_player := _player.global_position - global_position
+	to_player.y = 0.0
+	var my_distance := to_player.length()
+	var away: Array[Vector3] = []
+	for point in points:
+		if _flat_distance(point, _player.global_position) <= my_distance:
+			continue
+		var to_point := point - global_position
+		to_point.y = 0.0
+		if my_distance > 0.1 and to_point.length() > 0.1 and to_point.normalized().dot(to_player / my_distance) > 0.5:
+			continue
+		away.append(point)
+	return away if not away.is_empty() else points
 
 
 func _find_lure_spot() -> Variant:
