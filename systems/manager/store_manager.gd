@@ -7,6 +7,10 @@ extends Node3D
 ## public so tests can fast-forward without waiting on real seconds, and
 ## `issue_bonus_task()` can be called directly to test task assignment itself.
 
+## PA voice plays from this many intercom speakers nearest the player (more = phasing echo).
+const PA_SPEAKER_COUNT := 2
+const PA_VOICE_DB := 2.0
+
 @export var welcome_delay := 6.0
 @export var min_first_bonus_delay := 50.0
 @export var max_first_bonus_delay := 70.0
@@ -146,11 +150,59 @@ func _pick_inactive_station() -> TaskStation:
 	return candidates[_rng.randi() % candidates.size()]
 
 
+## Chime, then the manager's spoken PA clip (VoiceLines) at the intercom speakers nearest the
+## player -- only a couple, so the same line does not echo/phase out of every ceiling speaker.
+## A line with no generated clip falls back to the generic intercom babble.
 func _announce(message: String, zone: StringName = &"") -> void:
 	Events.intercom_announced.emit(message, zone)
-	for speaker in get_tree().get_nodes_in_group(&"intercom_speaker"):
+	var speakers := _nearest_intercom_speakers(PA_SPEAKER_COUNT)
+	for speaker in speakers:
 		Sfx.play_at(&"intercom_chime", speaker.global_position)
-		Sfx.play_at(&"intercom_voice", speaker.global_position)
+	var clip := VoiceLines.get_stream("MANAGER", message, false, VoiceLines.INTERCOM)
+	if clip == null:
+		for speaker in speakers:
+			Sfx.play_at(&"intercom_voice", speaker.global_position)
+		return
+	var chime := Sfx.get_stream(&"intercom_chime")
+	var delay := chime.get_length() * 0.8 if chime else 0.0
+	var positions: Array[Vector3] = []
+	for speaker in speakers:
+		positions.append(speaker.global_position)
+	if delay > 0.0 and is_inside_tree():
+		await get_tree().create_timer(delay, false).timeout
+		if not is_inside_tree():
+			return
+	for at in positions:
+		_play_pa_clip(clip, at)
+
+
+func _nearest_intercom_speakers(count: int) -> Array[Node3D]:
+	var speakers: Array[Node3D] = []
+	for node in get_tree().get_nodes_in_group(&"intercom_speaker"):
+		if node is Node3D:
+			speakers.append(node)
+	var listener: Node3D = GameState.player if is_instance_valid(GameState.player) else null
+	if listener == null or not listener.is_inside_tree() or speakers.size() <= count:
+		return speakers.slice(0, count)
+	var from := listener.global_position
+	speakers.sort_custom(func(a: Node3D, b: Node3D) -> bool:
+		return a.global_position.distance_squared_to(from) < b.global_position.distance_squared_to(from))
+	return speakers.slice(0, count)
+
+
+func _play_pa_clip(clip: AudioStream, at: Vector3) -> void:
+	var parent: Node = GameState.world_root if is_instance_valid(GameState.world_root) else self
+	var player := AudioStreamPlayer3D.new()
+	player.name = "PAVoice"
+	player.stream = clip
+	player.bus = &"Voice"
+	player.volume_db = PA_VOICE_DB
+	player.unit_size = 6.0
+	player.max_distance = 40.0
+	parent.add_child(player)
+	player.global_position = at
+	player.finished.connect(player.queue_free)
+	player.play()
 
 
 func _walkie(message: String) -> void:
