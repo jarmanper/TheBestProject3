@@ -50,7 +50,8 @@ func start_night() -> void:
 	Events.hour_changed.emit(0)
 
 
-## Moves the clock forward. Ends the night at END_HOUR.
+## Moves the clock forward. Ends the night at END_HOUR as win or fired -- unless the player
+## is already dead (dying just before 6:00 AM): their death path ends it as &"dead".
 func advance(delta: float) -> void:
 	if not night_running:
 		return
@@ -59,8 +60,13 @@ func advance(delta: float) -> void:
 	if hour != _last_hour:
 		_last_hour = hour
 		Events.hour_changed.emit(hour)
-	if hour >= END_HOUR:
+	if hour >= END_HOUR and not is_player_dead():
 		end_night(&"win" if Tasks.all_required_done() else &"fired")
+
+
+## True when the registered player has died (Player.is_dead()).
+func is_player_dead() -> bool:
+	return is_instance_valid(player) and player.has_method(&"is_dead") and player.call(&"is_dead")
 
 
 func end_night(result: StringName) -> void:
