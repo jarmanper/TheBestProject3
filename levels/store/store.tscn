@@ -262,22 +262,22 @@ fog_mode = 1
 fog_light_color = Color(0.02, 0.026, 0.023, 1)
 fog_density = 1.0
 fog_sky_affect = 0.0
-fog_depth_curve = 1.6
+fog_depth_curve = 3.0
 fog_depth_begin = 3.0
 fog_depth_end = 26.0
 adjustment_enabled = true
 adjustment_contrast = 1.08
 adjustment_saturation = 0.9
 
-[node name="Store" type="Node3D" unique_id=1708935152]
+[node name="Store" type="Node3D" unique_id=1575824079]
 script = ExtResource("1_le6hp")
 
-[node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=1846685014]
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=404827751]
 navigation_mesh = ExtResource("2_ky6b0")
 
 [node name="StoreInterior" type="Node3D" parent="NavigationRegion3D" unique_id=1530898697 instance=ExtResource("3_kwlki")]
 
-[node name="Props" type="Node3D" parent="NavigationRegion3D" unique_id=1557647089]
+[node name="Props" type="Node3D" parent="NavigationRegion3D" unique_id=1574432112]
 
 [node name="TimeClock_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=849766789 instance=ExtResource("4_btbsq")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 7, 1.4, -9.1)
@@ -285,50 +285,50 @@ transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 7, 1
 [node name="BreakTable_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=565520106 instance=ExtResource("5_1agnc")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.6, 0, -14.6)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/BreakTable_1" unique_id=1883882740]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/BreakTable_1" unique_id=581273575]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/BreakTable_1/Body" unique_id=793790913]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/BreakTable_1/Body" unique_id=130025660]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.425, 0)
 shape = SubResource("BoxShape3D_8pnut")
 
 [node name="Chair_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1878419968 instance=ExtResource("6_oobse")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.1, 0, -15.35)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/Chair_1" unique_id=1916216208]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/Chair_1" unique_id=440806388]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/Chair_1/Body" unique_id=1210984403]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/Chair_1/Body" unique_id=1897882429]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4242354, -0.032194704)
 shape = SubResource("BoxShape3D_obw8n")
 
-[node name="Chair_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=350952254 instance=ExtResource("6_oobse")]
+[node name="Chair_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=383363480 instance=ExtResource("6_oobse")]
 transform = Transform3D(0.99026805, 0, -0.1391731, 0, 1, 0, 0.1391731, 0, 0.99026805, 7.1, 0, -15.3)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/Chair_2" unique_id=2059005481]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/Chair_2" unique_id=865352890]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/Chair_2/Body" unique_id=1860629312]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/Chair_2/Body" unique_id=216862901]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4242354, -0.032194704)
 shape = SubResource("BoxShape3D_1x5mi")
 
-[node name="Chair_3" type="Node3D" parent="NavigationRegion3D/Props" unique_id=29347182 instance=ExtResource("6_oobse")]
+[node name="Chair_3" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1193760533 instance=ExtResource("6_oobse")]
 transform = Transform3D(-0.99026805, 0, 0.13917318, 0, 1, 0, -0.13917318, 0, -0.99026805, 6.2, 0, -13.85)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/Chair_3" unique_id=1413979785]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/Chair_3" unique_id=1438859856]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/Chair_3/Body" unique_id=1917225563]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/Chair_3/Body" unique_id=411583299]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4242354, -0.032194704)
 shape = SubResource("BoxShape3D_in776")
 
-[node name="Chair_4" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1181480166 instance=ExtResource("6_oobse")]
+[node name="Chair_4" type="Node3D" parent="NavigationRegion3D/Props" unique_id=189142117 instance=ExtResource("6_oobse")]
 transform = Transform3D(-0.9396926, 0, -0.34202015, 0, 1, 0, 0.34202015, 0, -0.9396926, 7.25, 0, -13.7)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/Chair_4" unique_id=209031542]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/Chair_4" unique_id=1289136586]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/Chair_4/Body" unique_id=1931593677]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/Chair_4/Body" unique_id=1825729456]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4242354, -0.032194704)
 shape = SubResource("BoxShape3D_enf1o")
 
@@ -338,30 +338,30 @@ transform = Transform3D(0.81915206, 0, 0.57357645, 0, 1, 0, -0.57357645, 0, 0.81
 [node name="VendingMachine_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1006844863 instance=ExtResource("8_rntpi")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 9.5, 0, -13.2)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/VendingMachine_1" unique_id=1411390237]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/VendingMachine_1" unique_id=434672838]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/VendingMachine_1/Body" unique_id=79758995]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/VendingMachine_1/Body" unique_id=497674721]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.0150000155)
 shape = SubResource("BoxShape3D_baeg8")
 
 [node name="TrashBin_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1372088979 instance=ExtResource("9_5l7s0")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.8, 0, -9.45)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/TrashBin_1" unique_id=918759475]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/TrashBin_1" unique_id=115555851]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/TrashBin_1/Body" unique_id=112893161]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/TrashBin_1/Body" unique_id=661436367]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.37, 0)
 shape = SubResource("BoxShape3D_tgh0s")
 
 [node name="ManagerDesk_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1916200523 instance=ExtResource("10_q7mum")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 0, -13.95)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/ManagerDesk_1" unique_id=407946754]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/ManagerDesk_1" unique_id=1118331286]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/ManagerDesk_1/Body" unique_id=437591809]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/ManagerDesk_1/Body" unique_id=1591378218]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.380255, 0)
 shape = SubResource("BoxShape3D_m3lxq")
 
@@ -374,30 +374,30 @@ transform = Transform3D(-0.9659258, 0, -0.25881907, 0, 1, 0, 0.25881907, 0, -0.9
 [node name="OfficeChair_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=156253656 instance=ExtResource("13_q1knb")]
 transform = Transform3D(-0.76604444, 0, -0.64278764, 0, 1, 0, 0.64278764, 0, -0.76604444, 14.45, 0, -14.95)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/OfficeChair_1" unique_id=345560378]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/OfficeChair_1" unique_id=1772175587]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/OfficeChair_1/Body" unique_id=718367226]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/OfficeChair_1/Body" unique_id=2001011544]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5288066, -0.0658316)
 shape = SubResource("BoxShape3D_pxoux")
 
-[node name="TrashBin_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1784990948 instance=ExtResource("9_5l7s0")]
+[node name="TrashBin_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=962296844 instance=ExtResource("9_5l7s0")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.55, 0, -9.55)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/TrashBin_2" unique_id=1293065878]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/TrashBin_2" unique_id=1767751184]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/TrashBin_2/Body" unique_id=1936504217]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/TrashBin_2/Body" unique_id=1913239969]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.37, 0)
 shape = SubResource("BoxShape3D_qfolf")
 
 [node name="CardboardBoxA_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1424535352 instance=ExtResource("14_i8hg0")]
 transform = Transform3D(0.99026805, 0, 0.1391731, 0, 1, 0, -0.1391731, 0, 0.99026805, 10.5, 0, -15.6)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/CardboardBoxA_1" unique_id=2070246386]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/CardboardBoxA_1" unique_id=506830767]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/CardboardBoxA_1/Body" unique_id=825319395]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/CardboardBoxA_1/Body" unique_id=1641994664]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17, 0)
 shape = SubResource("BoxShape3D_qvs0h")
 
@@ -407,40 +407,40 @@ transform = Transform3D(0.9702957, 0, -0.2419219, 0, 1, 0, 0.2419219, 0, 0.97029
 [node name="Sink_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1276068452 instance=ExtResource("16_dmxms")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.7, 0, -15.75)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/Sink_1" unique_id=854671372]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/Sink_1" unique_id=1753823097]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/Sink_1/Body" unique_id=1675148308]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/Sink_1/Body" unique_id=317119157]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.575, 0)
 shape = SubResource("BoxShape3D_6g7nx")
 
 [node name="MopBucket_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1215152432 instance=ExtResource("17_fgga1")]
 transform = Transform3D(0.90630776, 0, 0.42261827, 0, 1, 0, -0.42261827, 0, 0.90630776, 17, 0, -15.35)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/MopBucket_1" unique_id=1693516004]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/MopBucket_1" unique_id=1805188053]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/MopBucket_1/Body" unique_id=806731776]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/MopBucket_1/Body" unique_id=1341448300]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.50779426, 0.0037499964)
 shape = SubResource("BoxShape3D_e7cnl")
 
 [node name="TrashBag_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1519852182 instance=ExtResource("18_0otd2")]
 transform = Transform3D(0.76604444, 0, 0.6427876, 0, 1, 0, -0.6427876, 0, 0.76604444, 19.55, 0, -9.6)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/TrashBag_1" unique_id=1571323435]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/TrashBag_1" unique_id=1176377884]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/TrashBag_1/Body" unique_id=1008686022]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/TrashBag_1/Body" unique_id=418861954]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.29999998, 0)
 shape = SubResource("BoxShape3D_wp60c")
 
 [node name="WetFloorSign_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=403340292 instance=ExtResource("19_miiun")]
 transform = Transform3D(0.9659258, 0, 0.25881904, 0, 1, 0, -0.25881904, 0, 0.9659258, 16.6, 0, -15.6)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/WetFloorSign_1" unique_id=546796564]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/WetFloorSign_1" unique_id=1395464173]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/WetFloorSign_1/Body" unique_id=495462687]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/WetFloorSign_1/Body" unique_id=1676642446]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.33151746, 0)
 shape = SubResource("BoxShape3D_5i7er")
 
@@ -450,214 +450,214 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -8.9)
 [node name="Baler_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1432148079 instance=ExtResource("21_pjptg")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -19.33, 0, -7.5)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/Baler_1" unique_id=990037447]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/Baler_1" unique_id=1946365890]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/Baler_1/Body" unique_id=131587825]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/Baler_1/Body" unique_id=16976298]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0.04249999)
 shape = SubResource("BoxShape3D_rlpit")
 
 [node name="ShoppingCart_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=2072183533 instance=ExtResource("22_jkx1u")]
 transform = Transform3D(-0.08715577, 0, 0.9961947, 0, 1, 0, -0.9961947, 0, -0.08715577, -13, 0, -6.55)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/ShoppingCart_1" unique_id=1151051463]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/ShoppingCart_1" unique_id=1239254722]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/ShoppingCart_1/Body" unique_id=535136565]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/ShoppingCart_1/Body" unique_id=262589933]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5085, -0.035000026)
 shape = SubResource("BoxShape3D_0siih")
 
-[node name="TrashBag_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=2141806103 instance=ExtResource("18_0otd2")]
+[node name="TrashBag_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1981087245 instance=ExtResource("18_0otd2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.2, 0, -6.42)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/TrashBag_2" unique_id=633473558]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/TrashBag_2" unique_id=1894627220]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/TrashBag_2/Body" unique_id=1141706537]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/TrashBag_2/Body" unique_id=1862197180]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.29999998, 0)
 shape = SubResource("BoxShape3D_bonb1")
 
-[node name="TrashBag_3" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1449779806 instance=ExtResource("18_0otd2")]
+[node name="TrashBag_3" type="Node3D" parent="NavigationRegion3D/Props" unique_id=790882121 instance=ExtResource("18_0otd2")]
 transform = Transform3D(0.34202015, 0, 0.9396926, 0, 1, 0, -0.9396926, 0, 0.34202015, -7.65, 0, -6.45)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/TrashBag_3" unique_id=858950422]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/TrashBag_3" unique_id=708915204]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/TrashBag_3/Body" unique_id=137893718]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/TrashBag_3/Body" unique_id=1085408391]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.29999998, 0)
 shape = SubResource("BoxShape3D_of84j")
 
 [node name="FlattenedBoxes_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=48264149 instance=ExtResource("23_i53od")]
 transform = Transform3D(0.99026805, 0, 0.1391731, 0, 1, 0, -0.1391731, 0, 0.99026805, 3.6, 0, -8.35)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/FlattenedBoxes_1" unique_id=1999756696]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/FlattenedBoxes_1" unique_id=1930883371]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/FlattenedBoxes_1/Body" unique_id=180178340]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/FlattenedBoxes_1/Body" unique_id=1214547148]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1967989, 0)
 shape = SubResource("BoxShape3D_486fo")
 
-[node name="ShoppingCart_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1471539377 instance=ExtResource("22_jkx1u")]
+[node name="ShoppingCart_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=439344784 instance=ExtResource("22_jkx1u")]
 transform = Transform3D(-0.034899462, 0, 0.99939084, 0, 1, 0, -0.99939084, 0, -0.034899462, -8.9, 0, -12.3)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/ShoppingCart_2" unique_id=657878795]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/ShoppingCart_2" unique_id=1672517015]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/ShoppingCart_2/Body" unique_id=1280642660]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/ShoppingCart_2/Body" unique_id=1024166088]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5085, -0.035000026)
 shape = SubResource("BoxShape3D_4vaca")
 
-[node name="ShoppingCart_3" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1342118728 instance=ExtResource("22_jkx1u")]
+[node name="ShoppingCart_3" type="Node3D" parent="NavigationRegion3D/Props" unique_id=301587185 instance=ExtResource("22_jkx1u")]
 transform = Transform3D(0.2419219, 0, 0.9702957, 0, 1, 0, -0.9702957, 0, 0.2419219, -15.4, 0, -12.35)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/ShoppingCart_3" unique_id=1837460138]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/ShoppingCart_3" unique_id=1709045279]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/ShoppingCart_3/Body" unique_id=1440487600]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/ShoppingCart_3/Body" unique_id=1826444762]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5085, -0.035000026)
 shape = SubResource("BoxShape3D_gfpgn")
 
 [node name="CardboardBoxB_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1228329231 instance=ExtResource("24_63uyr")]
 transform = Transform3D(0.9396926, 0, 0.34202012, 0, 1, 0, -0.34202012, 0, 0.9396926, -13.9, 0, -13.75)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/CardboardBoxB_1" unique_id=1048351818]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/CardboardBoxB_1" unique_id=1248998893]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/CardboardBoxB_1/Body" unique_id=100964902]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/CardboardBoxB_1/Body" unique_id=1004105374]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.05606094, 0.35590726, 0.010672271)
 shape = SubResource("BoxShape3D_25di7")
 
-[node name="CardboardBoxA_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1805318279 instance=ExtResource("14_i8hg0")]
+[node name="CardboardBoxA_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=818302064 instance=ExtResource("14_i8hg0")]
 transform = Transform3D(0.9848077, 0, -0.17364818, 0, 1, 0, 0.17364818, 0, 0.9848077, -14.55, 0, -13.8)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/CardboardBoxA_2" unique_id=1348281182]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/CardboardBoxA_2" unique_id=291670383]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/CardboardBoxA_2/Body" unique_id=961331604]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/CardboardBoxA_2/Body" unique_id=1372231825]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17, 0)
 shape = SubResource("BoxShape3D_jqnk5")
 
-[node name="CardboardBoxA_3" type="Node3D" parent="NavigationRegion3D/Props" unique_id=37262477 instance=ExtResource("14_i8hg0")]
+[node name="CardboardBoxA_3" type="Node3D" parent="NavigationRegion3D/Props" unique_id=21347404 instance=ExtResource("14_i8hg0")]
 transform = Transform3D(0.90630776, 0, 0.42261827, 0, 1, 0, -0.42261827, 0, 0.90630776, -14.5, 0.34, -13.78)
 
 [node name="NewspaperDebris_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=335172248 instance=ExtResource("25_iywig")]
 transform = Transform3D(0.8660254, 0, 0.5, 0, 1, 0, -0.5, 0, 0.8660254, -11.6, 0, -13)
 
-[node name="NewspaperDebris_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1309491758 instance=ExtResource("25_iywig")]
+[node name="NewspaperDebris_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1268145799 instance=ExtResource("25_iywig")]
 transform = Transform3D(0.76604444, 0, -0.6427876, 0, 1, 0, 0.6427876, 0, 0.76604444, -7.4, 0, -13.4)
 
-[node name="FlattenedBoxes_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1082973696 instance=ExtResource("23_i53od")]
+[node name="FlattenedBoxes_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=2079949775 instance=ExtResource("23_i53od")]
 transform = Transform3D(0.9659258, 0, -0.25881904, 0, 1, 0, 0.25881904, 0, 0.9659258, -16.7, 0, -13.55)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/FlattenedBoxes_2" unique_id=800552974]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/FlattenedBoxes_2" unique_id=876093274]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/FlattenedBoxes_2/Body" unique_id=2113772398]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/FlattenedBoxes_2/Body" unique_id=158171564]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1967989, 0)
 shape = SubResource("BoxShape3D_q1uh0")
 
 [node name="PalletBoxes_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1441068680 instance=ExtResource("26_5elds")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.42, 0, -15.35)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/PalletBoxes_1" unique_id=425291233]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/PalletBoxes_1" unique_id=2059643499]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/PalletBoxes_1/Body" unique_id=253710317]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/PalletBoxes_1/Body" unique_id=1289007289]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.63699996, 0)
 shape = SubResource("BoxShape3D_4ac5m")
 
-[node name="TrashBag_4" type="Node3D" parent="NavigationRegion3D/Props" unique_id=243369122 instance=ExtResource("18_0otd2")]
+[node name="TrashBag_4" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1672192527 instance=ExtResource("18_0otd2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.9, 0, -9.5)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/TrashBag_4" unique_id=57573697]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/TrashBag_4" unique_id=952104712]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/TrashBag_4/Body" unique_id=1300139137]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/TrashBag_4/Body" unique_id=1107216394]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.29999998, 0)
 shape = SubResource("BoxShape3D_ig1o0")
 
-[node name="TrashBag_5" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1532060011 instance=ExtResource("18_0otd2")]
+[node name="TrashBag_5" type="Node3D" parent="NavigationRegion3D/Props" unique_id=158253389 instance=ExtResource("18_0otd2")]
 transform = Transform3D(-0.50000006, 0, 0.8660254, 0, 1, 0, -0.8660254, 0, -0.50000006, 1.4, 0, -9.5)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/TrashBag_5" unique_id=327252589]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/TrashBag_5" unique_id=257595616]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/TrashBag_5/Body" unique_id=1282982167]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/TrashBag_5/Body" unique_id=640323498]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.29999998, 0)
 shape = SubResource("BoxShape3D_wbj8m")
 
-[node name="ShoppingCart_4" type="Node3D" parent="NavigationRegion3D/Props" unique_id=35769610 instance=ExtResource("22_jkx1u")]
+[node name="ShoppingCart_4" type="Node3D" parent="NavigationRegion3D/Props" unique_id=224943172 instance=ExtResource("22_jkx1u")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2.75, 0, 15)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/ShoppingCart_4" unique_id=336789987]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/ShoppingCart_4" unique_id=904356192]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/ShoppingCart_4/Body" unique_id=1042459498]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/ShoppingCart_4/Body" unique_id=1727188381]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5085, -0.035000026)
 shape = SubResource("BoxShape3D_sq8yg")
 
-[node name="ShoppingCart_5" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1004656214 instance=ExtResource("22_jkx1u")]
+[node name="ShoppingCart_5" type="Node3D" parent="NavigationRegion3D/Props" unique_id=965497325 instance=ExtResource("22_jkx1u")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 3.15, 0, 15)
 
-[node name="ShoppingCart_6" type="Node3D" parent="NavigationRegion3D/Props" unique_id=460845206 instance=ExtResource("22_jkx1u")]
+[node name="ShoppingCart_6" type="Node3D" parent="NavigationRegion3D/Props" unique_id=384383313 instance=ExtResource("22_jkx1u")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 3.55, 0, 15)
 
-[node name="ShoppingCart_7" type="Node3D" parent="NavigationRegion3D/Props" unique_id=465783460 instance=ExtResource("22_jkx1u")]
+[node name="ShoppingCart_7" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1962367254 instance=ExtResource("22_jkx1u")]
 transform = Transform3D(-0.76604444, 0, 0.64278764, 0, 1, 0, -0.64278764, 0, -0.76604444, -17.5, 0, 9)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/ShoppingCart_7" unique_id=1383994237]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/ShoppingCart_7" unique_id=112155080]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/ShoppingCart_7/Body" unique_id=1120619224]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/ShoppingCart_7/Body" unique_id=794516492]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5085, -0.035000026)
 shape = SubResource("BoxShape3D_aqjtx")
 
-[node name="CardboardBoxA_4" type="Node3D" parent="NavigationRegion3D/Props" unique_id=114357314 instance=ExtResource("14_i8hg0")]
+[node name="CardboardBoxA_4" type="Node3D" parent="NavigationRegion3D/Props" unique_id=109253854 instance=ExtResource("14_i8hg0")]
 transform = Transform3D(0.9659258, 0, 0.25881904, 0, 1, 0, -0.25881904, 0, 0.9659258, 1.4, 0, 7.9)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/CardboardBoxA_4" unique_id=907192751]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/CardboardBoxA_4" unique_id=913696445]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/CardboardBoxA_4/Body" unique_id=1440757646]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/CardboardBoxA_4/Body" unique_id=1497203680]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17, 0)
 shape = SubResource("BoxShape3D_abthc")
 
-[node name="CardboardBoxB_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=669449418 instance=ExtResource("24_63uyr")]
+[node name="CardboardBoxB_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1417949095 instance=ExtResource("24_63uyr")]
 transform = Transform3D(0.8660254, 0, -0.5, 0, 1, 0, 0.5, 0, 0.8660254, -17.9, 0, 7.6)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/CardboardBoxB_2" unique_id=942902278]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/CardboardBoxB_2" unique_id=1025645501]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/CardboardBoxB_2/Body" unique_id=112101821]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/CardboardBoxB_2/Body" unique_id=1935480823]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.05606094, 0.35590726, 0.010672271)
 shape = SubResource("BoxShape3D_ed07p")
 
-[node name="CardboardBoxC_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=651706483 instance=ExtResource("15_78syq")]
+[node name="CardboardBoxC_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1671075941 instance=ExtResource("15_78syq")]
 transform = Transform3D(0.9961947, 0, 0.08715574, 0, 1, 0, -0.08715574, 0, 0.9961947, 5.4, 0, -4.9)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/CardboardBoxC_2" unique_id=1976623744]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/CardboardBoxC_2" unique_id=790086044]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/CardboardBoxC_2/Body" unique_id=531605351]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/CardboardBoxC_2/Body" unique_id=1403427063]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.007844001, 0.21978825, -1.4901161e-08)
 shape = SubResource("BoxShape3D_wgflv")
 
-[node name="WetFloorSign_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=935912616 instance=ExtResource("19_miiun")]
+[node name="WetFloorSign_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1745419261 instance=ExtResource("19_miiun")]
 transform = Transform3D(0.8660254, 0, 0.5, 0, 1, 0, -0.5, 0, 0.8660254, -9.9, 0, 7.7)
 
-[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/WetFloorSign_2" unique_id=1900955076]
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/WetFloorSign_2" unique_id=2065069973]
 collision_mask = 0
 
-[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/WetFloorSign_2/Body" unique_id=844603834]
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/WetFloorSign_2/Body" unique_id=1184565340]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.33151746, 0)
 shape = SubResource("BoxShape3D_r7xaw")
 
-[node name="NewspaperDebris_3" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1305654283 instance=ExtResource("25_iywig")]
+[node name="NewspaperDebris_3" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1364209940 instance=ExtResource("25_iywig")]
 transform = Transform3D(0.25881907, 0, 0.9659258, 0, 1, 0, -0.9659258, 0, 0.25881907, -2.2, 0, -2.2)
 
-[node name="Tools" type="Node3D" parent="NavigationRegion3D" unique_id=1958428907]
+[node name="Tools" type="Node3D" parent="NavigationRegion3D" unique_id=901422043]
 
-[node name="Rack_mop" type="Area3D" parent="NavigationRegion3D/Tools" unique_id=469158677 instance=ExtResource("27_gc510")]
+[node name="Rack_mop" type="Area3D" parent="NavigationRegion3D/Tools" unique_id=334421733 instance=ExtResource("27_gc510")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 19.98, 1.35, -12.6)
 collision_layer = 16
 collision_mask = 0
@@ -665,7 +665,7 @@ monitoring = false
 script = ExtResource("28_e6scn")
 tool_id = &"mop"
 
-[node name="Rack_price_gun" type="Area3D" parent="NavigationRegion3D/Tools" unique_id=1941581943 instance=ExtResource("29_cpr7f")]
+[node name="Rack_price_gun" type="Area3D" parent="NavigationRegion3D/Tools" unique_id=1256944120 instance=ExtResource("29_cpr7f")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 13.2, 1.05, 12.42)
 collision_layer = 16
 collision_mask = 0
@@ -673,7 +673,7 @@ monitoring = false
 script = ExtResource("28_e6scn")
 tool_id = &"price_gun"
 
-[node name="Rack_box_cutter" type="Area3D" parent="NavigationRegion3D/Tools" unique_id=1696343923 instance=ExtResource("30_ysvom")]
+[node name="Rack_box_cutter" type="Area3D" parent="NavigationRegion3D/Tools" unique_id=92368871 instance=ExtResource("30_ysvom")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 1.9, 1.25, -12.7)
 collision_layer = 16
 collision_mask = 0
@@ -681,7 +681,7 @@ monitoring = false
 script = ExtResource("28_e6scn")
 tool_id = &"box_cutter"
 
-[node name="Rack_stock_box" type="Area3D" parent="NavigationRegion3D/Tools" unique_id=1339007598 instance=ExtResource("31_bueu1")]
+[node name="Rack_stock_box" type="Area3D" parent="NavigationRegion3D/Tools" unique_id=1280875667 instance=ExtResource("31_bueu1")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 1.666, 0, -10.55)
 collision_layer = 16
 collision_mask = 0
@@ -689,7 +689,7 @@ monitoring = false
 script = ExtResource("28_e6scn")
 tool_id = &"stock_box"
 
-[node name="Rack_keys" type="Area3D" parent="NavigationRegion3D/Tools" unique_id=1721506384 instance=ExtResource("32_xqw2v")]
+[node name="Rack_keys" type="Area3D" parent="NavigationRegion3D/Tools" unique_id=940101267 instance=ExtResource("32_xqw2v")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10.1, 1.45, -11.2)
 collision_layer = 16
 collision_mask = 0
@@ -697,9 +697,9 @@ monitoring = false
 script = ExtResource("28_e6scn")
 tool_id = &"keys"
 
-[node name="HidingSpots" type="Node3D" parent="NavigationRegion3D" unique_id=508142410]
+[node name="HidingSpots" type="Node3D" parent="NavigationRegion3D" unique_id=773017478]
 
-[node name="Hide_locker_1" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=2015818975 instance=ExtResource("33_lo573")]
+[node name="Hide_locker_1" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=2043326318 instance=ExtResource("33_lo573")]
 editor_description = "Origin at the locker's floor centre, door toward +Z. The locker.glb model carries the hinged Door the spot swings open."
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2.37, 0, -10.35)
 collision_layer = 16
@@ -707,7 +707,7 @@ collision_mask = 0
 monitoring = false
 script = ExtResource("34_rnqhq")
 
-[node name="Hide_locker_2" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=1207975893 instance=ExtResource("33_lo573")]
+[node name="Hide_locker_2" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=415811868 instance=ExtResource("33_lo573")]
 editor_description = "Origin at the locker's floor centre, door toward +Z. The locker.glb model carries the hinged Door the spot swings open."
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2.37, 0, -10.88)
 collision_layer = 16
@@ -715,7 +715,7 @@ collision_mask = 0
 monitoring = false
 script = ExtResource("34_rnqhq")
 
-[node name="Hide_locker_3" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=422406824 instance=ExtResource("33_lo573")]
+[node name="Hide_locker_3" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=1193304785 instance=ExtResource("33_lo573")]
 editor_description = "Origin at the locker's floor centre, door toward +Z. The locker.glb model carries the hinged Door the spot swings open."
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2.37, 0, -11.41)
 collision_layer = 16
@@ -723,7 +723,7 @@ collision_mask = 0
 monitoring = false
 script = ExtResource("34_rnqhq")
 
-[node name="Hide_boxes_1" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=1681824963 instance=ExtResource("35_nabra")]
+[node name="Hide_boxes_1" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=1898343342 instance=ExtResource("35_nabra")]
 editor_description = "Origin at the floor centre of the pile; the crouch nook (x -0.42..0.42, z -0.40..0.38, 0.96 m high) opens toward +Z."
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.4, 0, -14.55)
 collision_layer = 16
@@ -732,7 +732,7 @@ monitoring = false
 script = ExtResource("34_rnqhq")
 spot_kind = &"boxes"
 
-[node name="Hide_boxes_2" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=673174631 instance=ExtResource("35_nabra")]
+[node name="Hide_boxes_2" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=501036097 instance=ExtResource("35_nabra")]
 editor_description = "Origin at the floor centre of the pile; the crouch nook (x -0.42..0.42, z -0.40..0.38, 0.96 m high) opens toward +Z."
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.2, 0, -10.2)
 collision_layer = 16
@@ -741,7 +741,7 @@ monitoring = false
 script = ExtResource("34_rnqhq")
 spot_kind = &"boxes"
 
-[node name="Hide_counter_1" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=1955640246 instance=ExtResource("36_eyt32")]
+[node name="Hide_counter_1" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=918110890 instance=ExtResource("36_eyt32")]
 editor_description = "A crouch spot inside an existing counter: put the origin at the floor centre of the cavity with +Z pointing out of its opening. The counter itself belongs to the level art."
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -11.95, 0, 11.8)
 collision_layer = 16
@@ -750,7 +750,7 @@ monitoring = false
 script = ExtResource("34_rnqhq")
 spot_kind = &"counter"
 
-[node name="Hide_counter_2" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=613240046 instance=ExtResource("36_eyt32")]
+[node name="Hide_counter_2" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=1091030507 instance=ExtResource("36_eyt32")]
 editor_description = "A crouch spot inside an existing counter: put the origin at the floor centre of the cavity with +Z pointing out of its opening. The counter itself belongs to the level art."
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -6.95, 0, 11.8)
 collision_layer = 16
@@ -759,7 +759,7 @@ monitoring = false
 script = ExtResource("34_rnqhq")
 spot_kind = &"counter"
 
-[node name="Hide_counter_3" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=30086459 instance=ExtResource("36_eyt32")]
+[node name="Hide_counter_3" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=1114256833 instance=ExtResource("36_eyt32")]
 editor_description = "A crouch spot inside an existing counter: put the origin at the floor centre of the cavity with +Z pointing out of its opening. The counter itself belongs to the level art."
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.95, 0, 11.8)
 collision_layer = 16
@@ -768,7 +768,7 @@ monitoring = false
 script = ExtResource("34_rnqhq")
 spot_kind = &"counter"
 
-[node name="Hide_counter_4" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=1355982834 instance=ExtResource("36_eyt32")]
+[node name="Hide_counter_4" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=1321218971 instance=ExtResource("36_eyt32")]
 editor_description = "A crouch spot inside an existing counter: put the origin at the floor centre of the cavity with +Z pointing out of its opening. The counter itself belongs to the level art."
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.6, 0, 12.5)
 collision_layer = 16
@@ -777,9 +777,9 @@ monitoring = false
 script = ExtResource("34_rnqhq")
 spot_kind = &"counter"
 
-[node name="Stations" type="Node3D" parent="NavigationRegion3D" unique_id=2115448046]
+[node name="Stations" type="Node3D" parent="NavigationRegion3D" unique_id=2076024338]
 
-[node name="Station_mop_spill_aisle_3" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=2066119517 instance=ExtResource("37_51jo5")]
+[node name="Station_mop_spill_aisle_3" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=89740583 instance=ExtResource("37_51jo5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 1)
 collision_layer = 16
 collision_mask = 0
@@ -792,7 +792,7 @@ required_tool = &"mop"
 manager_line = "Clean up on aisle three, someone's going to slip."
 hold_time = 4.0
 
-[node name="Station_mop_spill_produce" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=1625985961 instance=ExtResource("37_51jo5")]
+[node name="Station_mop_spill_produce" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=1932693834 instance=ExtResource("37_51jo5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 0)
 collision_layer = 16
 collision_mask = 0
@@ -805,7 +805,7 @@ required_tool = &"mop"
 manager_line = "There's a spill out by produce, grab the mop."
 hold_time = 4.0
 
-[node name="Station_restock_aisle_2" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=1454403221 instance=ExtResource("39_td5df")]
+[node name="Station_restock_aisle_2" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=181946237 instance=ExtResource("39_td5df")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -11.3, 0, 4)
 collision_layer = 16
 collision_mask = 0
@@ -818,7 +818,7 @@ required_tool = &"stock_box"
 manager_line = "Aisle two is looking bare, bring out a box."
 hold_time = 3.5
 
-[node name="Station_restock_aisle_4" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=392493052 instance=ExtResource("39_td5df")]
+[node name="Station_restock_aisle_4" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=1191930919 instance=ExtResource("39_td5df")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -0.7, 0, 0.5)
 collision_layer = 16
 collision_mask = 0
@@ -831,7 +831,7 @@ required_tool = &"stock_box"
 manager_line = "Aisle four needs restocking when you get a chance."
 hold_time = 3.5
 
-[node name="Station_face_shelf_aisle_1" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=1656079848 instance=ExtResource("40_2wywd")]
+[node name="Station_face_shelf_aisle_1" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=1547209288 instance=ExtResource("40_2wywd")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -15.3, 0, 2)
 collision_layer = 16
 collision_mask = 0
@@ -843,7 +843,7 @@ title = "Face the shelves in Aisle 1"
 manager_line = "Aisle one's a mess, square it away."
 hold_time = 3.0
 
-[node name="Station_register_checkout" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=1869805977 instance=ExtResource("41_foxcb")]
+[node name="Station_register_checkout" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=1269497755 instance=ExtResource("41_foxcb")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -11.55, 0, 12.8)
 collision_layer = 16
 collision_mask = 0
@@ -855,7 +855,7 @@ title = "Count Register 1"
 manager_line = "Register one needs to be counted out."
 hold_time = 4.0
 
-[node name="@Area3D@3" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=423949453 instance=ExtResource("41_foxcb")]
+[node name="@Area3D@3" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=1670642721 instance=ExtResource("41_foxcb")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -6.55, 0, 12.8)
 collision_layer = 16
 collision_mask = 0
@@ -867,7 +867,7 @@ title = "Count Register 2"
 manager_line = "Register two still needs counting."
 hold_time = 4.0
 
-[node name="Station_price_update_dairy" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=345300042 instance=ExtResource("42_k20a3")]
+[node name="Station_price_update_dairy" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=567440869 instance=ExtResource("42_k20a3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -5.05)
 collision_layer = 16
 collision_mask = 0
@@ -880,7 +880,7 @@ required_tool = &"price_gun"
 manager_line = "Dairy prices changed, re-tag the shelf labels."
 hold_time = 3.0
 
-[node name="Station_freezer_log_frozen" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=1780976182 instance=ExtResource("43_ljhi0")]
+[node name="Station_freezer_log_frozen" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=146360990 instance=ExtResource("43_ljhi0")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -19.2, 0, 2)
 collision_layer = 16
 collision_mask = 0
@@ -892,7 +892,7 @@ title = "Log the freezer temperature"
 manager_line = "Don't forget the freezer temperature log."
 hold_time = 3.0
 
-[node name="Station_boxes_storage" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=833254672 instance=ExtResource("44_s2pyp")]
+[node name="Station_boxes_storage" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=1432384258 instance=ExtResource("44_s2pyp")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -2.6, 0, -12)
 collision_layer = 16
 collision_mask = 0
@@ -905,7 +905,7 @@ required_tool = &"box_cutter"
 manager_line = "Storage room's piling up, break those boxes down."
 hold_time = 4.0
 
-[node name="Station_trash_break_room" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=1450482673 instance=ExtResource("45_rmsme")]
+[node name="Station_trash_break_room" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=1012945208 instance=ExtResource("45_rmsme")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 9.4, 0, -9.6)
 collision_layer = 16
 collision_mask = 0
@@ -917,7 +917,7 @@ title = "Empty the break room trash"
 manager_line = "Break room trash is overflowing again."
 hold_time = 3.0
 
-[node name="Station_breaker_hallway" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=1581228046 instance=ExtResource("46_gcw8u")]
+[node name="Station_breaker_hallway" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=525505278 instance=ExtResource("46_gcw8u")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -8.9)
 collision_layer = 16
 collision_mask = 0
@@ -931,7 +931,7 @@ basic_task = false
 manager_line = "The breaker tripped, go reset it before we lose the lights."
 hold_time = 5.0
 
-[node name="Station_safe_service_desk" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=279344634 instance=ExtResource("47_2vgj8")]
+[node name="Station_safe_service_desk" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=618099341 instance=ExtResource("47_2vgj8")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 13.4, 0, 15.1)
 collision_layer = 16
 collision_mask = 0
@@ -945,229 +945,229 @@ basic_task = false
 manager_line = "Lock up the safe at the service desk before it's too late."
 hold_time = 5.0
 
-[node name="Zones" type="Node3D" parent="." unique_id=460788735]
+[node name="Zones" type="Node3D" parent="." unique_id=2044934395]
 
-[node name="Zone_aisle_1" type="Area3D" parent="Zones" unique_id=138048162]
+[node name="Zone_aisle_1" type="Area3D" parent="Zones" unique_id=212293711]
 script = ExtResource("48_bwngl")
 zone_id = &"aisle_1"
 display_name = "Aisle 1"
 
-[node name="Box" type="CollisionShape3D" parent="Zones/Zone_aisle_1" unique_id=1076027713]
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_aisle_1" unique_id=110365463]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 2, 2)
 shape = SubResource("BoxShape3D_5y5th")
 
-[node name="Zone_aisle_2" type="Area3D" parent="Zones" unique_id=48651342]
+[node name="Zone_aisle_2" type="Area3D" parent="Zones" unique_id=1112642276]
 script = ExtResource("48_bwngl")
 zone_id = &"aisle_2"
 display_name = "Aisle 2"
 
-[node name="Box" type="CollisionShape3D" parent="Zones/Zone_aisle_2" unique_id=836618871]
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_aisle_2" unique_id=1710276615]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 2, 2)
 shape = SubResource("BoxShape3D_l4pxs")
 
-[node name="Zone_aisle_3" type="Area3D" parent="Zones" unique_id=1215260048]
+[node name="Zone_aisle_3" type="Area3D" parent="Zones" unique_id=1621365436]
 script = ExtResource("48_bwngl")
 zone_id = &"aisle_3"
 display_name = "Aisle 3"
 
-[node name="Box" type="CollisionShape3D" parent="Zones/Zone_aisle_3" unique_id=693982209]
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_aisle_3" unique_id=142327761]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 2, 2)
 shape = SubResource("BoxShape3D_gf7uv")
 
-[node name="Zone_aisle_4" type="Area3D" parent="Zones" unique_id=739575517]
+[node name="Zone_aisle_4" type="Area3D" parent="Zones" unique_id=91378394]
 script = ExtResource("48_bwngl")
 zone_id = &"aisle_4"
 display_name = "Aisle 4"
 
-[node name="Box" type="CollisionShape3D" parent="Zones/Zone_aisle_4" unique_id=365704886]
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_aisle_4" unique_id=1859676183]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 2)
 shape = SubResource("BoxShape3D_jnftd")
 
-[node name="Zone_dairy" type="Area3D" parent="Zones" unique_id=758937966]
+[node name="Zone_dairy" type="Area3D" parent="Zones" unique_id=2085590711]
 script = ExtResource("48_bwngl")
 zone_id = &"dairy"
 display_name = "Dairy"
 
-[node name="Box" type="CollisionShape3D" parent="Zones/Zone_dairy" unique_id=1873211331]
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_dairy" unique_id=1364369819]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 2, -4.5)
 shape = SubResource("BoxShape3D_58udc")
 
-[node name="Zone_frozen" type="Area3D" parent="Zones" unique_id=736105997]
+[node name="Zone_frozen" type="Area3D" parent="Zones" unique_id=1416766607]
 script = ExtResource("48_bwngl")
 zone_id = &"frozen"
 display_name = "Frozen Foods"
 
-[node name="Box" type="CollisionShape3D" parent="Zones/Zone_frozen" unique_id=506716905]
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_frozen" unique_id=482124117]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.3, 2, 2)
 shape = SubResource("BoxShape3D_3s1ts")
 
-[node name="Zone_produce" type="Area3D" parent="Zones" unique_id=1055786611]
+[node name="Zone_produce" type="Area3D" parent="Zones" unique_id=1058594315]
 script = ExtResource("48_bwngl")
 zone_id = &"produce"
 display_name = "Produce"
 
-[node name="Box" type="CollisionShape3D" parent="Zones/Zone_produce" unique_id=1505702913]
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_produce" unique_id=992126304]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 2, 1.5)
 shape = SubResource("BoxShape3D_aq0mg")
 
-[node name="Zone_checkout" type="Area3D" parent="Zones" unique_id=491386467]
+[node name="Zone_checkout" type="Area3D" parent="Zones" unique_id=1647374308]
 script = ExtResource("48_bwngl")
 zone_id = &"checkout"
 display_name = "Checkout"
 
-[node name="Box" type="CollisionShape3D" parent="Zones/Zone_checkout" unique_id=749558193]
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_checkout" unique_id=385764192]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 2, 11.5)
 shape = SubResource("BoxShape3D_dxn2v")
 
-[node name="Zone_service_desk" type="Area3D" parent="Zones" unique_id=376263140]
+[node name="Zone_service_desk" type="Area3D" parent="Zones" unique_id=1225205317]
 script = ExtResource("48_bwngl")
 zone_id = &"service_desk"
 display_name = "Customer Service"
 
-[node name="Box" type="CollisionShape3D" parent="Zones/Zone_service_desk" unique_id=578706482]
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_service_desk" unique_id=210023183]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 2, 12.5)
 shape = SubResource("BoxShape3D_lbuuj")
 
-[node name="Zone_hallway" type="Area3D" parent="Zones" unique_id=661822416]
+[node name="Zone_hallway" type="Area3D" parent="Zones" unique_id=448774209]
 script = ExtResource("48_bwngl")
 zone_id = &"hallway"
 display_name = "Back Hallway"
 
-[node name="Box" type="CollisionShape3D" parent="Zones/Zone_hallway" unique_id=1838292153]
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_hallway" unique_id=2129338365]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -7.5)
 shape = SubResource("BoxShape3D_r0vqf")
 
-[node name="Zone_storage" type="Area3D" parent="Zones" unique_id=2003702710]
+[node name="Zone_storage" type="Area3D" parent="Zones" unique_id=2081797655]
 script = ExtResource("48_bwngl")
 zone_id = &"storage"
 display_name = "Storage Room"
 
-[node name="Box" type="CollisionShape3D" parent="Zones/Zone_storage" unique_id=1330712792]
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_storage" unique_id=998756306]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 1.5, -12.5)
 shape = SubResource("BoxShape3D_hdf4j")
 
-[node name="Zone_break_room" type="Area3D" parent="Zones" unique_id=561590906]
+[node name="Zone_break_room" type="Area3D" parent="Zones" unique_id=459553312]
 script = ExtResource("48_bwngl")
 zone_id = &"break_room"
 display_name = "Break Room"
 
-[node name="Box" type="CollisionShape3D" parent="Zones/Zone_break_room" unique_id=155044065]
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_break_room" unique_id=1402333574]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 1.5, -12.5)
 shape = SubResource("BoxShape3D_1uew6")
 
-[node name="Zone_office" type="Area3D" parent="Zones" unique_id=1261394494]
+[node name="Zone_office" type="Area3D" parent="Zones" unique_id=1602966924]
 script = ExtResource("48_bwngl")
 zone_id = &"office"
 display_name = "Manager's Office"
 
-[node name="Box" type="CollisionShape3D" parent="Zones/Zone_office" unique_id=1997702046]
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_office" unique_id=144321514]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 1.5, -12.5)
 shape = SubResource("BoxShape3D_yf7ci")
 
-[node name="Zone_janitor" type="Area3D" parent="Zones" unique_id=2130363911]
+[node name="Zone_janitor" type="Area3D" parent="Zones" unique_id=1356695928]
 script = ExtResource("48_bwngl")
 zone_id = &"janitor"
 display_name = "Janitor Closet"
 
-[node name="Box" type="CollisionShape3D" parent="Zones/Zone_janitor" unique_id=599056277]
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_janitor" unique_id=356811149]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 1.5, -12.5)
 shape = SubResource("BoxShape3D_i0bi7")
 
-[node name="Markers" type="Node3D" parent="." unique_id=2125423229]
+[node name="Markers" type="Node3D" parent="." unique_id=1280311547]
 
-[node name="PlayerSpawn" type="Marker3D" parent="Markers" unique_id=101421976 groups=["player_spawn"]]
+[node name="PlayerSpawn" type="Marker3D" parent="Markers" unique_id=1113138783 groups=["player_spawn"]]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 6, 0, -12.5)
 
-[node name="CoworkerSpawn1" type="Marker3D" parent="Markers" unique_id=395229091 groups=["coworker_spawn"]]
+[node name="CoworkerSpawn1" type="Marker3D" parent="Markers" unique_id=426415473 groups=["coworker_spawn"]]
 transform = Transform3D(0.8660254, 0, 0.5, 0, 1, 0, -0.5, 0, 0.8660254, 4, 0, -14.4)
 
-[node name="CoworkerSpawn2" type="Marker3D" parent="Markers" unique_id=1614950993 groups=["coworker_spawn"]]
+[node name="CoworkerSpawn2" type="Marker3D" parent="Markers" unique_id=1162435852 groups=["coworker_spawn"]]
 transform = Transform3D(0.49999997, 0, -0.86602545, 0, 1, 0, 0.86602545, 0, 0.49999997, 8.2, 0, -11.2)
 
-[node name="CoworkerSpawn3" type="Marker3D" parent="Markers" unique_id=1544956466 groups=["coworker_spawn"]]
+[node name="CoworkerSpawn3" type="Marker3D" parent="Markers" unique_id=261043930 groups=["coworker_spawn"]]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.5, 0, -7.4)
 
-[node name="MonsterSpawn" type="Marker3D" parent="Markers" unique_id=977246816 groups=["monster_spawn"]]
+[node name="MonsterSpawn" type="Marker3D" parent="Markers" unique_id=560460931 groups=["monster_spawn"]]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -18, 0, -15)
 
-[node name="ManagerSpot" type="Marker3D" parent="Markers" unique_id=166741689 groups=["manager_spot"]]
+[node name="ManagerSpot" type="Marker3D" parent="Markers" unique_id=775851201 groups=["manager_spot"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 0, -15.15)
 
-[node name="Patrol01" type="Marker3D" parent="Markers" unique_id=694596590 groups=["patrol_point"]]
+[node name="Patrol01" type="Marker3D" parent="Markers" unique_id=1536480672 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0, 0.5)
 
-[node name="Patrol02" type="Marker3D" parent="Markers" unique_id=1772641152 groups=["patrol_point"]]
+[node name="Patrol02" type="Marker3D" parent="Markers" unique_id=1693911764 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 5.5)
 
-[node name="Patrol03" type="Marker3D" parent="Markers" unique_id=988700567 groups=["patrol_point"]]
+[node name="Patrol03" type="Marker3D" parent="Markers" unique_id=276855753 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -1.5)
 
-[node name="Patrol04" type="Marker3D" parent="Markers" unique_id=1301833290 groups=["patrol_point"]]
+[node name="Patrol04" type="Marker3D" parent="Markers" unique_id=503987366 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 4.5)
 
-[node name="Patrol05" type="Marker3D" parent="Markers" unique_id=231135418 groups=["patrol_point"]]
+[node name="Patrol05" type="Marker3D" parent="Markers" unique_id=1977488871 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 0, -4)
 
-[node name="Patrol06" type="Marker3D" parent="Markers" unique_id=1718957646 groups=["patrol_point"]]
+[node name="Patrol06" type="Marker3D" parent="Markers" unique_id=1846480370 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -4)
 
-[node name="Patrol07" type="Marker3D" parent="Markers" unique_id=1296737506 groups=["patrol_point"]]
+[node name="Patrol07" type="Marker3D" parent="Markers" unique_id=218897918 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 0, 5.5)
 
-[node name="Patrol08" type="Marker3D" parent="Markers" unique_id=328558165 groups=["patrol_point"]]
+[node name="Patrol08" type="Marker3D" parent="Markers" unique_id=1200617190 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 4)
 
-[node name="Patrol09" type="Marker3D" parent="Markers" unique_id=1572059790 groups=["patrol_point"]]
+[node name="Patrol09" type="Marker3D" parent="Markers" unique_id=1806928412 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, -0.5)
 
-[node name="Patrol10" type="Marker3D" parent="Markers" unique_id=1300967089 groups=["patrol_point"]]
+[node name="Patrol10" type="Marker3D" parent="Markers" unique_id=760740101 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 8.2)
 
-[node name="Patrol11" type="Marker3D" parent="Markers" unique_id=699384901 groups=["patrol_point"]]
+[node name="Patrol11" type="Marker3D" parent="Markers" unique_id=269469101 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.5, 0, 8.5)
 
-[node name="Patrol12" type="Marker3D" parent="Markers" unique_id=1062226515 groups=["patrol_point"]]
+[node name="Patrol12" type="Marker3D" parent="Markers" unique_id=515039195 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0, 14.5)
 
-[node name="Patrol13" type="Marker3D" parent="Markers" unique_id=607511957 groups=["patrol_point"]]
+[node name="Patrol13" type="Marker3D" parent="Markers" unique_id=579954013 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 0, 11.5)
 
-[node name="Patrol14" type="Marker3D" parent="Markers" unique_id=981175523 groups=["patrol_point"]]
+[node name="Patrol14" type="Marker3D" parent="Markers" unique_id=1686707845 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.5, 0, 11)
 
-[node name="Patrol15" type="Marker3D" parent="Markers" unique_id=150823571 groups=["patrol_point"]]
+[node name="Patrol15" type="Marker3D" parent="Markers" unique_id=29068880 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 10)
 
-[node name="Patrol16" type="Marker3D" parent="Markers" unique_id=2079946172 groups=["patrol_point"]]
+[node name="Patrol16" type="Marker3D" parent="Markers" unique_id=1074911995 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, -7.5)
 
-[node name="Patrol17" type="Marker3D" parent="Markers" unique_id=649753704 groups=["patrol_point"]]
+[node name="Patrol17" type="Marker3D" parent="Markers" unique_id=204536824 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, -7.5)
 
-[node name="Patrol18" type="Marker3D" parent="Markers" unique_id=349492951 groups=["patrol_point"]]
+[node name="Patrol18" type="Marker3D" parent="Markers" unique_id=1707461221 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, -7.5)
 
-[node name="Patrol19" type="Marker3D" parent="Markers" unique_id=1459383216 groups=["patrol_point"]]
+[node name="Patrol19" type="Marker3D" parent="Markers" unique_id=1590715346 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, -13)
 
-[node name="Patrol20" type="Marker3D" parent="Markers" unique_id=919932742 groups=["patrol_point"]]
+[node name="Patrol20" type="Marker3D" parent="Markers" unique_id=74451985 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.6, 0, -13)
 
-[node name="Patrol21" type="Marker3D" parent="Markers" unique_id=787225911 groups=["patrol_point"]]
+[node name="Patrol21" type="Marker3D" parent="Markers" unique_id=253170210 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0, -11.5)
 
-[node name="Patrol22" type="Marker3D" parent="Markers" unique_id=1564477375 groups=["patrol_point"]]
+[node name="Patrol22" type="Marker3D" parent="Markers" unique_id=984415520 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, 0, -10.4)
 
-[node name="Patrol23" type="Marker3D" parent="Markers" unique_id=647360677 groups=["patrol_point"]]
+[node name="Patrol23" type="Marker3D" parent="Markers" unique_id=1523931908 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.3, 0, -10.3)
 
-[node name="Patrol24" type="Marker3D" parent="Markers" unique_id=1962478490 groups=["patrol_point"]]
+[node name="Patrol24" type="Marker3D" parent="Markers" unique_id=1303377852 groups=["patrol_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.3, 0, -11)
 
-[node name="Lights" type="Node3D" parent="." unique_id=1109340642]
+[node name="Lights" type="Node3D" parent="." unique_id=939986128]
 
-[node name="CoolerLight_01" type="OmniLight3D" parent="Lights" unique_id=1036207144]
+[node name="CoolerLight_01" type="OmniLight3D" parent="Lights" unique_id=1543448548]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 1.3, -4.6)
 light_color = Color(0.81, 0.89, 0.94, 1)
 light_energy = 0.6
@@ -1178,7 +1178,7 @@ distance_fade_length = 6.0
 omni_range = 3.5
 omni_attenuation = 1.6
 
-[node name="CoolerLight_02" type="OmniLight3D" parent="Lights" unique_id=1627191492]
+[node name="CoolerLight_02" type="OmniLight3D" parent="Lights" unique_id=2041679925]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 1.3, -4.6)
 light_color = Color(0.81, 0.89, 0.94, 1)
 light_energy = 0.6
@@ -1189,7 +1189,7 @@ distance_fade_length = 6.0
 omni_range = 3.5
 omni_attenuation = 1.6
 
-[node name="CoolerLight_03" type="OmniLight3D" parent="Lights" unique_id=440405831]
+[node name="CoolerLight_03" type="OmniLight3D" parent="Lights" unique_id=955293764]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.3, -4.6)
 light_color = Color(0.81, 0.89, 0.94, 1)
 light_energy = 0.6
@@ -1200,7 +1200,7 @@ distance_fade_length = 6.0
 omni_range = 3.5
 omni_attenuation = 1.6
 
-[node name="CoolerLight_04" type="OmniLight3D" parent="Lights" unique_id=1443059110]
+[node name="CoolerLight_04" type="OmniLight3D" parent="Lights" unique_id=57352651]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.7, 1.3, 2)
 light_color = Color(0.81, 0.89, 0.94, 1)
 light_energy = 0.6
@@ -1211,7 +1211,7 @@ distance_fade_length = 6.0
 omni_range = 3.5
 omni_attenuation = 1.6
 
-[node name="EmergencyLight_01" type="OmniLight3D" parent="Lights" unique_id=139820671]
+[node name="EmergencyLight_01" type="OmniLight3D" parent="Lights" unique_id=227284431]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.35, -8.6)
 light_color = Color(0.95, 0.16, 0.12, 1)
 light_energy = 1.4
@@ -1222,7 +1222,7 @@ distance_fade_length = 6.0
 omni_range = 4.5
 omni_attenuation = 1.2
 
-[node name="EmergencyLight_02" type="OmniLight3D" parent="Lights" unique_id=953634678]
+[node name="EmergencyLight_02" type="OmniLight3D" parent="Lights" unique_id=1260907005]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 2.35, -8.6)
 light_color = Color(0.95, 0.16, 0.12, 1)
 light_energy = 1.4
@@ -1233,7 +1233,7 @@ distance_fade_length = 6.0
 omni_range = 4.5
 omni_attenuation = 1.2
 
-[node name="EmergencyLight_03" type="OmniLight3D" parent="Lights" unique_id=618115961]
+[node name="EmergencyLight_03" type="OmniLight3D" parent="Lights" unique_id=1894680244]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2.35, -8.6)
 light_color = Color(0.95, 0.16, 0.12, 1)
 light_energy = 1.4
@@ -1244,7 +1244,7 @@ distance_fade_length = 6.0
 omni_range = 4.5
 omni_attenuation = 1.2
 
-[node name="EmergencyLight_04" type="OmniLight3D" parent="Lights" unique_id=1049908320]
+[node name="EmergencyLight_04" type="OmniLight3D" parent="Lights" unique_id=1313659987]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2.35, -8.6)
 light_color = Color(0.95, 0.16, 0.12, 1)
 light_energy = 1.4
@@ -1255,7 +1255,7 @@ distance_fade_length = 6.0
 omni_range = 4.5
 omni_attenuation = 1.2
 
-[node name="EmergencyLight_05" type="OmniLight3D" parent="Lights" unique_id=1149395798]
+[node name="EmergencyLight_05" type="OmniLight3D" parent="Lights" unique_id=1802958321]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.7, 2.3, -10.4)
 light_color = Color(0.95, 0.16, 0.12, 1)
 light_energy = 1.4
@@ -1266,7 +1266,7 @@ distance_fade_length = 6.0
 omni_range = 4.5
 omni_attenuation = 1.2
 
-[node name="EmergencyLight_06" type="OmniLight3D" parent="Lights" unique_id=554323789]
+[node name="EmergencyLight_06" type="OmniLight3D" parent="Lights" unique_id=1162137161]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.3, -15.7)
 light_color = Color(0.95, 0.16, 0.12, 1)
 light_energy = 1.4
@@ -1277,7 +1277,7 @@ distance_fade_length = 6.0
 omni_range = 4.5
 omni_attenuation = 1.2
 
-[node name="EmergencyLight_07" type="OmniLight3D" parent="Lights" unique_id=597776257]
+[node name="EmergencyLight_07" type="OmniLight3D" parent="Lights" unique_id=868448313]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, 2.3, -15)
 light_color = Color(0.95, 0.16, 0.12, 1)
 light_energy = 1.4
@@ -1288,7 +1288,7 @@ distance_fade_length = 6.0
 omni_range = 4.5
 omni_attenuation = 1.2
 
-[node name="ExitLight" type="OmniLight3D" parent="Lights" unique_id=14134477]
+[node name="ExitLight" type="OmniLight3D" parent="Lights" unique_id=591430094]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.65, 2.3, -13)
 light_color = Color(0.2, 1, 0.42, 1)
 light_energy = 1.2
@@ -1299,12 +1299,12 @@ distance_fade_length = 6.0
 omni_range = 4.0
 omni_attenuation = 1.4
 
-[node name="StoreLight_001" type="Node3D" parent="Lights" unique_id=1401241151]
+[node name="StoreLight_001" type="Node3D" parent="Lights" unique_id=801422380]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 3.4, 5.9)
 script = ExtResource("49_4858n")
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_001")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_001" unique_id=209579634]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_001" unique_id=1261954507]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1314,13 +1314,13 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_002" type="Node3D" parent="Lights" unique_id=2005655760]
+[node name="StoreLight_002" type="Node3D" parent="Lights" unique_id=1734561973]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 3.4, 2.9)
 script = ExtResource("49_4858n")
 starts_off = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_002")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_002" unique_id=225818641]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_002" unique_id=1061041006]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1330,12 +1330,12 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_003" type="Node3D" parent="Lights" unique_id=460814949]
+[node name="StoreLight_003" type="Node3D" parent="Lights" unique_id=1231516849]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 3.4, -0.1)
 script = ExtResource("49_4858n")
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_003")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_003" unique_id=316489084]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_003" unique_id=842899132]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1345,13 +1345,13 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_004" type="Node3D" parent="Lights" unique_id=709201905]
+[node name="StoreLight_004" type="Node3D" parent="Lights" unique_id=1535137746]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 3.4, 5.9)
 script = ExtResource("49_4858n")
 starts_off = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_004")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_004" unique_id=580287055]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_004" unique_id=448721595]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1361,12 +1361,12 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_005" type="Node3D" parent="Lights" unique_id=376980939]
+[node name="StoreLight_005" type="Node3D" parent="Lights" unique_id=1631441607]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 3.4, 2.9)
 script = ExtResource("49_4858n")
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_005")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_005" unique_id=26396406]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_005" unique_id=258420780]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1376,13 +1376,13 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_006" type="Node3D" parent="Lights" unique_id=1723599733]
+[node name="StoreLight_006" type="Node3D" parent="Lights" unique_id=650663861]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 3.24, -0.1)
 script = ExtResource("49_4858n")
 starts_off = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_006_broken")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_006" unique_id=1737233705]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_006" unique_id=1938567082]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1392,12 +1392,12 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_007" type="Node3D" parent="Lights" unique_id=2035546066]
+[node name="StoreLight_007" type="Node3D" parent="Lights" unique_id=299647035]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 3.4, 5.9)
 script = ExtResource("49_4858n")
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_007")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_007" unique_id=1297325805]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_007" unique_id=1373029982]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1407,13 +1407,13 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_008" type="Node3D" parent="Lights" unique_id=1853575404]
+[node name="StoreLight_008" type="Node3D" parent="Lights" unique_id=2019332284]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 3.4, 2.9)
 script = ExtResource("49_4858n")
 starts_off = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_008")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_008" unique_id=1529256869]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_008" unique_id=1729161555]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1423,12 +1423,12 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_009" type="Node3D" parent="Lights" unique_id=1361995925]
+[node name="StoreLight_009" type="Node3D" parent="Lights" unique_id=1606425822]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 3.4, -0.1)
 script = ExtResource("49_4858n")
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_009")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_009" unique_id=1392243914]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_009" unique_id=200815403]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1438,12 +1438,12 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_010" type="Node3D" parent="Lights" unique_id=1763756841]
+[node name="StoreLight_010" type="Node3D" parent="Lights" unique_id=1488676869]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 3.4, 5.9)
 script = ExtResource("49_4858n")
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_010")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_010" unique_id=254181036]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_010" unique_id=1084140093]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1453,14 +1453,14 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_011" type="Node3D" parent="Lights" unique_id=1260154352]
+[node name="StoreLight_011" type="Node3D" parent="Lights" unique_id=1204851389]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 3.24, 2.9)
 script = ExtResource("49_4858n")
 always_flicker = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_011_broken")
 buzzes = true
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_011" unique_id=1830368996]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_011" unique_id=472552400]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1470,7 +1470,7 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="Sparks" type="CPUParticles3D" parent="Lights/StoreLight_011" unique_id=1623181811]
+[node name="Sparks" type="CPUParticles3D" parent="Lights/StoreLight_011" unique_id=1927106388]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.15, 0)
 cast_shadow = 0
 amount = 24
@@ -1488,12 +1488,12 @@ initial_velocity_max = 0.9
 scale_amount_min = 0.6
 scale_amount_max = 1.2
 
-[node name="StoreLight_012" type="Node3D" parent="Lights" unique_id=1914600776]
+[node name="StoreLight_012" type="Node3D" parent="Lights" unique_id=1727924186]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 3.4, -0.1)
 script = ExtResource("49_4858n")
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_012")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_012" unique_id=390749759]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_012" unique_id=529536120]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1503,14 +1503,14 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_013" type="Node3D" parent="Lights" unique_id=1793181128]
+[node name="StoreLight_013" type="Node3D" parent="Lights" unique_id=1841927608]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.9, 3.24, 5.9)
 script = ExtResource("49_4858n")
 always_flicker = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_013_broken")
 buzzes = true
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_013" unique_id=2106359670]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_013" unique_id=1986381202]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1520,7 +1520,7 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="Sparks" type="CPUParticles3D" parent="Lights/StoreLight_013" unique_id=496347694]
+[node name="Sparks" type="CPUParticles3D" parent="Lights/StoreLight_013" unique_id=1082488074]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.15, 0)
 cast_shadow = 0
 amount = 24
@@ -1538,13 +1538,13 @@ initial_velocity_max = 0.9
 scale_amount_min = 0.6
 scale_amount_max = 1.2
 
-[node name="StoreLight_014" type="Node3D" parent="Lights" unique_id=761727743]
+[node name="StoreLight_014" type="Node3D" parent="Lights" unique_id=941639060]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.9, 3.4, 2.9)
 script = ExtResource("49_4858n")
 starts_off = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_014")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_014" unique_id=57788891]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_014" unique_id=1761037452]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1554,12 +1554,12 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_015" type="Node3D" parent="Lights" unique_id=830466979]
+[node name="StoreLight_015" type="Node3D" parent="Lights" unique_id=1864742893]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.9, 3.4, -0.1)
 script = ExtResource("49_4858n")
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_015")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_015" unique_id=595551904]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_015" unique_id=2053860093]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1569,13 +1569,13 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_016" type="Node3D" parent="Lights" unique_id=283029003]
+[node name="StoreLight_016" type="Node3D" parent="Lights" unique_id=1653682054]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 3.4, -4.3)
 script = ExtResource("49_4858n")
 starts_off = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_016")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_016" unique_id=1626897275]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_016" unique_id=1003918171]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1585,12 +1585,12 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_017" type="Node3D" parent="Lights" unique_id=414108595]
+[node name="StoreLight_017" type="Node3D" parent="Lights" unique_id=1720566179]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 3.4, -4.3)
 script = ExtResource("49_4858n")
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_017")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_017" unique_id=2029945621]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_017" unique_id=1707915081]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1600,13 +1600,13 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_018" type="Node3D" parent="Lights" unique_id=1128479415]
+[node name="StoreLight_018" type="Node3D" parent="Lights" unique_id=1257584426]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 3.24, -4.3)
 script = ExtResource("49_4858n")
 starts_off = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_018_broken")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_018" unique_id=844890828]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_018" unique_id=2071791741]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1616,13 +1616,13 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_019" type="Node3D" parent="Lights" unique_id=595907312]
+[node name="StoreLight_019" type="Node3D" parent="Lights" unique_id=752402682]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 3.4, -4.3)
 script = ExtResource("49_4858n")
 starts_off = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_019")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_019" unique_id=1603549917]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_019" unique_id=1368522653]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1632,12 +1632,12 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_020" type="Node3D" parent="Lights" unique_id=1820457614]
+[node name="StoreLight_020" type="Node3D" parent="Lights" unique_id=1288291210]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 3.4, -4.3)
 script = ExtResource("49_4858n")
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_020")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_020" unique_id=375957547]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_020" unique_id=140203993]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1647,13 +1647,13 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_021" type="Node3D" parent="Lights" unique_id=1367918881]
+[node name="StoreLight_021" type="Node3D" parent="Lights" unique_id=903897158]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 3.4, 8.5)
 script = ExtResource("49_4858n")
 starts_off = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_021")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_021" unique_id=861419534]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_021" unique_id=937926720]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1663,12 +1663,12 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_022" type="Node3D" parent="Lights" unique_id=505886628]
+[node name="StoreLight_022" type="Node3D" parent="Lights" unique_id=836365609]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 3.4, 8.5)
 script = ExtResource("49_4858n")
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_022")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_022" unique_id=511086061]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_022" unique_id=1639218504]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1678,12 +1678,12 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_023" type="Node3D" parent="Lights" unique_id=282642992]
+[node name="StoreLight_023" type="Node3D" parent="Lights" unique_id=825614970]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 3.4, 8.5)
 script = ExtResource("49_4858n")
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_023")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_023" unique_id=770082636]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_023" unique_id=537475565]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1693,13 +1693,13 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_024" type="Node3D" parent="Lights" unique_id=406898610]
+[node name="StoreLight_024" type="Node3D" parent="Lights" unique_id=1347244428]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 3.4, 8.5)
 script = ExtResource("49_4858n")
 starts_off = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_024")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_024" unique_id=176158200]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_024" unique_id=1637980799]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1709,13 +1709,13 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_025" type="Node3D" parent="Lights" unique_id=1593460514]
+[node name="StoreLight_025" type="Node3D" parent="Lights" unique_id=1520722735]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.05, 3.4, 11.5)
 script = ExtResource("49_4858n")
 starts_off = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_025")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_025" unique_id=1370807672]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_025" unique_id=1221598159]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1725,12 +1725,12 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_026" type="Node3D" parent="Lights" unique_id=576357718]
+[node name="StoreLight_026" type="Node3D" parent="Lights" unique_id=539359755]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.05, 3.4, 11.5)
 script = ExtResource("49_4858n")
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_026")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_026" unique_id=1322394488]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_026" unique_id=155481268]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1740,12 +1740,12 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_027" type="Node3D" parent="Lights" unique_id=1590391562]
+[node name="StoreLight_027" type="Node3D" parent="Lights" unique_id=76975069]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.05, 3.4, 11.5)
 script = ExtResource("49_4858n")
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_027")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_027" unique_id=457574992]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_027" unique_id=456395006]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1755,13 +1755,13 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_028" type="Node3D" parent="Lights" unique_id=554651453]
+[node name="StoreLight_028" type="Node3D" parent="Lights" unique_id=15625562]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 3.24, 14.6)
 script = ExtResource("49_4858n")
 starts_off = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_028_broken")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_028" unique_id=1189175675]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_028" unique_id=1051760577]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1771,13 +1771,13 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_029" type="Node3D" parent="Lights" unique_id=1877453137]
+[node name="StoreLight_029" type="Node3D" parent="Lights" unique_id=954729016]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.5, 3.4, 14.6)
 script = ExtResource("49_4858n")
 starts_off = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_029")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_029" unique_id=1882817636]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_029" unique_id=1354806318]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1787,12 +1787,12 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_030" type="Node3D" parent="Lights" unique_id=812453472]
+[node name="StoreLight_030" type="Node3D" parent="Lights" unique_id=1047983860]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 3.4, 14.6)
 script = ExtResource("49_4858n")
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_030")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_030" unique_id=1482234]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_030" unique_id=1524622876]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1802,12 +1802,12 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_031" type="Node3D" parent="Lights" unique_id=1695530937]
+[node name="StoreLight_031" type="Node3D" parent="Lights" unique_id=2136997547]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 3.4, 13.6)
 script = ExtResource("49_4858n")
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_031")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_031" unique_id=868945448]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_031" unique_id=1451833818]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1817,13 +1817,13 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_032" type="Node3D" parent="Lights" unique_id=1889642380]
+[node name="StoreLight_032" type="Node3D" parent="Lights" unique_id=1876375619]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.5, 3.4, 11.2)
 script = ExtResource("49_4858n")
 starts_off = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_032")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_032" unique_id=249733568]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_032" unique_id=81488501]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1833,12 +1833,12 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_033" type="Node3D" parent="Lights" unique_id=1858921140]
+[node name="StoreLight_033" type="Node3D" parent="Lights" unique_id=857554770]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 3.4, -3)
 script = ExtResource("49_4858n")
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_033")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_033" unique_id=1333293469]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_033" unique_id=1421812785]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1848,13 +1848,13 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_034" type="Node3D" parent="Lights" unique_id=704484889]
+[node name="StoreLight_034" type="Node3D" parent="Lights" unique_id=38363450]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 3.4, 1.5)
 script = ExtResource("49_4858n")
 starts_off = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_034")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_034" unique_id=516567802]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_034" unique_id=1718165363]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1864,12 +1864,12 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_035" type="Node3D" parent="Lights" unique_id=276366432]
+[node name="StoreLight_035" type="Node3D" parent="Lights" unique_id=1565130976]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 3.4, 6)
 script = ExtResource("49_4858n")
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_035")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_035" unique_id=172207952]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_035" unique_id=1162031845]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1879,13 +1879,13 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_036" type="Node3D" parent="Lights" unique_id=2132741830]
+[node name="StoreLight_036" type="Node3D" parent="Lights" unique_id=1276015660]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 3.4, -3)
 script = ExtResource("49_4858n")
 starts_off = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_036")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_036" unique_id=783798708]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_036" unique_id=832531549]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1895,12 +1895,12 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_037" type="Node3D" parent="Lights" unique_id=727508105]
+[node name="StoreLight_037" type="Node3D" parent="Lights" unique_id=658295241]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 3.4, 1.5)
 script = ExtResource("49_4858n")
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_037")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_037" unique_id=1415588096]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_037" unique_id=547475668]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1910,13 +1910,13 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_038" type="Node3D" parent="Lights" unique_id=755233314]
+[node name="StoreLight_038" type="Node3D" parent="Lights" unique_id=1914077166]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 3.4, 6)
 script = ExtResource("49_4858n")
 starts_off = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_038")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_038" unique_id=1915499623]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_038" unique_id=198380082]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1926,12 +1926,12 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_039" type="Node3D" parent="Lights" unique_id=634897826]
+[node name="StoreLight_039" type="Node3D" parent="Lights" unique_id=754427137]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.5, 3.4, -3)
 script = ExtResource("49_4858n")
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_039")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_039" unique_id=703096036]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_039" unique_id=1770804934]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1941,13 +1941,13 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_040" type="Node3D" parent="Lights" unique_id=604217751]
+[node name="StoreLight_040" type="Node3D" parent="Lights" unique_id=905079160]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.5, 3.4, 1.5)
 script = ExtResource("49_4858n")
 starts_off = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_040")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_040" unique_id=521654733]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_040" unique_id=469578859]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1957,14 +1957,14 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_041" type="Node3D" parent="Lights" unique_id=578915489]
+[node name="StoreLight_041" type="Node3D" parent="Lights" unique_id=552813816]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.5, 3.24, 6)
 script = ExtResource("49_4858n")
 always_flicker = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_041_broken")
 buzzes = true
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_041" unique_id=1978658389]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_041" unique_id=1040339907]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_specular = 1.0
@@ -1974,7 +1974,7 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="Sparks" type="CPUParticles3D" parent="Lights/StoreLight_041" unique_id=493014361]
+[node name="Sparks" type="CPUParticles3D" parent="Lights/StoreLight_041" unique_id=383884459]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.15, 0)
 cast_shadow = 0
 amount = 24
@@ -1992,14 +1992,14 @@ initial_velocity_max = 0.9
 scale_amount_min = 0.6
 scale_amount_max = 1.2
 
-[node name="StoreLight_042" type="Node3D" parent="Lights" unique_id=571852339]
+[node name="StoreLight_042" type="Node3D" parent="Lights" unique_id=1133130698]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 2.62, -7.5)
 script = ExtResource("49_4858n")
 base_energy = 0.55
 starts_off = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_042")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_042" unique_id=457778379]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_042" unique_id=402754850]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_energy = 0.55
@@ -2010,14 +2010,14 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_043" type="Node3D" parent="Lights" unique_id=801454557]
+[node name="StoreLight_043" type="Node3D" parent="Lights" unique_id=906127160]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 2.62, -7.5)
 script = ExtResource("49_4858n")
 base_energy = 0.55
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_043")
 buzzes = true
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_043" unique_id=1514870448]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_043" unique_id=92634044]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_energy = 0.55
@@ -2028,14 +2028,14 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_044" type="Node3D" parent="Lights" unique_id=110666516]
+[node name="StoreLight_044" type="Node3D" parent="Lights" unique_id=678799311]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 2.62, -7.5)
 script = ExtResource("49_4858n")
 base_energy = 0.55
 starts_off = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_044")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_044" unique_id=350509264]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_044" unique_id=2138232812]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_energy = 0.55
@@ -2046,7 +2046,7 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_045" type="Node3D" parent="Lights" unique_id=783461809]
+[node name="StoreLight_045" type="Node3D" parent="Lights" unique_id=1436834466]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 2.46, -7.5)
 script = ExtResource("49_4858n")
 base_energy = 0.55
@@ -2054,7 +2054,7 @@ always_flicker = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_045_broken")
 buzzes = true
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_045" unique_id=870496604]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_045" unique_id=838022560]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_energy = 0.55
@@ -2065,7 +2065,7 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="Sparks" type="CPUParticles3D" parent="Lights/StoreLight_045" unique_id=1648610367]
+[node name="Sparks" type="CPUParticles3D" parent="Lights/StoreLight_045" unique_id=767972817]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.15, 0)
 cast_shadow = 0
 amount = 24
@@ -2083,13 +2083,13 @@ initial_velocity_max = 0.9
 scale_amount_min = 0.6
 scale_amount_max = 1.2
 
-[node name="StoreLight_046" type="Node3D" parent="Lights" unique_id=106593205]
+[node name="StoreLight_046" type="Node3D" parent="Lights" unique_id=298971382]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 2.62, -7.5)
 script = ExtResource("49_4858n")
 base_energy = 0.55
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_046")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_046" unique_id=1905592231]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_046" unique_id=304966569]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_energy = 0.55
@@ -2100,14 +2100,14 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_047" type="Node3D" parent="Lights" unique_id=576386763]
+[node name="StoreLight_047" type="Node3D" parent="Lights" unique_id=412189818]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.5, 2.46, -13)
 script = ExtResource("49_4858n")
 base_energy = 0.7
 starts_off = true
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_047_broken")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_047" unique_id=1448678878]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_047" unique_id=849748956]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_energy = 0.7
@@ -2118,14 +2118,14 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_048" type="Node3D" parent="Lights" unique_id=2085934607]
+[node name="StoreLight_048" type="Node3D" parent="Lights" unique_id=303570057]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 2.62, -13)
 script = ExtResource("49_4858n")
 base_energy = 0.7
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_048")
 buzzes = true
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_048" unique_id=950185767]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_048" unique_id=278495847]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_energy = 0.7
@@ -2136,13 +2136,13 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_049" type="Node3D" parent="Lights" unique_id=1329413293]
+[node name="StoreLight_049" type="Node3D" parent="Lights" unique_id=16281786]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 2.62, -12.5)
 script = ExtResource("49_4858n")
 base_energy = 0.7
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_049")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_049" unique_id=1654503759]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_049" unique_id=685918271]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_energy = 0.7
@@ -2153,14 +2153,14 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_050" type="Node3D" parent="Lights" unique_id=103824893]
+[node name="StoreLight_050" type="Node3D" parent="Lights" unique_id=665808865]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2.62, -12.5)
 script = ExtResource("49_4858n")
 base_energy = 1.15
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_050")
 buzzes = true
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_050" unique_id=1371049093]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_050" unique_id=2096064710]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_energy = 1.15
@@ -2171,13 +2171,13 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_051" type="Node3D" parent="Lights" unique_id=696686198]
+[node name="StoreLight_051" type="Node3D" parent="Lights" unique_id=1451441345]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 2.62, -12.5)
 script = ExtResource("49_4858n")
 base_energy = 0.75
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_051")
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_051" unique_id=1445848462]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_051" unique_id=209338526]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.95, 0.88, 0.72, 1)
 light_energy = 0.75
@@ -2188,14 +2188,14 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="StoreLight_052" type="Node3D" parent="Lights" unique_id=1020539741]
+[node name="StoreLight_052" type="Node3D" parent="Lights" unique_id=1207498513]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 2.62, -12.5)
 script = ExtResource("49_4858n")
 base_energy = 0.6
 fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_052")
 buzzes = true
 
-[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_052" unique_id=748314477]
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_052" unique_id=645956376]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
 light_color = Color(0.86, 0.9, 0.8, 1)
 light_energy = 0.6
@@ -2206,45 +2206,45 @@ distance_fade_length = 6.0
 omni_range = 5.5
 omni_attenuation = 1.5
 
-[node name="Audio" type="Node3D" parent="." unique_id=495623740]
+[node name="Audio" type="Node3D" parent="." unique_id=513250875]
 
-[node name="IntercomSpeaker1" type="AudioStreamPlayer3D" parent="Audio" unique_id=951913051 groups=["intercom_speaker"]]
+[node name="IntercomSpeaker1" type="AudioStreamPlayer3D" parent="Audio" unique_id=862313361 groups=["intercom_speaker"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 3.9, 2)
 unit_size = 8.0
 max_distance = 60.0
 bus = &"Voice"
 
-[node name="IntercomSpeaker2" type="AudioStreamPlayer3D" parent="Audio" unique_id=319570529 groups=["intercom_speaker"]]
+[node name="IntercomSpeaker2" type="AudioStreamPlayer3D" parent="Audio" unique_id=1384528318 groups=["intercom_speaker"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 3.9, 2)
 unit_size = 8.0
 max_distance = 60.0
 bus = &"Voice"
 
-[node name="IntercomSpeaker3" type="AudioStreamPlayer3D" parent="Audio" unique_id=1789932775 groups=["intercom_speaker"]]
+[node name="IntercomSpeaker3" type="AudioStreamPlayer3D" parent="Audio" unique_id=591278426 groups=["intercom_speaker"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 3.9, 12)
 unit_size = 8.0
 max_distance = 60.0
 bus = &"Voice"
 
-[node name="IntercomSpeaker4" type="AudioStreamPlayer3D" parent="Audio" unique_id=1619566181 groups=["intercom_speaker"]]
+[node name="IntercomSpeaker4" type="AudioStreamPlayer3D" parent="Audio" unique_id=158542511 groups=["intercom_speaker"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.9, -7.5)
 unit_size = 8.0
 max_distance = 60.0
 bus = &"Voice"
 
-[node name="IntercomSpeaker5" type="AudioStreamPlayer3D" parent="Audio" unique_id=2021165237 groups=["intercom_speaker"]]
+[node name="IntercomSpeaker5" type="AudioStreamPlayer3D" parent="Audio" unique_id=199117384 groups=["intercom_speaker"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.9, -12.5)
 unit_size = 8.0
 max_distance = 60.0
 bus = &"Voice"
 
-[node name="IntercomSpeaker6" type="AudioStreamPlayer3D" parent="Audio" unique_id=609861104 groups=["intercom_speaker"]]
+[node name="IntercomSpeaker6" type="AudioStreamPlayer3D" parent="Audio" unique_id=1175751020 groups=["intercom_speaker"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2.9, -11)
 unit_size = 8.0
 max_distance = 60.0
 bus = &"Voice"
 
-[node name="Ambience1_freezer_hum" type="AudioStreamPlayer3D" parent="Audio" unique_id=1322307340]
+[node name="Ambience1_freezer_hum" type="AudioStreamPlayer3D" parent="Audio" unique_id=1622167898]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 1.2, -5.2)
 volume_db = -10.0
 unit_size = 3.0
@@ -2253,7 +2253,7 @@ bus = &"Ambience"
 script = ExtResource("50_x0opm")
 sound_id = &"amb_freezer_hum"
 
-[node name="Ambience2_freezer_hum" type="AudioStreamPlayer3D" parent="Audio" unique_id=1464171395]
+[node name="Ambience2_freezer_hum" type="AudioStreamPlayer3D" parent="Audio" unique_id=745039127]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 1.2, -5.2)
 volume_db = -10.0
 unit_size = 3.0
@@ -2262,7 +2262,7 @@ bus = &"Ambience"
 script = ExtResource("50_x0opm")
 sound_id = &"amb_freezer_hum"
 
-[node name="Ambience3_freezer_hum" type="AudioStreamPlayer3D" parent="Audio" unique_id=1941116676]
+[node name="Ambience3_freezer_hum" type="AudioStreamPlayer3D" parent="Audio" unique_id=856038208]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 1.2, 2)
 volume_db = -10.0
 unit_size = 3.0
@@ -2271,7 +2271,7 @@ bus = &"Ambience"
 script = ExtResource("50_x0opm")
 sound_id = &"amb_freezer_hum"
 
-[node name="Ambience4_backroom" type="AudioStreamPlayer3D" parent="Audio" unique_id=1066251813]
+[node name="Ambience4_backroom" type="AudioStreamPlayer3D" parent="Audio" unique_id=1642676915]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 2, -7.5)
 volume_db = -12.0
 unit_size = 3.0
@@ -2279,7 +2279,7 @@ max_distance = 16.0
 bus = &"Ambience"
 script = ExtResource("50_x0opm")
 
-[node name="Ambience5_backroom" type="AudioStreamPlayer3D" parent="Audio" unique_id=1345113119]
+[node name="Ambience5_backroom" type="AudioStreamPlayer3D" parent="Audio" unique_id=2113962470]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2, -7.5)
 volume_db = -12.0
 unit_size = 3.0
@@ -2287,7 +2287,7 @@ max_distance = 16.0
 bus = &"Ambience"
 script = ExtResource("50_x0opm")
 
-[node name="Ambience6_backroom" type="AudioStreamPlayer3D" parent="Audio" unique_id=962341650]
+[node name="Ambience6_backroom" type="AudioStreamPlayer3D" parent="Audio" unique_id=305180196]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2, -12.8)
 volume_db = -10.0
 unit_size = 3.0
@@ -2295,8 +2295,8 @@ max_distance = 16.0
 bus = &"Ambience"
 script = ExtResource("50_x0opm")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1906656979]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=441328630]
 environment = SubResource("Environment_ytdqx")
 
-[node name="AreaCuller" type="Node" parent="." unique_id=1204045453]
+[node name="AreaCuller" type="Node" parent="." unique_id=712850745]
 script = ExtResource("51_1oiam")

@@ -27,7 +27,7 @@ static func make() -> Environment:
 	env.fog_density = 1.0
 	env.fog_depth_begin = 3.0
 	env.fog_depth_end = FOG_END
-	env.fog_depth_curve = 1.6
+	env.fog_depth_curve = 3.0
 	env.fog_sky_affect = 0.0
 	env.glow_enabled = true
 	env.glow_intensity = 0.7

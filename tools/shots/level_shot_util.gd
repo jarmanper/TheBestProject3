@@ -178,6 +178,13 @@ static func _stage(tree: SceneTree, game: Game, view: String) -> void:
 			if crew.size() >= 1:
 				pose(crew[0], Vector3(5.2, 0, -11.6), -70.0, Catalog.ANIM_WALK)
 			await tree.create_timer(0.8).timeout
+		"sighting15", "sighting20":
+			# Rule 3 staging distance check: the true form 15 / 20 m down the front of the store.
+			place_player(Vector3(-18.5, 0, 14.6), -90.0, 0.0)
+			if monster:
+				monster.call(&"_set_form", true)
+				var ahead := 15.0 if view == "sighting15" else 20.0
+				pose(monster, Vector3(-18.5 + ahead, 0, 14.4), -90.0, Catalog.ANIM_IDLE)
 		"hallway":
 			place_player(Vector3(-17.5, 0, -7.5), -90.0, 0.0)
 		"breaker":
