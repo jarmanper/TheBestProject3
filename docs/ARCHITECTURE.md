@@ -163,9 +163,25 @@ Camera: first person, FOV **95°**, slight sway while walking, subtle extra move
 sprinting. A `SpotLight3D` flashlight (toggle `flashlight`) flickers when the monster is near.
 
 ### Interactable — `systems/interaction/interactable.gd`, `class_name Interactable extends Area3D`
-Collision layer 5 (interact). The player ray-casts on that layer and calls
-`get_prompt(player)`, `can_interact(player)`, `interact(player)`. `hold_time > 0` means the
-player must hold `interact` that long; the player drives the progress bar.
+Collision layer 5 (interact). The player ray-casts on layers world+interact (so walls block it)
+and calls `get_prompt(player)`, `can_interact(player)`, `interact(player)`. `hold_time > 0` means
+the player must hold `interact` that long; the player drives the progress bar and calls
+`hold_started(player)` / `hold_stopped(player)` (stopped = cancelled, not completed).
+
+### Who plays which voice audio
+- **Walkie** (`Events.walkie_message`): the player side (HUD/radio) plays `walkie_squelch_on`,
+  then `walkie_voice` (or `walkie_voice_mimic` when `is_mimic`), then `walkie_squelch_off`, on the
+  `Voice` bus, and shows the subtitle `[RADIO] NAME: message`.
+- **Intercom** (`Events.intercom_announced`): `StoreManager` plays `intercom_chime` + `intercom_voice`
+  positionally at every `intercom_speaker`; the HUD shows `[INTERCOM] message`.
+- `Events.subtitle`: HUD only.
+
+### Model orientation and scale
+1 Blender unit = 1 m. Models are authored facing Blender **-Y** (Blender's front view), which the
+glTF exporter turns into Godot **+Z** ("model front"). Code that turns a character toward a point
+uses `look_at(target, Vector3.UP, true)` (use_model_front). Origins: characters and floor props at
+the floor centre of their footprint; wall props at the wall-contact centre. Viewmodels: see the
+props task — they are posed for a camera looking down Godot -Z.
 
 ### TaskStation, ToolPickup, HidingSpot (extend Interactable)
 - `TaskStation`: one place in the store where a task can be done. `task_kind`, `zone`,
@@ -202,6 +218,11 @@ Game (Node, game.gd)
 ```
 `game.gd` spawns actors at the level's spawn markers, calls `GameState.start_night()` and
 `Tasks.begin_night()`, and switches to the end screen on `Events.night_ended`.
+
+### Monster proximity effects
+The monster calls `StoreLight.set_disturbance(amount)` (0..1, from distance) on lights within 12 m
+about every 0.25 s; a light's disturbance decays to 0 within 0.5 s when no longer refreshed. The
+player's flashlight reads `GameState.monster` distance itself and flickers within 12 m.
 
 ## 7. Store layout (Godot coordinates, metres)
 

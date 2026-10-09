@@ -27,3 +27,13 @@ func can_interact(_player: Node) -> bool:
 
 func interact(_player: Node) -> void:
 	pass
+
+
+## The player started holding `interact` on this (hold_time > 0 only).
+func hold_started(_player: Node) -> void:
+	pass
+
+
+## The hold ended without completing (released, looked away, moved).
+func hold_stopped(_player: Node) -> void:
+	pass
