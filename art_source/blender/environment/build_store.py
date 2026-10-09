@@ -1,9 +1,13 @@
 """Builds the Graveyard Shift store environment and exports it for Godot.
 
 	blender -b --factory-startup -P art_source/blender/environment/build_store.py [-- --no-kit | --kit-only]
+	python3 art_source/blender/environment/godot_setup.py      # shared Godot materials + import settings
+	~/tools/godot/godot --headless --path . --import             # reimport
 
 Outputs (paths relative to the repo root):
 	art_source/blender/environment/store.blend          the generated store (packed textures)
+	art_source/blender/environment/kit.blend            every kit piece laid out in a grid
+	art_source/blender/environment/light_anchors.txt    LightAnchor_### list (name, Godot position, zone, broken)
 	assets/models/environment/store_interior.glb        complete static store, ARCHITECTURE section 7 layout
 	assets/models/environment/kit/*.glb                 reusable pieces (front = Godot +Z)
 	assets/models/environment/textures/*.png            the pixel-art atlases (shared by the Godot materials)
