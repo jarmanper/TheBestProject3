@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://ui/postfx/postfx.gd" id="1_postfx"]
+[ext_resource type="Shader" path="res://ui/postfx/crt.gdshader" id="2_crt"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_crt"]
+shader = ExtResource("2_crt")
+
+[node name="PostFX" type="CanvasLayer"]
+process_mode = 3
+layer = 1
+script = ExtResource("1_postfx")
+
+[node name="Screen" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_crt")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
