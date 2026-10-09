@@ -1,8 +1,14 @@
 """Builds the Graveyard Shift store environment and exports it for Godot.
 
-	blender -b --factory-startup -P art_source/blender/environment/build_store.py [-- --no-kit | --kit-only]
-	python3 art_source/blender/environment/godot_setup.py      # shared Godot materials + import settings
-	~/tools/godot/godot --headless --path . --import             # reimport
+To rebuild, ALWAYS use the wrapper (it runs this script, then godot_setup.py, then the Godot reimport):
+
+	art_source/blender/environment/rebuild.sh [--no-kit | --kit-only]     # env: BLENDER, GODOT
+
+Running this script alone leaves the Godot import settings stale (godot_setup.py must follow it).
+
+The GLB/PNG outputs are byte-identical between runs. .blend files are not (Blender writes runtime memory
+addresses and thread-order-dependent edge arrays), so each .blend is only re-saved when its content
+fingerprint changes (sha256 of the generator sources + the exported GLBs, stored in <name>.blend.fingerprint).
 
 Outputs (paths relative to the repo root):
 	art_source/blender/environment/store.blend          the generated store (packed textures)
@@ -15,6 +21,8 @@ Outputs (paths relative to the repo root):
 Everything is authored in Godot coordinates (see geo.py); Blender (x, y, z) = Godot (x, -z, y).
 Re-running is deterministic (fixed seeds).
 """
+import glob
+import hashlib
 import math
 import os
 import sys
@@ -960,8 +968,34 @@ def kit_pieces(P, E, mats):
 	piece("emergency_light", lambda mb: (k.emergency_light(mb), [])[1])
 	piece("emergency_door", lambda mb: k.steel_door(mb, 1.0, 2.1))
 	piece("pallet_boxes_static", lambda mb: k.pallet_stack(mb, np.random.default_rng(87), 2))
-	bpy.ops.wm.save_as_mainfile(filepath=os.path.join(HERE, "kit.blend"), compress=True)
+	kit_glbs = [os.path.join(KIT_DIR, name + ".glb") for name, _, _ in out]
+	save_blend_if_changed(os.path.join(HERE, "kit.blend"), content_fingerprint(kit_glbs))
 	return out
+
+
+def content_fingerprint(output_paths):
+	"""sha256 over the generator sources and the (deterministic) exported files."""
+	h = hashlib.sha256()
+	for path in sorted(glob.glob(os.path.join(HERE, "*.py"))) + sorted(output_paths):
+		h.update(os.path.basename(path).encode())
+		with open(path, "rb") as f:
+			h.update(f.read())
+	return h.hexdigest()
+
+
+def save_blend_if_changed(path, fingerprint):
+	"""Re-saving a .blend always changes its bytes, so skip it when the content is unchanged."""
+	fp_path = path + ".fingerprint"
+	if os.path.exists(path) and os.path.exists(fp_path):
+		with open(fp_path) as f:
+			if f.read().strip() == fingerprint:
+				print("BLEND unchanged, kept %s" % os.path.basename(path))
+				return
+	bpy.ops.file.pack_all()
+	bpy.ops.wm.save_as_mainfile(filepath=path, compress=True)
+	with open(fp_path, "w") as f:
+		f.write(fingerprint + "\n")
+	print("BLEND saved %s" % os.path.basename(path))
 
 
 def _shift(mb, offset, builder):
@@ -976,9 +1010,9 @@ def main():
 	if "--kit-only" not in ARGS:
 		st = build_store(P, E, mats)
 		os.makedirs(OUT_DIR, exist_ok=True)
-		bpy.ops.file.pack_all()
-		bpy.ops.wm.save_as_mainfile(filepath=BLEND_PATH, compress=True)
-		export_glb(os.path.join(OUT_DIR, "store_interior.glb"))
+		store_glb = os.path.join(OUT_DIR, "store_interior.glb")
+		export_glb(store_glb)
+		save_blend_if_changed(BLEND_PATH, content_fingerprint([store_glb]))
 		print("STORE objects=%d tris=%d glb=%.2f MB fixtures=%d" % (st.objects, st.tris,
 			os.path.getsize(os.path.join(OUT_DIR, "store_interior.glb")) / 1e6, len(st.fixtures)))
 		for g, t in sorted(st.group_tris.items(), key=lambda kv: -kv[1]):
