@@ -8,6 +8,7 @@ extends AudioStreamPlayer3D
 
 func _ready() -> void:
 	bus = &"Ambience"
+	volume_db += Sfx.mix_db(sound_id)
 	stream = Sfx.get_stream(sound_id)
 	if stream:
 		play()
