@@ -18,7 +18,7 @@ var _settings: SettingsPanel
 func _ready() -> void:
 	theme = THEME
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_build()
 	visible = false
 
@@ -88,6 +88,8 @@ func _button(text: String, action: Callable) -> Button:
 	var button := Button.new()
 	button.text = text
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	button.custom_minimum_size.x = 300
 	button.pressed.connect(func() -> void:
 		Sfx.play(&"ui_click")
 		action.call())

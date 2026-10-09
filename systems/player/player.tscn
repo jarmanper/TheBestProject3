@@ -29,8 +29,8 @@ far = 120.0
 [node name="Flashlight" type="SpotLight3D" parent="Head/Camera3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.16, -0.14, -0.05)
 light_color = Color(1, 0.91, 0.76, 1)
-light_energy = 2.4
-light_specular = 0.35
+light_energy = 1.8
+light_specular = 0.25
 shadow_enabled = true
 shadow_bias = 0.04
 spot_range = 18.0

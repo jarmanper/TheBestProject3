@@ -138,6 +138,8 @@ func test_hide_overlay_follows_spot_kind() -> void:
 	spot.spot_kind = &"counter"
 	Events.player_hid.emit(spot)
 	assert_eq(hud.get_hide_overlay_kind(), &"counter")
+	var overlay := hud.get_node("Root/HideOverlay") as Control
+	assert_eq(overlay.size, (hud.get_node("Root") as Control).size, "overlay covers the screen")
 	Events.player_unhid.emit(spot)
 	assert_eq(hud.get_hide_overlay_kind(), &"")
 	spot.free()

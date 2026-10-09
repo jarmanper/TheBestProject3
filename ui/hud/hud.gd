@@ -383,7 +383,7 @@ func _build() -> void:
 	_hide_overlay = HudHideOverlay.new()
 	_hide_overlay.name = "HideOverlay"
 	_root.add_child(_hide_overlay)
-	_hide_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_hide_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
 	# Top-left: health, slots, stamina.
 	var top_left := VBoxContainer.new()

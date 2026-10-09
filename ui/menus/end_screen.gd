@@ -27,7 +27,7 @@ var _buttons: Array[Button] = []
 func _ready() -> void:
 	theme = THEME
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_build()
 	visible = false
 

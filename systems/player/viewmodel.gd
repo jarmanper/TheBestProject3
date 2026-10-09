@@ -4,6 +4,9 @@ extends Node3D
 ## Loads Catalog.tool_viewmodel_path(id); the GLBs are posed for a camera looking down -Z,
 ## so the model sits at this node's origin. Missing files fall back to a box.
 
+## Render layer 20: the player's own flashlight excludes it (it sits right behind the hands
+## and would blow them out); store lights and ambient still light the viewmodel.
+const RENDER_LAYER := 1 << 19
 const SWAY_AMOUNT := 0.00035     ## metres per pixel of mouse motion
 const SWAY_MAX := 0.035
 const SWAY_RETURN := 8.0
@@ -26,7 +29,7 @@ func show_tool(tool_id: StringName) -> void:
 	_model = _load_model(id)
 	_model.name = "Model"
 	add_child(_model)
-	_disable_shadows(_model)
+	_prepare_geometry(_model)
 
 
 func add_sway(mouse_relative: Vector2) -> void:
@@ -84,8 +87,11 @@ static func _placeholder(id: StringName) -> Node3D:
 	return root
 
 
-static func _disable_shadows(node: Node) -> void:
+## No shadows from the hands, and put them on RENDER_LAYER.
+static func _prepare_geometry(node: Node) -> void:
 	if node is GeometryInstance3D:
-		(node as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var geometry := node as GeometryInstance3D
+		geometry.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		geometry.layers = RENDER_LAYER
 	for child in node.get_children():
-		_disable_shadows(child)
+		_prepare_geometry(child)

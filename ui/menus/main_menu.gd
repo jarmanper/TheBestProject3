@@ -33,7 +33,7 @@ var _flicker := 0.0
 
 func _ready() -> void:
 	theme = THEME
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	get_tree().paused = false
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_build()
@@ -129,13 +129,16 @@ func _build() -> void:
 	var quit := _button("QUIT", func() -> void: get_tree().quit())
 	quit.visible = not OS.has_feature("web")
 
+	# Bottom-right, growing up/left to fit its content (stays below the title).
 	var panel := PanelContainer.new()
 	panel.name = "Controls"
-	panel.set_anchors_preset(Control.PRESET_CENTER_RIGHT)
-	panel.offset_left = -500.0
-	panel.offset_right = -90.0
-	panel.offset_top = -170.0
-	panel.offset_bottom = 230.0
+	panel.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	panel.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	panel.offset_left = -80.0
+	panel.offset_right = -80.0
+	panel.offset_top = -56.0
+	panel.offset_bottom = -56.0
 	add_child(panel)
 	var controls := VBoxContainer.new()
 	controls.add_theme_constant_override(&"separation", 2)
@@ -188,6 +191,8 @@ func _button(text: String, action: Callable) -> Button:
 	var button := Button.new()
 	button.text = text
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	button.custom_minimum_size.x = 260
 	button.add_theme_font_size_override(&"font_size", 48)
 	button.pressed.connect(func() -> void:
 		Sfx.play(&"ui_click")

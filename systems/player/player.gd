@@ -39,7 +39,7 @@ const BOB_LATERAL := 0.02
 const SPRINT_BOB_SCALE := 1.6
 const SPRINT_ROLL := deg_to_rad(1.1)
 
-const FLASHLIGHT_ENERGY := 2.4
+const FLASHLIGHT_ENERGY := 1.8
 const FLICKER_RADIUS := 12.0
 
 const SHAKE_MAX_ANGLE := deg_to_rad(3.5)
@@ -100,6 +100,7 @@ func _ready() -> void:
 	collision_mask = Catalog.LAYER_WORLD | Catalog.LAYER_NPC
 	GameState.player = self
 	_camera.fov = FOV
+	_flashlight.light_cull_mask &= ~PlayerViewmodel.RENDER_LAYER
 	_viewmodel.show_tool(held_tool)
 	_apply_flashlight(1.0)
 

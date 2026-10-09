@@ -340,7 +340,7 @@ func _build_signs() -> void:
 		_sign("AisleSign", "AISLE %d" % (i + 1), at, Vector3.BACK, Vector2(1.4, 0.55), 72, true)
 		for dx in [-0.5, 0.5]:
 			_visual("SignChain", at + Vector3(dx, 0.48, 0), Vector3(0.015, 0.42, 0.015), &"metal_dark", decor, false)
-	_sign("DairySign", "DAIRY", Vector3(-2.0, 3.0, -5.4), Vector3.BACK, Vector2(1.8, 0.45), 64, false)
+	_sign("DairySign", "DAIRY", Vector3(-2.0, 2.8, -5.4), Vector3.BACK, Vector2(2.4, 0.6), 110, false)
 	_sign("FrozenSign", "FROZEN", Vector3(-18.9, 2.75, 2.0), Vector3.RIGHT, Vector2(1.8, 0.45), 64, false)
 	_sign("ProduceSign", "PRODUCE", Vector3(11.0, 3.3, 1.5), Vector3.BACK, Vector2(2.0, 0.5), 72, true)
 	_sign("ServiceSign", "CUSTOMER SERVICE", Vector3(12.0, 2.7, 12.4), Vector3.FORWARD, Vector2(3.2, 0.45), 60, true)
@@ -685,7 +685,8 @@ func _build_lights() -> void:
 		["AisleLight3", Vector3(-6, y_sales, 4.0), LIGHT_COOL, 1.0, 7.0, true],
 		["AisleLight4", Vector3(-2, y_sales, 0.5), LIGHT_COOL, 1.2, 7.5, false],
 		["AisleLight4Front", Vector3(-2, y_sales, 6.0), LIGHT_COOL, 0.8, 6.5, false],
-		["DairyLight", Vector3(-9, y_sales, -4.5), LIGHT_COOL, 1.0, 7.5, false],
+		["DairyLight", Vector3(-12, y_sales, -4.5), LIGHT_COOL, 1.0, 7.5, false],
+		["DairyLightAisle4", Vector3(-2.5, y_sales, -4.4), LIGHT_COOL, 1.1, 7.0, false],
 		["FrozenLight", Vector3(-18.3, y_sales, 1.0), LIGHT_COOL, 0.9, 7.0, false],
 		["CheckoutLightWest", Vector3(-12, y_sales, 10.5), LIGHT_COOL, 1.0, 7.5, false],
 		["CheckoutLightEast", Vector3(-3, y_sales, 10.5), LIGHT_COOL, 0.9, 7.5, false],
@@ -820,7 +821,7 @@ func _visual(base: String, center: Vector3, size: Vector3, material: StringName,
 
 ## Placeholder filled with boxes at load time by greybox.gd (see fill_product_run).
 func _product_run(base: String, origin: Vector3, yaw: float, length: float, depth: float, levels: Array,
-		palette: StringName, item_min := Vector3(0.22, 0.16, 0.1), item_max := Vector3(0.45, 0.34, 0.26),
+		palette: StringName, item_min := Vector3(0.2, 0.13, 0.07), item_max := Vector3(0.42, 0.3, 0.19),
 		gap_chance := 0.08) -> void:
 	var run := MultiMeshInstance3D.new()
 	run.name = _unique(base)
@@ -925,9 +926,9 @@ func _mat(id: StringName) -> StandardMaterial3D:
 			m.albedo_color = Color(0.15, 0.17, 0.16)
 			m.metallic = 0.4
 		&"cooler_glass":
-			_glow(m, Color(0.72, 0.85, 0.8), 0.35, 0.3)
+			_glow(m, Color(0.72, 0.85, 0.8), 0.9, 0.45)
 		&"freezer_glass":
-			_glow(m, Color(0.55, 0.72, 0.9), 0.35, 0.3)
+			_glow(m, Color(0.55, 0.72, 0.9), 0.8, 0.45)
 		&"fixture_tube":
 			_glow(m, Catalog.COLOR_CREAM.lightened(0.3), 2.5, 1.0)
 		&"emergency_red":
@@ -962,7 +963,7 @@ func _mat(id: StringName) -> StandardMaterial3D:
 			m.metallic = 0.35
 			m.roughness = 0.5
 		&"metal":
-			m.albedo_color = Color(0.36, 0.38, 0.37)
+			m.albedo_color = Color(0.25, 0.27, 0.26)
 			m.metallic = 0.5
 			m.roughness = 0.5
 		&"metal_dark":

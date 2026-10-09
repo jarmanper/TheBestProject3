@@ -54,7 +54,7 @@ static func fill_product_run(run: MultiMeshInstance3D) -> void:
 			if rng.randf() >= gap_chance:
 				var origin := Vector3(depth - size.x * 0.5 - rng.randf_range(0.0, 0.04), level_y + size.y * 0.5, z + size.z * 0.5)
 				transforms.append(Transform3D(Basis.from_scale(size), origin))
-				colors.append(palette[rng.randi() % palette.size()].darkened(rng.randf_range(0.0, 0.3)))
+				colors.append(palette[rng.randi() % palette.size()].darkened(rng.randf_range(0.15, 0.45)))
 			z += size.z + rng.randf_range(0.004, 0.025)
 	var multimesh := MultiMesh.new()
 	multimesh.transform_format = MultiMesh.TRANSFORM_3D
