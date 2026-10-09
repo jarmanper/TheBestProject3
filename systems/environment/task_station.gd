@@ -58,8 +58,23 @@ func get_prompt(player: Node) -> String:
 	if not is_active():
 		return ""
 	if not player.has_tool(required_tool):
-		return "Needs: %s" % Catalog.tool_name(required_tool)
+		return "Needs: %s%s" % [Catalog.tool_name(required_tool), _rack_hint()]
 	return VERB_PROMPTS.get(task_kind, title if not title.is_empty() else "Do task")
+
+
+## " — in <Zone>" when `required_tool`'s rack is in the scene and inside a known zone,
+## else "" (e.g. no rack found, or the rack sits outside any StoreZone).
+func _rack_hint() -> String:
+	var tree := get_tree()
+	if tree == null:
+		return ""
+	var rack := ToolPickup.find_rack(tree, required_tool)
+	if rack == null:
+		return ""
+	var zone_id := StoreZone.find_zone_id_at(tree, rack.global_position)
+	if zone_id == &"":
+		return ""
+	return " — in %s" % Catalog.zone_name(zone_id)
 
 
 func can_interact(player: Node) -> bool:

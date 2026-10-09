@@ -135,7 +135,7 @@ func render_checklist(tasks: Array) -> void:
 	var finished: Array[TaskData] = []
 	for task in _tasks:
 		if task.is_open():
-			_rows.append({"text": format_task(task), "color": color_for(task)})
+			_rows.append({"text": format_task(task) + _tool_hint(task), "color": color_for(task)})
 			continue
 		seen[task] = _finished_at.get(task, _now)
 		finished.append(task)
@@ -218,6 +218,37 @@ static func format_task(task: TaskData) -> String:
 			text += "  %d:%02d" % [floori(seconds / 60.0), seconds % 60]
 		return text
 	return "%s %s" % [MARK_OPEN, task.title]
+
+
+## "  (Mop: Janitor Closet)" when `task` needs a tool the player isn't holding, so the
+## checklist doubles as "where is that thing" — "" once the player holds it or the task
+## needs no tool.
+func _tool_hint(task: TaskData) -> String:
+	if task.required_tool == &"":
+		return ""
+	var player := GameState.player
+	if is_instance_valid(player) and player.has_tool(task.required_tool):
+		return ""
+	return GameHud.format_tool_hint(Catalog.tool_name(task.required_tool), _rack_zone_name(task.required_tool))
+
+
+## The display name of the zone holding `tool_id`'s rack, or "" if no rack/zone is found.
+func _rack_zone_name(tool_id: StringName) -> String:
+	var tree := get_tree()
+	if tree == null:
+		return ""
+	var rack := ToolPickup.find_rack(tree, tool_id)
+	if rack == null:
+		return ""
+	var zone_id := StoreZone.find_zone_id_at(tree, rack.global_position)
+	return Catalog.zone_name(zone_id) if zone_id != &"" else ""
+
+
+## Pure formatting helper (testable without a scene tree).
+static func format_tool_hint(tool_name: String, zone_name: String) -> String:
+	if zone_name.is_empty():
+		return "  (%s)" % tool_name
+	return "  (%s: %s)" % [tool_name, zone_name]
 
 
 static func color_for(task: TaskData) -> Color:

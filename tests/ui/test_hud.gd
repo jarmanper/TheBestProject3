@@ -1,6 +1,7 @@
 extends TestCase
 
 const HUD_SCENE := "res://ui/hud/hud.tscn"
+const PlayerHelper := preload("res://tests/helpers/player_helper.gd")
 
 var hud: GameHud
 
@@ -53,6 +54,49 @@ func test_checklist_order_and_styles() -> void:
 	assert_eq(rows[2].color, Catalog.COLOR_CREAM, "basic tasks cream")
 	assert_true(rows[3].color.a < 0.5, "done tasks dimmed")
 	assert_eq(rows[4].color, Catalog.COLOR_RED, "failed tasks red")
+
+
+func test_format_tool_hint_includes_zone_when_known() -> void:
+	assert_eq(GameHud.format_tool_hint("Mop", "Janitor Closet"), "  (Mop: Janitor Closet)")
+	assert_eq(GameHud.format_tool_hint("Mop", ""), "  (Mop)")
+
+
+func test_checklist_hint_shows_the_racks_zone_until_the_tool_is_held() -> void:
+	Tasks.reset()
+	var station := TaskStation.new()
+	station.task_kind = &"mop_spill"
+	station.title = "Mop the spill in Aisle 3"
+	station.required_tool = &"mop"
+	tree.root.add_child(station)
+	var rack := ToolPickup.new()
+	rack.tool_id = &"mop"
+	tree.root.add_child(rack)
+	var zone := StoreZone.new()
+	zone.zone_id = &"janitor"
+	var shape := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(10, 4, 10)
+	shape.shape = box
+	zone.add_child(shape)
+	tree.root.add_child(zone)
+	zone.global_position = Vector3(18, 0, -12)
+	rack.global_position = Vector3(18, 0, -12)
+	var player := PlayerHelper.make_player(tree)
+
+	Tasks.add_manager_task(station, 30.0)
+	hud.render_checklist(Tasks.get_tasks_for_checklist())
+	assert_eq(hud.get_checklist_rows()[0].text, "[!] Mop the spill in Aisle 3  0:30  (Mop: Janitor Closet)")
+
+	player.set_held_tool(&"mop")
+	hud.render_checklist(Tasks.get_tasks_for_checklist())
+	assert_eq(hud.get_checklist_rows()[0].text, "[!] Mop the spill in Aisle 3  0:30")
+
+	station.free()
+	rack.free()
+	zone.free()
+	player.free()
+	GameState.night_running = false
+	Tasks.reset()
 
 
 func test_countdown_rounds_up_and_untimed_manager_tasks_have_none() -> void:

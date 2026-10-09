@@ -37,6 +37,26 @@ func test_active_station_prompts_for_the_missing_tool() -> void:
 	assert_false(_station.can_interact(_player))
 
 
+func test_active_station_prompts_the_racks_zone_when_one_is_found() -> void:
+	Tasks.add_manager_task(_station, 30.0)
+	var rack := ToolPickup.new()
+	rack.tool_id = &"mop"
+	tree.root.add_child(rack)
+	var zone := StoreZone.new()
+	zone.zone_id = &"janitor"
+	var shape := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(10, 4, 10)
+	shape.shape = box
+	zone.add_child(shape)
+	tree.root.add_child(zone)
+	rack.global_position = Vector3(18, 0, -12)
+	zone.global_position = Vector3(18, 0, -12)
+	assert_eq(_station.get_prompt(_player), "Needs: Mop — in Janitor Closet")
+	rack.free()
+	zone.free()
+
+
 func test_active_station_prompts_a_verb_once_player_has_the_tool() -> void:
 	Tasks.add_manager_task(_station, 30.0)
 	_player.set_held_tool(&"mop")
