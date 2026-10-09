@@ -1,0 +1,44 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scenes/game.gd" id="1_game"]
+[ext_resource type="PackedScene" path="res://ui/postfx/postfx.tscn" id="2_postfx"]
+[ext_resource type="PackedScene" path="res://ui/hud/hud.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://ui/menus/pause_menu.tscn" id="4_pause"]
+[ext_resource type="PackedScene" path="res://ui/menus/end_screen.tscn" id="5_end"]
+
+[node name="Game" type="Node"]
+process_mode = 3
+script = ExtResource("1_game")
+
+[node name="WorldView" type="SubViewportContainer" parent="."]
+process_mode = 1
+texture_filter = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+stretch = true
+stretch_shrink = 2
+
+[node name="SubViewport" type="SubViewport" parent="WorldView"]
+handle_input_locally = false
+audio_listener_enable_3d = true
+size = Vector2i(640, 360)
+render_target_update_mode = 4
+
+[node name="World" type="Node3D" parent="WorldView/SubViewport"]
+
+[node name="PostFX" parent="." instance=ExtResource("2_postfx")]
+
+[node name="HUD" parent="." instance=ExtResource("3_hud")]
+process_mode = 1
+
+[node name="Menus" type="CanvasLayer" parent="."]
+process_mode = 3
+layer = 3
+
+[node name="PauseMenu" parent="Menus" instance=ExtResource("4_pause")]
+
+[node name="EndScreen" parent="Menus" instance=ExtResource("5_end")]
