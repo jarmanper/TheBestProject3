@@ -5,3 +5,4 @@
 # Web export output and task-tracking scratch files
 build/
 .superpowers/
+/build/
