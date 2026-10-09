@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://systems/environment/store_light.gd" id="1"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_fixture"]
+size = Vector3(1.2, 0.1, 0.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fixture"]
+albedo_color = Color(0.8471, 0.8275, 0.6588, 1)
+emission_enabled = true
+emission = Color(0.9, 0.95, 1, 1)
+emission_energy_multiplier = 1.0
+
+[node name="StoreLight" type="Node3D"]
+script = ExtResource("1")
+fixture_path = NodePath("Fixture")
+
+[node name="Light" type="OmniLight3D" parent="."]
+light_energy = 1.0
+light_color = Color(0.78, 0.86, 1, 1)
+omni_range = 7.0
+shadow_enabled = false
+
+[node name="Fixture" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+mesh = SubResource("BoxMesh_fixture")
+material_override = SubResource("StandardMaterial3D_fixture")

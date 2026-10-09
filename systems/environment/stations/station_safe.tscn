@@ -1,0 +1,32 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://systems/environment/task_station.gd" id="1"]
+[ext_resource type="Script" path="res://systems/environment/prop_placeholder.gd" id="2"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1"]
+size = Vector3(1.2, 1.6, 1.2)
+
+[node name="StationSafe" type="Area3D"]
+script = ExtResource("1")
+task_kind = &"safe"
+zone = &"service_desk"
+title = "Lock the safe"
+required_tool = &"keys"
+hold_time = 5.0
+basic_task = false
+manager_line = "Lock up the safe at the service desk before it's too late."
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("BoxShape3D_1")
+
+[node name="WorkPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.9)
+
+[node name="ActiveVisual" type="Node3D" parent="."]
+visible = false
+
+[node name="SafeBox" type="Node3D" parent="ActiveVisual"]
+script = ExtResource("2")
+fallback_size = Vector3(0.8, 0.8, 0.8)
+fallback_color = Color(0.2667, 0.2902, 0.2824, 1)

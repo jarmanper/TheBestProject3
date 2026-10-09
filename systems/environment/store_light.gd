@@ -1,17 +1,101 @@
 class_name StoreLight
 extends Node3D
 ## One ceiling fixture: a light plus the emissive tube mesh it belongs to.
-## STUB — public API only. The Store Environment task replaces the bodies.
+## Child "Light" (OmniLight3D) is required; an optional `fixture_path` points
+## at a fixture mesh whose emission is modulated alongside the light.
+
+const DISTURBANCE_DECAY_TIME := 0.5    ## seconds for set_disturbance() to fade back to 0
+const NATURAL_FLICKER_MIN := 8.0
+const NATURAL_FLICKER_MAX := 20.0
 
 @export var base_energy := 1.0
 @export var always_flicker := false   ## a "broken" fixture
 @export var starts_off := false
+@export var fixture_path: NodePath
+@export var buzzes := false           ## plays a quiet amb_fluorescent_buzz loop (budget: <= 10 lights)
+
+var _light: OmniLight3D
+var _fixture: MeshInstance3D
+var _fixture_material: StandardMaterial3D
+var _disturbance := 0.0
+var _flicker_elapsed := 0.0
+var _next_flicker_at := 0.0
 
 
 func _ready() -> void:
 	add_to_group(&"store_light")
+	_light = get_node_or_null(^"Light") as OmniLight3D
+	if _light:
+		_light.omni_range = 7.0
+		_light.shadow_enabled = false
+		_light.light_color = Color(0.78, 0.86, 1.0)
+	if not fixture_path.is_empty():
+		_fixture = get_node_or_null(fixture_path) as MeshInstance3D
+		if _fixture:
+			var base_mat := _fixture.get_active_material(0)
+			_fixture_material = base_mat.duplicate() as StandardMaterial3D if base_mat is StandardMaterial3D else StandardMaterial3D.new()
+			_fixture.material_override = _fixture_material
+	if starts_off:
+		_set_energy_fraction(0.0)
+	else:
+		_set_energy_fraction(1.0)
+		_schedule_next_flicker()
+	if buzzes:
+		_start_buzz()
+
+
+func _process(delta: float) -> void:
+	if _disturbance > 0.0:
+		_disturbance = maxf(0.0, _disturbance - delta / DISTURBANCE_DECAY_TIME)
+	if starts_off:
+		return
+	if always_flicker or _disturbance > 0.05:
+		_erratic_flicker()
+	else:
+		_natural_flicker(delta)
 
 
 ## 0 = steady, 1 = violent flicker. Called by the monster's proximity effect.
-func set_disturbance(_amount: float) -> void:
-	pass
+func set_disturbance(amount: float) -> void:
+	_disturbance = clampf(amount, 0.0, 1.0)
+
+
+func get_disturbance() -> float:
+	return _disturbance
+
+
+func _schedule_next_flicker() -> void:
+	_flicker_elapsed = 0.0
+	_next_flicker_at = randf_range(NATURAL_FLICKER_MIN, NATURAL_FLICKER_MAX)
+
+
+func _natural_flicker(delta: float) -> void:
+	_flicker_elapsed += delta
+	if _flicker_elapsed >= _next_flicker_at:
+		_schedule_next_flicker()
+		_quick_flicker()
+
+
+func _quick_flicker() -> void:
+	Sfx.play_at(&"light_flicker", global_position)
+	var tween := create_tween()
+	tween.tween_method(_set_energy_fraction, 1.0, 0.15, 0.05)
+	tween.tween_method(_set_energy_fraction, 0.15, 1.0, 0.1)
+
+
+func _erratic_flicker() -> void:
+	var intensity := maxf(_disturbance, 0.35 if always_flicker else 0.0)
+	_set_energy_fraction(1.0 - randf() * 0.6 * intensity)
+
+
+func _set_energy_fraction(fraction: float) -> void:
+	if _light:
+		_light.light_energy = base_energy * fraction
+	if _fixture_material:
+		_fixture_material.emission_energy_multiplier = fraction
+
+
+func _start_buzz() -> void:
+	var emitter := Sfx.play_at(&"amb_fluorescent_buzz", global_position, -18.0)
+	if emitter:
+		emitter.max_distance = 6.0
