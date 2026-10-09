@@ -46,11 +46,14 @@ const INVESTIGATE_LINGER := Vector2(10.0, 20.0)
 const LURE_TIME := 45.0
 const LURE_MIN_DISTANCE := 18.0
 const SEARCH_TIME := 10.0
-const SEARCH_TRAVEL_MAX := 15.0
+const SEARCH_TRAVEL_MAX := 15.0         ## seconds to reach the last known spot / watched hiding spot
 const SEARCH_HOP_RADIUS := 6.0
+const SEARCH_HOP_WAIT := 1.5
+const PULL_OUT_REACH := 2.0             ## drags a hider out only from this close to the spot
 const RETREAT_UNSEEN_TIME := 2.0
 const RETREAT_MIN_DISTANCE := 15.0
-const RETREAT_GIVE_UP := 25.0           ## then any out-of-view spot will do
+const RETREAT_GIVE_UP := 25.0           ## then any out-of-view spot will do; still watched: turns on the player
+const SIGHTING_WALKOFF_MAX := 15.0      ## still watched this long after walking off: stops pretending
 const SIGHTING_DISTANCE := Vector2(12.0, 22.0)
 const SIGHTING_DISTANCE_RELAXED := Vector2(6.0, 28.0)  ## after a few failed attempts (small rooms)
 const SIGHTING_HOLD_TIME := 3.0         ## seconds in view before it walks off
@@ -94,7 +97,8 @@ const RETREAT := &"retreat"
 const SIGHTING := &"sighting"
 const CALM_STATES: Array[StringName] = [DISGUISED_ROAM, INVESTIGATE, LURE]
 const RULE2_STATES: Array[StringName] = [DISGUISED_ROAM, INVESTIGATE, LURE, SIGHTING]
-const HUNTING_STATES: Array[StringName] = [REVEAL, CHASE, WINDED, SEARCH, ATTACK]
+## States in which it is going after the player (and so watches where they hide).
+const PURSUIT_STATES: Array[StringName] = [REVEAL, CHASE, WINDED, SEARCH, ATTACK]
 
 var state: StringName = DISGUISED_ROAM
 var state_time := 0.0
@@ -131,9 +135,12 @@ var _stuck_time := 0.0
 var _stuck_check_pos := Vector3.ZERO
 
 # Per-state scratch (reset on every state change).
-var _phase := 0
-var _timer := 0.0
-var _timer2 := 0.0
+var _phase := 0                         ## step within the current state (0 = first)
+var _phase_left := 0.0                  ## countdown for the current step (work pause, linger, lure, reveal, search, walk-off)
+var _seen_time := 0.0                   ## sighting: seconds the player has seen it hold
+var _glance_left := 0.0                 ## looking around: next glance in
+var _hop_wait := 0.0                    ## search: idle time before the next hop
+var _wheeze_left := 0.0                 ## winded: next wheeze in
 var _attack_hit := false
 var _sighting_failures := 0
 var _pending_intercom: StringName = &""
@@ -179,6 +186,7 @@ func _ready() -> void:
 	_twitch_left = _roll(TWITCH_INTERVAL)
 	Events.intercom_announced.connect(_on_intercom_announced)
 	Events.player_hid.connect(_on_player_hid)
+	Events.player_unhid.connect(_on_player_unhid)
 	Events.coworker_missing.connect(_on_coworker_missing)
 	_set_state(DISGUISED_ROAM)
 
@@ -208,8 +216,10 @@ func is_true_form() -> bool:
 	return _true_form_active
 
 
+## True from the moment it turns on the player (Events.chase_started) until it has
+## slipped away and put a face back on (Events.chase_ended), retreat included.
 func is_hunting() -> bool:
-	return state in HUNTING_STATES
+	return _chase_active
 
 
 func is_in_player_view() -> bool:
@@ -295,10 +305,7 @@ func try_stage_sighting() -> bool:
 	if spot == null:
 		_sighting_failures += 1
 		return false
-	_set_form(rng.randf() < SIGHTING_TRUE_FORM_CHANCE)
-	_teleport(spot)
-	_face_now(_player.global_position)
-	_set_state(SIGHTING)
+	_begin_sighting(spot, rng.randf() < SIGHTING_TRUE_FORM_CHANCE)
 	return true
 
 
@@ -316,7 +323,8 @@ func get_debug_text() -> String:
 # --- Perception -------------------------------------------------------------------
 
 func _sense(delta: float) -> void:
-	_nav_ok = AiNav.is_ready(_agent.get_navigation_map(), global_position)
+	if not _nav_ok:   # once the map has synced it stays usable
+		_nav_ok = AiNav.is_ready(_agent.get_navigation_map(), global_position)
 	_player = GameState.player if is_instance_valid(GameState.player) else null
 	if _player != null and (not _player.is_inside_tree() or float(_player.get(&"health")) <= 0.0):
 		_player = null   # gone, or dead: nothing left to hunt
@@ -339,6 +347,7 @@ func _sense(delta: float) -> void:
 	_sees_player = _has_los and not _player_hidden
 	if _sees_player:
 		_last_known = _player.global_position
+		witnessed_spot = null   # they are out in the open: whatever it saw them hide in is stale
 	_in_view = _is_visible_at(global_position, _height())
 	_out_of_view_time = 0.0 if _in_view else _out_of_view_time + delta
 
@@ -376,7 +385,7 @@ func _tick_rules(delta: float) -> void:
 	var lingering := state in RULE2_STATES \
 		and MonsterRules.is_reveal_condition(_player_distance, _has_los, _player_hidden)
 	if rules.tick_reveal(delta, lingering):
-		_set_state(REVEAL)
+		_begin_hunt()
 		return
 	if not state in CALM_STATES:
 		return
@@ -387,9 +396,11 @@ func _tick_rules(delta: float) -> void:
 		return
 	if state != DISGUISED_ROAM:
 		return
-	if rules.abduction_due() and not try_abduction():
+	if rules.abduction_due():
+		if try_abduction():
+			return   # one off-screen act per tick: it is now standing in the victim's place
 		rules.delay_abduction(ABDUCT_RETRY)
-	elif rules.mimic_due():
+	if rules.mimic_due():
 		if try_mimic_lure():
 			rules.mimic_done()
 		else:
@@ -402,8 +413,11 @@ func _set_state(new_state: StringName) -> void:
 	state = new_state
 	state_time = 0.0
 	_phase = 0
-	_timer = 0.0
-	_timer2 = 0.0
+	_phase_left = 0.0
+	_seen_time = 0.0
+	_glance_left = 0.0
+	_hop_wait = 0.0
+	_wheeze_left = 0.0
 	_face_point = null
 	_staring = false
 	_anim_override = &""
@@ -452,11 +466,11 @@ func _tick_disguised_roam(delta: float) -> void:
 	if _phase == 0:
 		if not _moving:
 			_phase = 1
-			_timer = _roll(WORK_PAUSE)
+			_phase_left = _roll(WORK_PAUSE)
 			_pretend_to_work()
 		return
-	_timer -= delta
-	if _timer <= 0.0:
+	_phase_left -= delta
+	if _phase_left <= 0.0:
 		_phase = 0
 		_face_point = null
 		_anim_override = &""
@@ -474,11 +488,11 @@ func _tick_investigate(delta: float) -> void:
 	if _phase == 0:
 		if not _moving:
 			_phase = 1
-			_timer = _roll(INVESTIGATE_LINGER)
+			_phase_left = _roll(INVESTIGATE_LINGER)
 		return
 	_look_around(delta)
-	_timer -= delta
-	if _timer <= 0.0:
+	_phase_left -= delta
+	if _phase_left <= 0.0:
 		_set_state(DISGUISED_ROAM)
 
 
@@ -488,15 +502,28 @@ func _enter_lure() -> void:
 	if _player != null:
 		_face_now(global_position * 2.0 - _player.global_position)
 	_anim_override = Catalog.ANIM_WORK if rng.randf() < 0.5 else &""
-	_timer = LURE_TIME
+	_phase_left = LURE_TIME
 
 
 func _tick_lure(delta: float) -> void:
 	if _stare_if_lingered():
 		return
-	_timer -= delta
-	if _timer <= 0.0:
+	_phase_left -= delta
+	if _phase_left <= 0.0:
 		_set_state(DISGUISED_ROAM)
+
+
+## Turns on the player: rule 2, or a player who keeps watching it slink away.
+## A disguised body transforms first (reveal); one already in its true form
+## does not transform again, it roars and charges.
+func _begin_hunt() -> void:
+	if not _true_form_active:
+		_set_state(REVEAL)
+		return
+	Sfx.play_at(&"monster_growl", global_position + Vector3.UP * 2.0, 3.0, 1.0, 40.0)
+	if not _chase_active:
+		Sfx.play(&"chase_stinger")
+	_set_state(CHASE)
 
 
 # reveal: transforms into the true form in front of the player.
@@ -508,15 +535,15 @@ func _enter_reveal() -> void:
 	_play_once(Catalog.ANIM_REVEAL)
 	Sfx.play_at(&"monster_reveal", global_position + Vector3.UP * 2.0, 3.0, 1.0, 40.0)
 	Sfx.play(&"chase_stinger")
-	_timer = rng.randf_range(REVEAL_DURATION.x, REVEAL_DURATION.y)
+	_phase_left = rng.randf_range(REVEAL_DURATION.x, REVEAL_DURATION.y)
 	_start_chase_event()
 
 
 func _tick_reveal(delta: float) -> void:
 	if _player != null:
 		_face_point = _player.global_position
-	_timer -= delta
-	if _timer <= 0.0:
+	_phase_left -= delta
+	if _phase_left <= 0.0:
 		_set_state(CHASE)
 
 
@@ -550,23 +577,23 @@ func _tick_chase(delta: float) -> void:
 func _enter_winded() -> void:
 	_ensure_hunting_form()
 	rules.start_winded()
-	_timer2 = 0.0
 
 
 func _tick_winded(delta: float) -> void:
-	_timer2 -= delta
-	if _timer2 <= 0.0:
-		_timer2 = WHEEZE_INTERVAL
+	_wheeze_left -= delta
+	if _wheeze_left <= 0.0:
+		_wheeze_left = WHEEZE_INTERVAL
 		Sfx.play_at(&"monster_winded", global_position + Vector3.UP * 2.2, 4.0, 1.0, 40.0)
 	_go_to(_last_known, WINDED_SPEED)
 	if rules.tick_winded(delta):
 		_set_state(CHASE if _sees_player else SEARCH)
 
 
-# search: last known position, or straight to the hiding spot it saw the player enter.
+# search: last known position, or straight to the hiding spot it saw the player
+# enter (phase 0, at most SEARCH_TRAVEL_MAX), then looks around there (phase 1).
 func _enter_search() -> void:
 	_ensure_hunting_form()
-	_timer = SEARCH_TRAVEL_MAX
+	_phase_left = SEARCH_TRAVEL_MAX
 	if witnessed_spot != null and is_instance_valid(witnessed_spot):
 		_go_to(_snap_to_nav(_spot_front(witnessed_spot)), SEARCH_SPEED)
 	else:
@@ -579,35 +606,51 @@ func _tick_search(delta: float) -> void:
 	if _sees_player:
 		_set_state(CHASE)
 		return
+	_phase_left -= delta
 	if witnessed_spot != null:
-		if not is_instance_valid(witnessed_spot):
-			witnessed_spot = null
-		elif not _moving or _flat_distance(global_position, _spot_front(witnessed_spot)) <= 1.3:
-			if _pull_player_out(witnessed_spot):
-				return
-			witnessed_spot = null   # they slipped out before it got there
-			_phase = 1
-			_timer = SEARCH_TIME
+		_search_witnessed_spot()
 		return
 	if _hears_player():
 		_last_known = _player.global_position
 		_go_to(_last_known, SEARCH_SPEED)
-	_timer -= delta
 	if _phase == 0:
-		if not _moving or _timer <= 0.0:
-			_phase = 1
-			_timer = SEARCH_TIME
+		if not _moving or _phase_left <= 0.0:
+			_start_looking_around()
 		return
-	if _timer <= 0.0:
+	if _phase_left <= 0.0:
 		_set_state(RETREAT)
 		return
 	if not _moving:
 		_look_around(delta)
-		_timer2 -= delta
-		if _timer2 <= -1.5:
-			_timer2 = 0.0
-			var hop := _last_known + Vector3(rng.randf_range(-1.0, 1.0), 0.0, rng.randf_range(-1.0, 1.0)).normalized() * SEARCH_HOP_RADIUS
+		_hop_wait += delta
+		if _hop_wait >= SEARCH_HOP_WAIT:
+			_hop_wait = 0.0
+			var hop := _last_known + _random_flat_dir() * SEARCH_HOP_RADIUS
 			_go_to(_snap_to_nav(hop), SEARCH_SPEED)
+
+
+## Heading for the hiding spot it watched the player enter: drags them out
+## once within PULL_OUT_REACH; if it cannot get there in time (or the spot is
+## empty when it arrives) it searches the area like any other lost trail.
+func _search_witnessed_spot() -> void:
+	if not is_instance_valid(witnessed_spot):
+		witnessed_spot = null
+		return
+	var reach := minf(_flat_distance(global_position, _spot_front(witnessed_spot)),
+		_flat_distance(global_position, witnessed_spot.global_position))
+	if reach <= PULL_OUT_REACH:
+		if _pull_player_out(witnessed_spot):
+			return
+		witnessed_spot = null   # they slipped out before it got there
+		_start_looking_around()
+	elif not _moving or _phase_left <= 0.0:
+		witnessed_spot = null   # cannot reach it: no pulling anyone out from across the room
+		_start_looking_around()
+
+
+func _start_looking_around() -> void:
+	_phase = 1
+	_phase_left = SEARCH_TIME
 
 
 # attack: lunging wind-up with a scream, damage if the player is still in range.
@@ -646,6 +689,8 @@ func _resolve_attack() -> void:
 
 
 # retreat: breaks away; once unseen and far, vanishes and puts a face back on.
+# A player who keeps it in view for RETREAT_GIVE_UP gets charged again: watching
+# it is not a way to stay safe.
 func _enter_retreat() -> void:
 	_ensure_hunting_form()
 	_go_to(_pick_far_point(), RETREAT_SPEED)
@@ -657,6 +702,9 @@ func _tick_retreat(delta: float) -> void:
 	var far := _player == null or _player_distance > RETREAT_MIN_DISTANCE
 	if unseen and (far or state_time >= RETREAT_GIVE_UP):
 		_finish_retreat()
+		return
+	if state_time >= RETREAT_GIVE_UP and _in_view and _sees_player:
+		_begin_hunt()
 		return
 	if not _moving:
 		_go_to(_pick_far_point(), RETREAT_SPEED)
@@ -675,10 +723,19 @@ func _finish_retreat() -> void:
 	_set_state(DISGUISED_ROAM)
 
 
-# sighting (rule 3): holds in the player's view, then walks out of it.
+# sighting (rule 3): holds in the player's view (phase 0), then walks out of it
+# (phase 1). Still watched after SIGHTING_WALKOFF_MAX: a disguise just carries on
+# as a coworker, the true form (which cannot vanish in view) turns on the player.
+func _begin_sighting(spot: Vector3, true_form: bool) -> void:
+	_set_form(true_form)
+	_teleport(spot)
+	if _player != null:
+		_face_now(_player.global_position)
+	_set_state(SIGHTING)
+
+
 func _enter_sighting() -> void:
 	_stop()
-	_timer = 0.0
 
 
 func _tick_sighting(delta: float) -> void:
@@ -686,10 +743,11 @@ func _tick_sighting(delta: float) -> void:
 		if _player != null:
 			_face_point = _player.global_position
 		if _in_view:
-			_timer += delta
+			_seen_time += delta
 		var close := _player != null and _player_distance <= SIGHTING_CLOSE_DISTANCE
-		if _timer >= SIGHTING_HOLD_TIME or close or state_time >= SIGHTING_MAX_HOLD:
+		if _seen_time >= SIGHTING_HOLD_TIME or close or state_time >= SIGHTING_MAX_HOLD:
 			_phase = 1
+			_phase_left = SIGHTING_WALKOFF_MAX
 			_face_point = null
 			_sighting_failures = 0
 			_leave_view()
@@ -698,7 +756,17 @@ func _tick_sighting(delta: float) -> void:
 		if _true_form_active:
 			_set_form(false)
 		_set_state(DISGUISED_ROAM)
-	elif not _moving:
+		return
+	_phase_left -= delta
+	if _phase_left <= 0.0:
+		if not _true_form_active:
+			_set_state(DISGUISED_ROAM)
+			return
+		if _sees_player:
+			_begin_hunt()
+			return
+		_phase_left = 1.0   # watched from a hiding spot: keep walking, check again
+	if not _moving:
 		_leave_view()
 
 
@@ -723,9 +791,9 @@ func _pretend_to_work() -> void:
 
 
 func _look_around(delta: float) -> void:
-	_timer2 -= delta
-	if _timer2 <= 0.0:
-		_timer2 = rng.randf_range(1.5, 3.0)
+	_glance_left -= delta
+	if _glance_left <= 0.0:
+		_glance_left = rng.randf_range(1.5, 3.0)
 		_face_point = global_position + _random_flat_dir()
 
 
@@ -961,20 +1029,38 @@ func _set_disguise(identity: Dictionary) -> void:
 	if skeleton != null and skeleton.find_bone(HeadTwitch.BONE_NAME) >= 0:
 		_head_twitch = HeadTwitch.new()
 		skeleton.add_child(_head_twitch)
-	if not _true_form_active:
-		_anim = CharacterModel.find_animation_player(_disguise_model)
+	_activate_form_animation()
 
 
 func _set_form(true_form: bool) -> void:
 	_true_form_active = true_form
 	_true_form.visible = true_form
 	_disguise_form.visible = not true_form
-	_anim = CharacterModel.find_animation_player(_true_model if true_form else _disguise_model)
+	_activate_form_animation()
 	_step_distance = 0.0
 	if true_form and _breath.stream != null:
 		_breath.play()
 	elif not true_form:
 		_breath.stop()
+
+
+## Only the visible body animates: the hidden form's AnimationPlayer and head
+## twitch are switched off so they cost nothing per frame.
+func _activate_form_animation() -> void:
+	var shown := _true_model if _true_form_active else _disguise_model
+	var hidden := _disguise_model if _true_form_active else _true_model
+	var hidden_anim := CharacterModel.find_animation_player(hidden)
+	if hidden_anim != null:
+		hidden_anim.active = false
+	_anim = CharacterModel.find_animation_player(shown)
+	if _anim != null:
+		_anim.active = true
+	if _head_twitch != null:
+		_head_twitch.active = not _true_form_active
+
+
+func _anim_body() -> StringName:
+	return &"monster" if _true_form_active else &"employee"
 
 
 func _height() -> float:
@@ -1158,14 +1244,11 @@ func _update_animation() -> void:
 	if _anim == null or _anim_locked:
 		return
 	var speed := Vector2(velocity.x, velocity.z).length()
-	if speed > 3.2:
-		CharacterModel.play(_anim, Catalog.ANIM_RUN, clampf(speed / CHASE_SPEED, 0.6, 1.6))
-	elif speed > 0.15:
-		CharacterModel.play(_anim, Catalog.ANIM_WALK, clampf(speed / DISGUISED_SPEED, 0.5, 2.0))
-	elif _anim_override != &"" and not _staring:
+	if speed < CharacterModel.IDLE_BELOW and _anim_override != &"" and not _staring:
 		CharacterModel.play(_anim, _anim_override)
 	else:
-		CharacterModel.play(_anim, Catalog.ANIM_IDLE)
+		# Clip and speed_scale from the body's measured ground speed: no foot sliding.
+		CharacterModel.play_locomotion(_anim, _anim_body(), speed)
 
 
 # --- Signals -------------------------------------------------------------------------
@@ -1183,7 +1266,12 @@ func _on_intercom_announced(_message: String, zone: StringName) -> void:
 
 ## It only knows where the player hid if it was watching at that moment.
 func _on_player_hid(spot: Node3D) -> void:
-	witnessed_spot = spot if _has_los and state in HUNTING_STATES else null
+	witnessed_spot = spot if _has_los and state in PURSUIT_STATES else null
+
+
+## Whatever spot it saw them enter is empty now.
+func _on_player_unhid(_spot: Node3D) -> void:
+	witnessed_spot = null
 
 
 func _on_coworker_missing(coworker_name: String) -> void:

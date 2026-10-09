@@ -121,15 +121,9 @@ func add_station(at: Vector3, zone: StringName, title: String) -> TaskStation:
 	return station
 
 
-## Bakes the navmesh from the static colliders. 0.5/2.0 is what radius 0.4 and
-## height 1.8 round up to on the default 0.25 m cells (without the bake warnings).
+## Bakes the navmesh from the static colliders (see AiNav.make_bake_mesh()).
 func bake_navigation() -> void:
-	var mesh := NavigationMesh.new()
-	mesh.geometry_parsed_geometry_type = NavigationMesh.PARSED_GEOMETRY_STATIC_COLLIDERS
-	mesh.geometry_collision_mask = Catalog.LAYER_WORLD
-	mesh.agent_radius = 0.5
-	mesh.agent_height = 2.0
-	region.navigation_mesh = mesh
+	region.navigation_mesh = AiNav.make_bake_mesh()
 	region.bake_navigation_mesh(false)
 
 

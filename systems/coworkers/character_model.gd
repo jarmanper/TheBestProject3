@@ -9,6 +9,16 @@ enum Placeholder { EMPLOYEE, MONSTER }
 const LOOPING_ANIMS: Array[StringName] = [
 	Catalog.ANIM_IDLE, Catalog.ANIM_WALK, Catalog.ANIM_RUN, Catalog.ANIM_WORK,
 ]
+## Ground speed (m/s) of each body's walk/run clip: moving at exactly this speed
+## with speed_scale 1 keeps the planted foot still. Measured by Task 1's generator
+## (art_source/blender/characters/build_characters.py prints "ground speed" per
+## clip on every rebuild); update these when the animations change.
+const GROUND_SPEED := {
+	&"employee": {&"walk": 2.14, &"run": 4.86},
+	&"monster": {&"walk": 1.14, &"run": 3.98},
+	&"manager": {&"walk": 1.44},
+}
+const IDLE_BELOW := 0.15                 ## m/s; slower than this plays idle
 const SKIN_COLOR := Color("c99a7a")
 const MONSTER_SKIN := Color("b9a7a3")   ## pale, desaturated greyish pink
 const CLAW_COLOR := Color("1c1a1a")
@@ -59,9 +69,29 @@ static func setup_loops(player: AnimationPlayer) -> void:
 static func play(player: AnimationPlayer, anim_name: StringName, speed := 1.0, blend := 0.2) -> void:
 	if player == null or not player.has_animation(anim_name):
 		return
-	if player.current_animation != anim_name:
+	if player.current_animation != anim_name or not player.is_playing():
 		player.play(anim_name, blend)
 	player.speed_scale = speed
+
+
+## Which clip a `body` (a GROUND_SPEED key) moving at `speed` m/s plays, and the
+## speed_scale that keeps its feet planted: [anim_name, speed_scale].
+## Runs once the speed is past halfway between the walk and run ground speeds.
+static func locomotion(body: StringName, speed: float) -> Array:
+	if speed < IDLE_BELOW:
+		return [Catalog.ANIM_IDLE, 1.0]
+	var speeds: Dictionary = GROUND_SPEED[body]
+	var walk: float = speeds[&"walk"]
+	var run: float = speeds.get(&"run", 0.0)
+	if run > 0.0 and speed > (walk + run) * 0.5:
+		return [Catalog.ANIM_RUN, speed / run]
+	return [Catalog.ANIM_WALK, speed / walk]
+
+
+## Plays idle/walk/run for `body` moving at `speed` (see locomotion()).
+static func play_locomotion(player: AnimationPlayer, body: StringName, speed: float) -> void:
+	var choice := locomotion(body, speed)
+	play(player, choice[0], choice[1])
 
 
 # --- Placeholders ------------------------------------------------------------

@@ -33,6 +33,28 @@ func test_loop_modes_set_in_code() -> void:
 	holder.free()
 
 
+func test_locomotion_matches_clip_ground_speed() -> void:
+	# [clip, speed_scale] such that speed_scale x ground speed == the body's speed: no foot sliding.
+	var chase := CharacterModel.locomotion(&"monster", Monster.CHASE_SPEED)
+	assert_eq(chase[0], Catalog.ANIM_RUN)
+	assert_near(chase[1], Monster.CHASE_SPEED / 3.98, 0.001)
+	var winded := CharacterModel.locomotion(&"monster", Monster.WINDED_SPEED)
+	assert_eq(winded[0], Catalog.ANIM_WALK)
+	assert_near(winded[1], Monster.WINDED_SPEED / 1.14, 0.001)
+	var search := CharacterModel.locomotion(&"monster", Monster.SEARCH_SPEED)
+	assert_eq(search[0], Catalog.ANIM_RUN, "3 m/s is closer to the monster's lurching run")
+	var disguised := CharacterModel.locomotion(&"employee", Monster.DISGUISED_SPEED)
+	assert_eq(disguised[0], Catalog.ANIM_WALK)
+	assert_near(disguised[1], Monster.DISGUISED_SPEED / 2.14, 0.001)
+	var walker := CharacterModel.locomotion(&"employee", Coworker.WALK_SPEED)
+	assert_near(walker[1], disguised[1], 0.001, "the disguise walks exactly like a coworker")
+	var flee := CharacterModel.locomotion(&"employee", Coworker.FLEE_SPEED)
+	assert_eq(flee[0], Catalog.ANIM_RUN)
+	assert_near(flee[1], Coworker.FLEE_SPEED / 4.86, 0.001)
+	assert_eq(CharacterModel.locomotion(&"employee", 0.05)[0], Catalog.ANIM_IDLE)
+	assert_eq(CharacterModel.locomotion(&"manager", 3.0)[0], Catalog.ANIM_WALK, "no run clip")
+
+
 func test_head_twitch_rotates_the_head_bone() -> void:
 	var skeleton := Skeleton3D.new()
 	skeleton.add_bone("neck")

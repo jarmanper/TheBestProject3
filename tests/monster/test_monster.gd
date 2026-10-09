@@ -239,6 +239,61 @@ func test_new_sighting_counted_after_a_real_gap() -> void:
 	assert_eq(GameState.stats.get("monster_sightings", 0), 2)
 
 
+## A staged sighting `distance` m ahead of a player at the origin looking down -Z.
+func _staged_sighting(distance: float, true_form: bool) -> Monster:
+	world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
+	for at in [Vector3(-20, 0, -25), Vector3(20, 0, -25), Vector3(0, 0, -28)]:
+		world.add_marker(&"patrol_point", at)
+	var monster := _spawn_monster(Vector3(0, 0, 25))
+	await world.settle()
+	await _run(monster, STEP)
+	monster._begin_sighting(Vector3(0, 0, -distance), true_form)
+	assert_eq(monster.state, Monster.SIGHTING)
+	assert_eq(monster.is_true_form(), true_form)
+	return monster
+
+
+func test_watched_true_form_sighting_walk_off_turns_on_the_player() -> void:
+	var monster: Monster = await _staged_sighting(14.0, true)
+	var pin := func() -> void: monster.global_position = Vector3(0, 0, -14)   # cannot get out of view
+	var cap := Monster.SIGHTING_HOLD_TIME + Monster.SIGHTING_WALKOFF_MAX
+	var ticks: int = await _ticks_until_leaving(monster, Monster.SIGHTING, roundi((cap + 1.0) / STEP), pin)
+	assert_near(ticks * STEP, cap, 0.1, "holds, then walks off for at most SIGHTING_WALKOFF_MAX")
+	assert_eq(monster.state, Monster.CHASE, "a true form that cannot vanish turns on the watcher")
+	assert_false(Monster.REVEAL in states, "no second transformation")
+	assert_eq(events.count("chase_started"), 1)
+
+
+func test_watched_disguised_sighting_walk_off_carries_on_as_a_coworker() -> void:
+	var monster: Monster = await _staged_sighting(14.0, false)
+	var pin := func() -> void: monster.global_position = Vector3(0, 0, -14)
+	var cap := Monster.SIGHTING_HOLD_TIME + Monster.SIGHTING_WALKOFF_MAX
+	var ticks: int = await _ticks_until_leaving(monster, Monster.SIGHTING, roundi((cap + 1.0) / STEP), pin)
+	assert_near(ticks * STEP, cap, 0.1)
+	assert_eq(monster.state, Monster.DISGUISED_ROAM, "just another coworker walking around")
+	assert_eq(events.count("chase_started"), 0)
+
+
+func test_rule2_during_a_disguised_sighting_reveals() -> void:
+	var monster: Monster = await _staged_sighting(6.0, false)
+	# The player follows it 4 m behind as it walks off.
+	var follow := func() -> void: world.get_node(^"Player").global_position = monster.global_position + Vector3(0, 0, 4)
+	var ticks: int = await _ticks_until_leaving(monster, Monster.SIGHTING, roundi(6.0 / STEP), follow)
+	assert_near(ticks * STEP, Monster.REVEAL_TIME, 0.05, "rule 2 applies during a sighting")
+	assert_eq(monster.state, Monster.REVEAL)
+	assert_true(monster.is_true_form())
+
+
+func test_rule2_during_a_true_form_sighting_charges_without_transforming() -> void:
+	var monster: Monster = await _staged_sighting(6.0, true)
+	var follow := func() -> void: world.get_node(^"Player").global_position = monster.global_position + Vector3(0, 0, 4)
+	var ticks: int = await _ticks_until_leaving(monster, Monster.SIGHTING, roundi(6.0 / STEP), follow)
+	assert_near(ticks * STEP, Monster.REVEAL_TIME, 0.05)
+	assert_eq(monster.state, Monster.CHASE, "already transformed: straight to the chase")
+	assert_false(Monster.REVEAL in states, "the reveal transform is not replayed")
+	assert_eq(events.count("chase_started"), 1)
+
+
 # --- Seam 1, hearing ---------------------------------------------------------------------
 
 func test_intercom_sends_it_to_investigate_that_zone() -> void:
@@ -276,6 +331,21 @@ func test_hears_sprinting_player_within_radius() -> void:
 	await _run(monster, STEP)
 	assert_eq(monster.state, Monster.INVESTIGATE, "sprinting within 14 m is heard")
 	assert_true(monster.investigate_target.distance_to(Vector3.ZERO) < 0.5)
+
+
+func test_walkie_messages_do_not_reach_it() -> void:
+	world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
+	world.add_zone(&"storage", Vector3(15, 1.5, 15), Vector3(8, 3, 8))
+	var monster := _spawn_monster(Vector3(0, 0, -20))
+	await world.settle()
+	monster.force_state(Monster.LURE)
+	var before := states.size()
+	Events.walkie_message.emit("MANAGER", "Can someone check the storage room?", Vector3(15, 0, 15), false)
+	Events.walkie_message.emit("RITA", "I'm in the storage room.", Vector3(15, 0, 15), false)
+	await _run(monster, STEP)
+	assert_eq(monster.state, Monster.LURE, "the walkie is private (GDD seam 1)")
+	assert_eq(states.size(), before, "no state change")
+	assert_eq(monster.investigate_target, Vector3.ZERO)
 
 
 func test_does_not_hear_beyond_radius() -> void:
@@ -325,6 +395,39 @@ func test_unwitnessed_hiding_is_not_known() -> void:
 	monster.force_state(Monster.CHASE)
 	await _run(monster, STEP)
 	player.enter_hiding(spot)
+	assert_eq(monster.witnessed_spot, null)
+
+
+func test_far_pull_out_is_refused() -> void:
+	var player: FakePlayer = world.add_player(Vector3(0, 0, -1), Vector3(0, 0, -10))
+	var spot := _add_spot(Vector3(0, 0, -1.5), Vector3(0, 0, -0.5))
+	world.add_box(Vector3(0.0, 1.5, 3.0), Vector3(10.0, 3.0, 0.3))   # blocks the way (no navmesh)
+	var monster := _spawn_monster(Vector3(0, 0, 6))
+	await world.settle()
+	player.enter_hiding(spot)
+	monster.witnessed_spot = spot   # it saw them go in, but cannot reach the spot
+	monster.force_state(Monster.SEARCH)
+	await _run(monster, 4.5)        # walks into the wall and stalls there (~4 m away): stuck after 2 s
+	assert_true(player.is_hidden, "nobody is dragged out from across the room")
+	assert_false(Monster.ATTACK in states)
+	assert_eq(monster.witnessed_spot, null, "gave up on the spot")
+	assert_eq(monster.state, Monster.SEARCH, "searches the area instead")
+
+
+func test_witnessed_spot_forgotten_once_the_player_leaves_it() -> void:
+	var player: FakePlayer = world.add_player(Vector3(0, 0, -1), Vector3(0, 0, -10))
+	var spot := _add_spot(Vector3(0, 0, -1.5), Vector3(0, 0, -0.5))
+	var monster := _spawn_monster(Vector3(0, 0, 8))
+	await world.settle()
+	monster.force_state(Monster.CHASE)
+	player.global_position = Vector3(0, 0, -6)
+	await _run(monster, STEP)
+	player.enter_hiding(spot)
+	assert_eq(monster.witnessed_spot, spot)
+	player.exit_hiding()
+	assert_eq(monster.witnessed_spot, null, "cleared on Events.player_unhid")
+	monster.witnessed_spot = spot   # stale memory...
+	await _run(monster, STEP)       # ...dropped as soon as it sees the player in the open
 	assert_eq(monster.witnessed_spot, null)
 
 
@@ -382,6 +485,34 @@ func test_retreat_waits_while_in_view() -> void:
 	assert_eq(ticks, -1)
 	assert_eq(monster.state, Monster.RETREAT, "never vanishes while watched")
 	assert_true(monster.is_true_form())
+	assert_true(monster.is_hunting(), "still hunting while it retreats")
+
+
+func test_watched_retreat_turns_on_the_player() -> void:
+	world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
+	var monster := _spawn_monster(Vector3(0, 0, -10))   # in plain view, 10 m away
+	await world.settle()
+	monster.force_state(Monster.RETREAT)   # starts the chase event (true form)
+	var pin := func() -> void: monster.global_position = Vector3(0, 0, -10)   # cannot get out of view
+	var ticks: int = await _ticks_until_leaving(monster, Monster.RETREAT, roundi((Monster.RETREAT_GIVE_UP + 1.0) / STEP), pin)
+	assert_near(ticks * STEP, Monster.RETREAT_GIVE_UP, 0.05, "gives up slinking away after RETREAT_GIVE_UP")
+	assert_eq(monster.state, Monster.CHASE, "watching it is not a way to stay safe")
+	assert_false(Monster.REVEAL in states, "already in true form: no second transformation")
+	assert_eq(events.count("chase_started"), 1, "the same chase goes on")
+	assert_eq(events.count("chase_ended"), 0)
+
+
+func test_unwatched_retreat_still_vanishes_after_give_up_when_close() -> void:
+	world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
+	var monster := _spawn_monster(Vector3(0, 0, 8))   # behind the player, only 8 m away
+	await world.settle()
+	monster.force_state(Monster.RETREAT)
+	var pin := func() -> void: monster.global_position = Vector3(0, 0, 8)
+	var ticks: int = await _ticks_until_leaving(monster, Monster.RETREAT, roundi((Monster.RETREAT_GIVE_UP + 1.0) / STEP), pin)
+	assert_near(ticks * STEP, Monster.RETREAT_GIVE_UP, 0.05)
+	assert_eq(monster.state, Monster.DISGUISED_ROAM, "unseen: puts a face back on")
+	assert_eq(events.count("chase_ended"), 1)
+	assert_false(monster.is_hunting())
 
 
 # --- Mimicry and abductions ----------------------------------------------------------------------
@@ -431,6 +562,47 @@ func test_abduction_emits_coworker_missing() -> void:
 	assert_true("RITA" in monster.missing_names)
 
 
+func test_abduction_swap_leaves_it_in_the_victims_place_wearing_their_face() -> void:
+	world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
+	var rita: Coworker = world.add_coworker("RITA", Vector3(3, 0, 25))   # behind the player, far
+	rita.set_physics_process(false)
+	var monster := _spawn_monster(Vector3(-10, 0, 10))
+	await world.settle()
+	monster._set_disguise(monster._identity_for("DALE"))
+	await _run(monster, STEP)
+	assert_true(monster.try_abduction())
+	var flat := Vector2(monster.global_position.x - 3.0, monster.global_position.z - 25.0).length()
+	assert_true(flat < 0.5, "stands where RITA was (%.2f m off)" % flat)
+	assert_eq(monster.disguise_name, "RITA", "wears her face and voice")
+	assert_false(monster.is_true_form())
+	assert_eq(monster.state, Monster.DISGUISED_ROAM)
+	var models := monster.get_node(^"DisguiseForm").get_children()
+	assert_eq(models.size(), 1, "the old disguise is gone")
+	var rita_model: String = Catalog.COWORKERS[1]["model"]
+	if ResourceLoader.exists(rita_model):
+		assert_eq(models[0].scene_file_path, rita_model, "RITA's model")
+
+
+func test_abduction_and_mimic_never_happen_in_the_same_tick() -> void:
+	world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
+	world.add_zone(&"storage", Vector3(-20, 1.5, 20), Vector3(8, 3, 8))
+	var rita: Coworker = world.add_coworker("RITA", Vector3(3, 0, 25))
+	rita.set_physics_process(false)
+	var monster := _spawn_monster(Vector3(-10, 0, 10))
+	world.bake_navigation()
+	await world.settle_navigation()
+	_set_hour(1)
+	monster.rules.next_abduction_in = 0.0
+	monster.rules.next_mimic_in = 0.0
+	await _run(monster, STEP)
+	assert_eq(missing, ["RITA"] as Array[String], "the abduction happens")
+	assert_true(walkies.is_empty(), "no lure call in the same tick")
+	assert_eq(monster.state, Monster.DISGUISED_ROAM)
+	await _run(monster, STEP)
+	assert_eq(walkies.size(), 1, "the lure follows on a later tick")
+	assert_true(walkies[0]["is_mimic"])
+
+
 func test_no_abduction_in_view_or_near_player() -> void:
 	world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
 	var near: Coworker = world.add_coworker("DALE", Vector3(0, 0, 8))      # behind but close
@@ -459,6 +631,20 @@ func test_abductions_capped_at_two() -> void:
 
 
 # --- Presence --------------------------------------------------------------------------------------
+
+func test_only_the_visible_form_animates() -> void:
+	var monster := _spawn_monster(Vector3.ZERO)
+	await world.settle()
+	var true_anim := CharacterModel.find_animation_player(monster.get_node(^"TrueForm"))
+	var disguise_anim := CharacterModel.find_animation_player(monster.get_node(^"DisguiseForm"))
+	if true_anim == null or disguise_anim == null:
+		return   # placeholder models have no AnimationPlayer
+	assert_false(true_anim.active, "hidden true form does not animate")
+	assert_true(disguise_anim.active)
+	monster.force_state(Monster.REVEAL)
+	assert_true(true_anim.active)
+	assert_false(disguise_anim.active, "hidden disguise does not animate")
+	assert_eq(true_anim.current_animation, Catalog.ANIM_REVEAL)
 
 func test_flickers_lights_within_radius() -> void:
 	var near := RecordingLight.new()
