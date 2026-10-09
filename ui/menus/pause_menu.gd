@@ -13,6 +13,8 @@ var _buttons: VBoxContainer
 var _clock: Label
 var _resume: Button
 var _settings: SettingsPanel
+var _click_prompt: VBoxContainer
+var _click_label: Label
 
 
 func _ready() -> void:
@@ -26,13 +28,28 @@ func _ready() -> void:
 func open() -> void:
 	_clock.text = "%s  -  %s" % [GameState.get_clock_text(), "SHIFT IN PROGRESS"]
 	_settings.visible = false
+	_click_prompt.visible = false
 	_buttons.visible = true
 	visible = true
 	_resume.grab_focus()
 
 
+## Waiting for the pointer lock: only "CLICK TO RESUME" (the game scene consumes the click).
+func show_click_prompt(text := "CLICK TO RESUME") -> void:
+	_click_label.text = text
+	_settings.visible = false
+	_buttons.visible = false
+	_click_prompt.visible = true
+	visible = true
+
+
+func is_click_prompt_visible() -> bool:
+	return visible and _click_prompt.visible
+
+
 func close() -> void:
 	_settings.visible = false
+	_click_prompt.visible = false
 	visible = false
 
 
@@ -50,6 +67,26 @@ func _build() -> void:
 	shade.color = Color(0.02, 0.025, 0.024, 0.72)
 	shade.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(shade)
+
+	_click_prompt = VBoxContainer.new()
+	_click_prompt.set_anchors_preset(Control.PRESET_CENTER)
+	_click_prompt.offset_left = -400.0
+	_click_prompt.offset_right = 400.0
+	_click_prompt.offset_top = -60.0
+	_click_prompt.offset_bottom = 60.0
+	_click_prompt.visible = false
+	add_child(_click_prompt)
+	_click_label = Label.new()
+	_click_label.add_theme_font_size_override(&"font_size", 64)
+	_click_label.add_theme_color_override(&"font_color", Catalog.COLOR_CREAM)
+	_click_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_click_prompt.add_child(_click_label)
+	var hint := Label.new()
+	hint.text = "ESC: PAUSE MENU"
+	hint.add_theme_font_size_override(&"font_size", 26)
+	hint.add_theme_color_override(&"font_color", Color(Catalog.COLOR_CREAM, 0.55))
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_click_prompt.add_child(hint)
 
 	_buttons = VBoxContainer.new()
 	_buttons.set_anchors_preset(Control.PRESET_CENTER_LEFT)

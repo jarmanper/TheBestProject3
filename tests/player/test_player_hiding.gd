@@ -46,11 +46,23 @@ func test_hidden_player_cannot_move_and_has_no_collision() -> void:
 	assert_near(player.global_position.distance_to(start), 0.0, 0.01, "no movement while hidden")
 
 
+## Waits for the condition, not a wall-clock timer. Physics frames tick at a fixed 60 Hz, so
+## the 180-frame cap is ~3 s, far more than the 0.35 s blend.
+func _wait_camera_at(target: Vector3) -> float:
+	var camera := player.get_camera()
+	for i in 180:
+		if camera.global_position.distance_to(target) < 0.02:
+			break
+		await tree.physics_frame
+	await tree.process_frame
+	return camera.global_position.distance_to(target)
+
+
 func test_camera_blends_to_hide_point() -> void:
 	player.enter_hiding(spot)
-	await tree.create_timer(Player.HIDE_BLEND_TIME + 0.2).timeout
 	var hide_point := spot.get_node("HidePoint") as Node3D
-	assert_near(player.get_camera().global_position.distance_to(hide_point.global_position), 0.0, 0.02)
+	assert_true(player.get_camera().global_position.distance_to(hide_point.global_position) > 0.1, "starts at the eye")
+	assert_near(await _wait_camera_at(hide_point.global_position), 0.0, 0.02, "blended to the hide point")
 
 
 func test_hidden_look_is_limited() -> void:
@@ -81,10 +93,43 @@ func test_exit_hiding_moves_to_exit_point() -> void:
 	assert_false(shape.disabled, "collision back on")
 
 
+func test_real_spot_enters_and_tracks_the_occupant() -> void:
+	spot.interact(player)
+	assert_true(player.is_hidden)
+	assert_eq(spot.occupant, player, "the spot owns its occupant")
+	var stranger := Node.new()
+	assert_false(spot.can_interact(stranger), "occupied for anyone else")
+	stranger.free()
+
+
 func test_interact_while_hidden_leaves_the_spot() -> void:
-	player.enter_hiding(spot)
+	spot.interact(player)
 	await wait_physics_frames(2)
 	Input.action_press(&"interact")
 	await wait_physics_frames(3)
 	Input.action_release(&"interact")
 	assert_false(player.is_hidden, "pressing interact while hidden leaves")
+	assert_eq(spot.occupant, null, "the spot cleared its occupant")
+
+
+func test_dying_while_hidden_leaves_the_spot_first() -> void:
+	var unhid: Array = []
+	var record := func(s: Node3D) -> void: unhid.append(s)
+	Events.player_unhid.connect(record)
+	spot.interact(player)
+	await _wait_camera_at((spot.get_node("HidePoint") as Node3D).global_position)
+	player.take_damage(200.0, spot.global_position)
+	Events.player_unhid.disconnect(record)
+	assert_true(player.is_dead())
+	assert_false(player.is_hidden, "out of the spot")
+	assert_eq(player.current_hiding_spot, null)
+	assert_eq(spot.occupant, null, "the spot is free again")
+	assert_eq(unhid, [spot], "player_unhid emitted")
+	# The camera returns to the (falling) head instead of staying in the locker.
+	var camera := player.get_camera()
+	for i in 180:
+		if not camera.top_level and camera.global_position.y < 1.0:
+			break
+		await tree.physics_frame
+	assert_false(camera.top_level, "camera re-attached to the head")
+	assert_true(camera.global_position.y < 1.0, "camera fell with the body (y %s)" % camera.global_position.y)

@@ -115,7 +115,12 @@ func test_hold_completes_and_reports_progress() -> void:
 	var station := _add_station(1.5, 0.3)
 	await wait_physics_frames(2)
 	Input.action_press(&"interact")
-	await tree.create_timer(0.6).timeout
+	# Holds advance with the fixed physics step: 0.3 s = 18 ticks. Wait for the outcome.
+	for i in 60:
+		await tree.physics_frame
+		if station.used > 0:
+			break
+	await wait_physics_frames(2)
 	Input.action_release(&"interact")
 	assert_eq(station.started, 1, "hold_started once")
 	assert_eq(station.used, 1, "interact after the hold filled")

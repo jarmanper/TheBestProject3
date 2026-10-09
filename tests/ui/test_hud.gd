@@ -119,9 +119,34 @@ func test_subtitles_from_events() -> void:
 
 
 func test_subtitles_expire() -> void:
+	hud.set_process(false)   # step time by hand
 	hud.show_subtitle("short", 0.05)
-	await tree.create_timer(0.3).timeout
-	assert_false(hud.get_subtitle_lines().has("short"))
+	hud.show_subtitle("long", 5.0)
+	hud.update_subtitles(0.04)
+	assert_true(hud.get_subtitle_lines().has("short"), "still shown before its duration")
+	hud.update_subtitles(0.02)
+	assert_false(hud.get_subtitle_lines().has("short"), "gone after its duration")
+	assert_true(hud.get_subtitle_lines().has("long"))
+
+
+func _visible_row_texts() -> Array[String]:
+	var texts: Array[String] = []
+	for label in hud.find_children("*", "Label", true, false):
+		if label.get_parent().name == &"ChecklistRows" and (label as Label).is_visible_in_tree():
+			texts.append((label as Label).text)
+	return texts
+
+
+func test_checklist_rows_survive_shrink_and_grow_in_one_frame() -> void:
+	var many := [_task("A"), _task("B"), _task("C"), _task("D")]
+	hud.render_checklist(many)
+	hud.render_checklist([_task("A")])
+	hud.render_checklist(many)
+	await wait_frames(2)
+	assert_eq(_visible_row_texts(), ["[ ] A", "[ ] B", "[ ] C", "[ ] D"] as Array[String], "no row vanished")
+	hud.render_checklist([_task("Z")])
+	await wait_frames(1)
+	assert_eq(_visible_row_texts(), ["[ ] Z"] as Array[String], "surplus rows hidden")
 
 
 func test_walkie_message_subtitle_never_reveals_mimic() -> void:
