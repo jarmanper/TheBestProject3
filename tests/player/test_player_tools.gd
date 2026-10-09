@@ -86,3 +86,9 @@ func test_flashlight_flickers_near_monster() -> void:
 	GameState.monster = previous
 	assert_true(dimmed > 0, "flashlight dipped while the monster was 1 m away")
 	assert_true(dimmed < 40, "and recovered between dips")
+
+
+func test_flashlight_shadows_follow_the_platform() -> void:
+	var light := player.get_node("Head/Camera3D/Flashlight") as SpotLight3D
+	assert_eq(Player.flashlight_shadows_enabled(), not OS.has_feature("web"))
+	assert_eq(light.shadow_enabled, Player.flashlight_shadows_enabled(), "desktop keeps the flashlight shadow; web drops it for frame rate")

@@ -103,8 +103,15 @@ func _ready() -> void:
 	GameState.player = self
 	_camera.fov = FOV
 	_flashlight.light_cull_mask &= ~PlayerViewmodel.RENDER_LAYER
+	_flashlight.shadow_enabled = flashlight_shadows_enabled()
 	_viewmodel.show_tool(held_tool)
 	_apply_flashlight(1.0)
+
+
+## The flashlight's shadow re-renders the scene from the light every frame. That is
+## affordable on desktop but costs WebGL frame rate, so web (GitHub Pages) builds skip it.
+static func flashlight_shadows_enabled() -> bool:
+	return not OS.has_feature("web")
 
 
 func _exit_tree() -> void:
