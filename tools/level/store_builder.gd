@@ -11,6 +11,7 @@ const OUT_SCENE := "res://levels/store/store.tscn"
 const OUT_NAVMESH := "res://levels/store/store_navmesh.res"
 const ROOT_SCRIPT := "res://levels/store/store.gd"
 const AMBIENT_SCRIPT := "res://levels/store/ambient_emitter.gd"
+const CULLER_SCRIPT := "res://levels/store/area_culler.gd"
 const STORE_GLB := "res://assets/models/environment/store_interior.glb"
 
 const NAV_CELL_SIZE := 0.1
@@ -62,6 +63,7 @@ func build(tree: SceneTree) -> Error:
 	_build_lights()
 	_build_audio()
 	_build_environment()
+	_build_culler()
 
 	var packed := PackedScene.new()
 	var err := packed.pack(level)
@@ -242,7 +244,7 @@ func _fixture_light(holder: Node3D, anchor: Node3D, position: Vector3, extras: D
 	omni.light_energy = light.base_energy
 	omni.omni_range = Layout.FIXTURE_RANGE
 	omni.omni_attenuation = Layout.FIXTURE_ATTENUATION
-	omni.light_specular = 0.6
+	omni.light_specular = 1.0
 	omni.shadow_enabled = false
 	omni.distance_fade_enabled = true
 	omni.distance_fade_begin = 24.0
@@ -303,6 +305,14 @@ func _build_audio() -> void:
 		emitter.bus = &"Ambience"
 		_add(holder, emitter)
 		_count("ambient_emitters")
+
+
+## Last child: its _ready tags every mesh after the props and stations loaded their models.
+func _build_culler() -> void:
+	var culler := Node.new()
+	culler.name = "AreaCuller"
+	culler.set_script(load(CULLER_SCRIPT))
+	_add(level, culler)
 
 
 func _build_environment() -> void:

@@ -173,7 +173,7 @@ const PROPS := [
 
 ## Fluorescent fixtures (LightAnchor_###) that stay dark: about a third of the working ones,
 ## so the floor alternates bright and dark pools.
-const FIXTURES_OFF := [2, 4, 8, 14, 16, 19, 21, 24, 26, 29, 32, 34, 36, 38, 40, 42, 44]
+const FIXTURES_OFF := [2, 4, 8, 14, 16, 19, 21, 24, 25, 29, 32, 34, 36, 38, 40, 42, 44]
 ## Broken fixtures (Fixture_###_broken): flicker constantly, or are dead.
 const BROKEN_FLICKER := [11, 13, 41, 45]
 const BROKEN_DEAD := [6, 18, 28, 47]
@@ -183,7 +183,7 @@ const BUZZING := [11, 13, 41, 45, 43, 48, 50, 52]
 const ZONE_ENERGY := {
 	&"hallway": 0.55,
 	&"storage": 0.7,
-	&"break_room": 0.85,
+	&"break_room": 1.15,
 	&"office": 0.75,
 	&"janitor": 0.6,
 }

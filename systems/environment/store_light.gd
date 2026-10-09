@@ -89,6 +89,8 @@ func _erratic_flicker() -> void:
 func _set_energy_fraction(fraction: float) -> void:
 	if _light:
 		_light.light_energy = base_energy * fraction
+		# A dark light still counts toward the renderer's per-view and per-mesh light limits.
+		_light.visible = fraction > 0.0
 	if _fixture_material:
 		_fixture_material.emission_energy_multiplier = _fixture_emission * fraction
 

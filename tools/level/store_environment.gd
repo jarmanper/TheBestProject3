@@ -5,6 +5,9 @@ extends RefCounted
 ## and filmic tonemapping that keeps the wet-floor highlights from clipping.
 
 
+const FOG_END := 26.0
+
+
 static func make() -> Environment:
 	var env := Environment.new()
 	env.background_mode = Environment.BG_COLOR
@@ -16,11 +19,15 @@ static func make() -> Environment:
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.tonemap_exposure = 1.0
 	env.tonemap_white = 6.0
+	# Depth fog: clear up close, fully opaque at FOG_END (the area culler stops drawing there).
 	env.fog_enabled = true
-	env.fog_mode = Environment.FOG_MODE_EXPONENTIAL
-	env.fog_light_color = Color(0.03, 0.038, 0.034)
+	env.fog_mode = Environment.FOG_MODE_DEPTH
+	env.fog_light_color = Color(0.02, 0.026, 0.023)
 	env.fog_light_energy = 1.0
-	env.fog_density = 0.035
+	env.fog_density = 1.0
+	env.fog_depth_begin = 3.0
+	env.fog_depth_end = FOG_END
+	env.fog_depth_curve = 1.6
 	env.fog_sky_affect = 0.0
 	env.glow_enabled = true
 	env.glow_intensity = 0.7

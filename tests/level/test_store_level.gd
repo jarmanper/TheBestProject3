@@ -308,3 +308,54 @@ func test_lights() -> void:
 	assert_true(off >= 15 and off <= 26, "about a third of the fixtures dark, got %d" % off)
 	for light: Light3D in level.find_children("*", "Light3D", true, false):
 		assert_false(light.shadow_enabled, "%s casts no shadows (only the flashlight does)" % light.name)
+
+
+# --- Area culling -----------------------------------------------------------------------------
+
+func _culler() -> StoreAreaCuller:
+	return level.get_node("AreaCuller") as StoreAreaCuller
+
+
+func _camera_at(position: Vector3, yaw_degrees: float) -> Camera3D:
+	var camera := Camera3D.new()
+	camera.fov = 95.0
+	holder.add_child(camera)
+	camera.global_position = position
+	camera.rotation_degrees = Vector3(0, yaw_degrees, 0)
+	return camera
+
+
+func _area_visible(mask: int, area: StringName) -> bool:
+	return mask & (1 << (StoreAreaCuller.FIRST_AREA_LAYER - 1 + StoreAreaCuller.AREAS.find(area))) != 0
+
+
+func test_every_level_mesh_is_in_an_area() -> void:
+	var culler := _culler()
+	assert_true(culler != null, "the level has its area culler")
+	if culler == null:
+		return
+	var untagged: Array[String] = []
+	for instance: GeometryInstance3D in level.find_children("*", "GeometryInstance3D", true, false):
+		if instance.layers & culler.area_mask == 0 and instance.is_visible_in_tree():
+			untagged.append(String(instance.name))
+	assert_true(untagged.size() <= 2, "meshes outside every area: %s" % [untagged])
+
+
+func test_culler_keeps_rooms_behind_walls_out_of_view() -> void:
+	var culler := _culler()
+	# Break room, facing the back wall: only the break room.
+	var mask := culler.compute_visible(_camera_at(Vector3(6, 1.6, -12.5), 0.0))
+	assert_true(_area_visible(mask, &"break_room"), "own room visible")
+	assert_false(_area_visible(mask, &"sales"), "sales floor hidden behind the walls")
+	assert_false(_area_visible(mask, &"storage"), "storage hidden")
+	# Break room, facing the door: the hallway beyond it too.
+	mask = culler.compute_visible(_camera_at(Vector3(5.6, 1.6, -11.0), 180.0))
+	assert_true(_area_visible(mask, &"hallway"), "hallway through the open door")
+	assert_false(_area_visible(mask, &"office"), "office still hidden")
+	# Aisle 4 facing the dairy wall: sales floor only (the employees door is off to the side).
+	mask = culler.compute_visible(_camera_at(Vector3(-2, 1.6, 6.0), 0.0))
+	assert_true(_area_visible(mask, &"sales"), "sales floor visible")
+	assert_false(_area_visible(mask, &"break_room"), "break room hidden")
+	# Standing in a doorway sees both sides whatever the angle.
+	mask = culler.compute_visible(_camera_at(Vector3(5.6, 1.6, -9.0), 90.0))
+	assert_true(_area_visible(mask, &"hallway") and _area_visible(mask, &"break_room"), "doorway sees both rooms")
