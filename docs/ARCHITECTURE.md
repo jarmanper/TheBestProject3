@@ -148,7 +148,11 @@ See the file's public methods; summary:
 `reset()`, `begin_night()`, `add_manager_task(station, time_limit) -> TaskData`,
 `complete_task(task, by)`, `claim_task(task, worker) -> bool`, `release_task(task, worker)`,
 `get_open_tasks() -> Array[TaskData]` (manager tasks first), `get_tasks_for_checklist()`,
-`get_required_remaining() -> int`, `all_required_done() -> bool`.
+`get_required_remaining() -> int`, `all_required_done() -> bool`,
+`get_coworker_basic_completions() -> int`.
+**Balance:** coworkers together may take at most `Tasks.MAX_COWORKER_BASIC_COMPLETIONS = 2`
+basic tasks per night: `claim_task` refuses a basic task to a non-player worker once coworker
+basic completions + open coworker claims reach the cap. Manager tasks are never capped.
 
 ## 6. Scene contracts
 
@@ -204,6 +208,17 @@ Root `Node3D` containing: `Marker3D` in groups `player_spawn` (1), `coworker_spa
 baked mesh (agent radius 0.4 m, height 1.8 m); `AudioStreamPlayer3D`s in group
 `intercom_speaker`; a `WorldEnvironment`.
 
+**Navigation settings (all levels, sandboxes and tests):** navmesh `cell_size` = `cell_height`
+= **0.1 m** (the 1.2 m doorways stay open for 0.4 m-radius agents; 0.25 m cells would round the
+radius up to 0.5 m and close them), `agent_radius` 0.4, `agent_height` 1.8, `agent_max_climb`
+0.2, parsed from static colliders on the world layer. `project.godot` sets
+`navigation/3d/default_cell_size` / `default_cell_height` = 0.1 so the map matches.
+`region_min_size` must drop the walkable tops of shelves, coolers and tables: Recast squares it
+in cells, so the store uses **24** (576 cells = 5.76 m²; a gondola top erodes to ~4.6 m²) and
+the store's navmesh is one connected island. Region sync is asynchronous: wait for
+`map_get_iteration_id(map) > 0` and a valid `map_get_closest_point_owner` before querying.
+Character/model fronts face +Z; player cameras look down -Z (player marker yaw 180° faces +Z).
+
 ### Game scene — `scenes/game.tscn`
 ```
 Game (Node, game.gd)
@@ -227,7 +242,8 @@ player's flashlight reads `GameState.monster` distance itself and flickers withi
 ## 7. Store layout (Godot coordinates, metres)
 
 Y is up. **+Z points toward the store entrance (front), -Z toward the back.** Floor at y = 0.
-Blender is Z-up: Blender (x, y, z) = Godot (x, -z, y). Exterior walls 0.3 m thick.
+Blender is Z-up: Blender (x, y, z) = Godot (x, -z, y). Exterior walls 0.3 m thick, outside the
+footprint; interior walls 0.2 m thick, centred on their lines (z = -6, z = -9, x = 2 / 10 / 16).
 Sales floor ceiling height 4.0 m (drop ceiling); back-of-house ceiling 3.0 m.
 
 **Footprint:** x ∈ [-20, 20], z ∈ [-16, 16].
@@ -268,7 +284,51 @@ Sales floor ceiling height 4.0 m (drop ceiling); back-of-house ceiling 3.0 m.
 **Spawns:** player in the break room by the time clock (6, 0, -12.5) facing the door; coworkers in
 the break room/hallway; monster in the far storage corner (-18, 0, -15).
 
-## 8. Art direction (GDD §6 + reference pictures)
+## 8. Final store level (`levels/store/`, Task 9)
+
+`levels/store/store.tscn` is **generated** — edit the generator, then rebuild:
+`godot --headless --path . -s res://tools/build_store_level.gd` (logic `tools/level/store_builder.gd`,
+placement data `tools/level/store_layout.gd`, environment `tools/level/store_environment.gd`).
+It instances `store_interior.glb` (under the NavigationRegion3D with everything that has a
+collider), the 14 zones from `levels/greybox/build_greybox.gd` `ZONE_BOUNDS` (single source),
+the stations from `StationLayout`, the tool/hiding scenes, props, lights, audio and the
+`AreaCuller`. Tests: `tests/level/test_store_level.gd` (contract, reachability, interaction
+rays, filters, light budget) and `tests/level/test_night_smoke.gd` (a whole night, ~100 s).
+
+**Placement conventions.**
+- `StationLayout.STATIONS[].position` is the thing worked on, at floor level (breaker: on the
+  wall); `yaw_degrees` turns the station's +Z toward the worker (its `WorkPoint` is 0.9 m along +Z).
+- Hiding scenes (`hide_locker/boxes/counter.tscn`): +Z is the opening; `HidePoint` looks out
+  along +Z; `ExitPoint` lies on open floor in front (≥ 0.5 m past the obstacle, outside the
+  0.4 m navmesh erosion). Lockers and box piles carry their own world colliders; a counter spot
+  is just the cavity in the level art.
+- Tool rack scenes (`pickup_<tool>.tscn`): the scene origin is the model origin — wall racks
+  (mop 1.35 m, box cutter 1.25 m, keys 1.45 m above the floor) at the wall-contact point facing
+  out, the price gun on a counter top, the stock box rack on the floor (with a collider). Taking
+  a tool hides only the model's inner `Tool` mesh; the `Rack` stays.
+- Other wall-prop mount heights (origin height): clipboard 1.35, time clock 1.4,
+  breaker panel / sparks 1.5 m. The art's `BreakerPanel_Static` is hidden at runtime
+  (`store.gd`); the `breaker_panel.glb` prop (with its door) is the one shown.
+
+**Lighting budget (Compatibility renderer: 32 lights per view, 8 per mesh).** A `StoreLight`
+at each `LightAnchor_###` (range 5.5 m, attenuation 1.5, energy ~1, back rooms dimmer, distance
+fade from 24 m), driving the fixture's tube surface. About a third of the working fixtures are
+`starts_off`; broken fixtures flicker (with sparks) or are dead; ≤ 10 buzz. **A dark StoreLight
+hides its OmniLight** — a zero-energy light still uses up the limits. Red emergency lights at
+`EmergencyAnchor_##`, green at `ExitAnchor`, pale blue at `CoolerAnchor_##`. No shadows
+except the player's flashlight.
+
+**Area culling.** `levels/store/area_culler.gd` puts every level mesh and light on visual layers
+**11–16** (sales floor, hallway, storage, break room, office, janitor; walls on both sides) and,
+each frame, sets the active camera's and the flashlight's cull mask to the areas visible through
+on-screen doorways (the hallway is the hub). Depth fog is fully opaque at 26 m, so level meshes
+stop drawing at 20 m (small) / 27 m. Keep layers 11–16 free elsewhere; characters stay on
+layer 1. Budget: < 600 draw calls (sweep of 552 views: max 594, median 239).
+
+**Shutdown.** `Sfx` stops every audio player when the engine quits and lets the audio thread
+run a few mix steps; otherwise the paused playbacks are reported as leaked at exit.
+
+## 9. Art direction (GDD §6 + reference pictures)
 
 - Low-poly, slightly pixelated textures (Lethal Company style). Textures small (32–256 px), sampled
   **nearest**. No photorealism, no heavy detail, no gore, no cartoonish monster.
