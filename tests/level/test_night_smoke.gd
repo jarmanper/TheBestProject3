@@ -167,6 +167,7 @@ func test_a_whole_night_runs_clean() -> void:
 
 	for hook: Array in _hooks:
 		(hook[0] as Signal).disconnect(hook[1])
+	_hooks.clear()   # the callables hold this test case: break the cycle
 	game.queue_free()
 	await tree.process_frame
 	await tree.process_frame
