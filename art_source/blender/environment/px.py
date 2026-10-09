@@ -609,7 +609,7 @@ def build_env_atlas(seed=11):
 		c.noise(x, y, w, h, 0.05, rng)
 		c.grade(x, y, w, h, sat=0.8, val=0.78)
 	x, y, w, h = A.alloc("cooler_side", 16, 32)
-	c.rect(x, y, w, h, "#4A504C")
+	c.rect(x, y, w, h, "#6E7670")
 	c.vgrad(x, y, w, h, 1.15, 0.7)
 	c.outline(x, y, w, h, "#2A2C2B")
 	c.noise(x, y, w, h, 0.02, rng)

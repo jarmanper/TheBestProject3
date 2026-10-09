@@ -647,6 +647,7 @@ class Store:
 		cable_uv = k.ep("cable")
 		spans = [((-2.6, -1.0), (-1.2, -3.2), 0.75), ((-1.4, -0.4), (-2.9, -2.6), 0.55), ((-3.2, -3.4), (-0.8, -4.6), 0.9),
 			((-1.0, 1.4), (-2.8, -0.2), 0.6), ((-3.0, -1.6), (-1.6, -4.4), 1.0), ((-0.9, -2.4), (-2.0, -5.0), 0.7),
+			((-2.9, 3.6), (-1.3, 1.0), 0.8), ((-1.2, 3.2), (-2.6, 4.6), 0.5),
 			((-2.2, 0.8), (-0.9, -0.6), 0.45), ((-10.5, -1.5), (-9.2, -4.0), 0.7), ((-6.8, 4.4), (-5.2, 2.2), 0.5),
 			((-14.6, -2.0), (-13.2, -4.4), 0.8), ((8.0, -2.0), (10.5, -4.0), 0.6), ((14.5, 3.0), (12.6, 5.5), 0.7),
 			((-17.0, 5.0), (-18.6, 2.6), 0.5), ((-8.8, 9.0), (-6.0, 8.0), 0.6), ((3.5, 12.0), (1.0, 9.5), 0.65)]
@@ -656,7 +657,7 @@ class Store:
 			for i in range(13):
 				t = i / 12
 				pts.append((a[0] + (b[0] - a[0]) * t, CEIL_SALES - 0.02 - sag * 4 * t * (1 - t), a[1] + (b[1] - a[1]) * t))
-			mb.tube(pts, 0.014, ENV, cable_uv)
+			mb.tube(pts, 0.017, ENV, cable_uv)
 		for (x, z, ln) in ((-1.6, -2.1, 1.1), (-2.4, -3.9, 0.8), (-9.8, -2.6, 1.3), (11.0, -1.0, 0.9), (-5.8, 6.5, 0.7)):
 			mb = det.get(x, z)
 			pts = [(x + 0.04 * math.sin(i), CEIL_SALES - 0.02 - ln * i / 6, z + 0.05 * math.cos(i * 1.3)) for i in range(7)]
@@ -739,7 +740,7 @@ class Store:
 			self.fixtures.append((num, name, (x, round(hy - 0.13 - drop, 3), z), zone, broken))
 		# red emergency lights (hallway + storage), each with an anchor
 		em = [((-12.0, 2.55, -9.0 + INT_HALF), 0, "hallway"), ((8.0, 2.55, -9.0 + INT_HALF), 0, "hallway"),
-			((-2.0, 2.55, SALES_Z0 - INT_HALF), 180, "hallway"), ((16.0, 2.55, SALES_Z0 - INT_HALF), 180, "hallway"),
+			((-2.0, 2.55, -9.0 + INT_HALF), 0, "hallway"), ((15.0, 2.55, -9.0 + INT_HALF), 0, "hallway"),
 			((X0, 2.5, -10.4), 90, "storage"), ((-12.0, 2.5, Z0), 0, "storage"), ((1.9, 2.5, -15.0), -90, "storage")]
 		for i, (pos, rot, zone) in enumerate(em):
 			mb = MB()
@@ -842,11 +843,11 @@ def build_materials():
 
 
 # ================================================================== export
-def export_glb(path):
+def export_glb(path, selection=False):
 	os.makedirs(os.path.dirname(path), exist_ok=True)
 	bpy.ops.export_scene.gltf(filepath=path, export_format="GLB", export_extras=True, export_yup=True,
 		export_apply=False, export_materials="EXPORT", export_image_format="AUTO", export_cameras=False,
-		export_lights=False, export_animations=False, use_selection=False)
+		export_lights=False, export_animations=False, use_selection=selection)
 
 
 def clear_objects():
@@ -877,25 +878,33 @@ def build_store(P, E, mats):
 
 
 def kit_pieces(P, E, mats):
+	"""Exports every kit piece at the origin (selection export), then lays them out in a grid for kit.blend."""
 	k = kitmod.Kit(P, E)
+	clear_objects()
 	col = bpy.context.scene.collection
 	out = []
 
 	def piece(name, builder, colliders=True, anchors=()):
-		clear_objects()
 		mb = MB()
 		boxes = builder(mb)
 		obname = "".join(w.capitalize() for w in name.split("_"))
-		make_object(bpy, obname, mb, mats, col)
+		objs = [make_object(bpy, obname, mb, mats, col)]
 		if colliders and boxes:
 			cm = MB()
 			for mn, mx in boxes:
 				cm.box(mn, mx, "Collision", (0, 0, 0, 0))
-			make_object(bpy, obname + "_Collision-colonly", cm, {}, col)
+			objs.append(make_object(bpy, obname + "_Collision-colonly", cm, {}, col))
 		for an, pos in anchors:
-			make_empty(bpy, an, col, pos)
+			objs.append(make_empty(bpy, an, col, pos))
+		for ob in bpy.context.scene.objects:
+			ob.select_set(ob in objs)
 		path = os.path.join(KIT_DIR, name + ".glb")
-		export_glb(path)
+		export_glb(path, selection=True)
+		i = len(out)
+		for ob in objs:
+			ob.location.x += (i % 6) * 5.0
+			ob.location.y += (i // 6) * 5.0
+			ob.select_set(False)
 		out.append((name, mb.tris(), os.path.getsize(path)))
 
 	def gondola(cat, placard):
@@ -947,6 +956,7 @@ def kit_pieces(P, E, mats):
 	piece("emergency_light", lambda mb: (k.emergency_light(mb), [])[1])
 	piece("emergency_door", lambda mb: k.steel_door(mb, 1.0, 2.1))
 	piece("pallet_boxes_static", lambda mb: k.pallet_stack(mb, np.random.default_rng(87), 2))
+	bpy.ops.wm.save_as_mainfile(filepath=os.path.join(HERE, "kit.blend"), compress=True)
 	return out
 
 
