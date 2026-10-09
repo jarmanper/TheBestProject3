@@ -191,6 +191,10 @@ const engine = new Engine(GODOT_CONFIG);
 		startOverlay.classList.add('hidden');
 		const missingMsg = 'Error\nThe following features required to run this game are missing:\n';
 		displayFailureNotice(missingMsg + missing.join('\n'));
+	} else if (new URLSearchParams(window.location.search).get('autostart') === '1') {
+		// Dev only (automated browser smoke tests): ?autostart=1 starts the engine without the
+		// click gate. Audio stays locked until a real click; players never use this URL.
+		startGame();
 	} else {
 		startOverlay.addEventListener('click', startGame, { once: true });
 	}
