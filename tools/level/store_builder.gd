@@ -251,6 +251,8 @@ func _fixture_light(holder: Node3D, anchor: Node3D, position: Vector3, extras: D
 	omni.distance_fade_length = 6.0
 	_add(holder, light)
 	_add(light, omni)
+	if light.always_flicker:
+		_add(light, _sparks())
 	if fixture:
 		light.fixture_path = light.get_path_to(fixture)
 	else:
@@ -258,6 +260,39 @@ func _fixture_light(holder: Node3D, anchor: Node3D, position: Vector3, extras: D
 	_count("store_lights")
 	if light.starts_off:
 		_count("store_lights_off")
+
+
+## A slow trickle of sparks under a broken, flickering fixture (references 1 and 2).
+func _sparks() -> CPUParticles3D:
+	var sparks := CPUParticles3D.new()
+	sparks.name = "Sparks"
+	sparks.position = Vector3(0, -0.15, 0)
+	sparks.amount = 24
+	sparks.lifetime = 1.4
+	sparks.randomness = 0.6
+	sparks.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+	sparks.emission_sphere_radius = 0.25
+	sparks.direction = Vector3(0, -1, 0)
+	sparks.spread = 35.0
+	sparks.initial_velocity_min = 0.2
+	sparks.initial_velocity_max = 0.9
+	sparks.gravity = Vector3(0, -5.5, 0)
+	sparks.scale_amount_min = 0.6
+	sparks.scale_amount_max = 1.2
+	sparks.visibility_aabb = AABB(Vector3(-1.5, -3.6, -1.5), Vector3(3, 3.8, 3))
+	var quad := QuadMesh.new()
+	quad.size = Vector2(0.05, 0.05)
+	var material := StandardMaterial3D.new()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	material.albedo_color = Color(1.0, 0.93, 0.7)
+	material.emission_enabled = true
+	material.emission = Color(1.0, 0.85, 0.55)
+	material.emission_energy_multiplier = 3.0
+	quad.material = material
+	sparks.mesh = quad
+	sparks.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return sparks
 
 
 func _plain_light(holder: Node3D, light_name: String, position: Vector3, color: Color, energy: float,

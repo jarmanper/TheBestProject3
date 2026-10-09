@@ -6,7 +6,7 @@
 [resource]
 resource_name = "FloorTile"
 roughness = 1.0
-metallic_specular = 0.6
+metallic_specular = 1.0
 albedo_texture = ExtResource("1")
 roughness_texture = ExtResource("2")
 texture_filter = 2

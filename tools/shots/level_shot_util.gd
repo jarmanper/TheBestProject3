@@ -33,6 +33,13 @@ static func run(tree: SceneTree) -> void:
 	await tree.create_timer(GameHud.INTRO_TIME + 0.6).timeout
 	var player := GameState.player as Player
 	player.set_flashlight(arg("flashlight", "on") == "on")
+	if arg("activate", "") == "all":
+		# Show every station's task visual (spill, boxes, sparks...) for the detail shots.
+		for station: TaskStation in tree.get_nodes_in_group(&"task_station"):
+			if not station.is_active():
+				var task := TaskData.new()
+				task.title = station.title
+				station.set_task(task)
 	var prefix := arg("prefix", "")
 	var report: Array[String] = []
 	for view in arg("views", ALL_VIEWS).split(","):
@@ -74,6 +81,15 @@ static func place_player(position: Vector3, yaw: float, pitch := 0.0) -> Player:
 	(player.get_node("Head") as Node3D).rotation.x = deg_to_rad(pitch)
 	player.velocity = Vector3.ZERO
 	return player
+
+
+## Puts the player at `position` (feet) looking at `target`.
+static func aim_player(position: Vector3, target: Vector3) -> Player:
+	var eye := position + Vector3.UP * 1.6
+	var to := target - eye
+	var yaw := rad_to_deg(atan2(-to.x, -to.z))
+	var pitch := rad_to_deg(atan2(to.y, Vector2(to.x, to.z).length()))
+	return place_player(position, yaw, pitch)
 
 
 ## Puts a character at `position` with its model front (+Z) turned to `yaw` degrees, playing `anim`.
@@ -164,5 +180,19 @@ static func _stage(tree: SceneTree, game: Game, view: String) -> void:
 			await tree.create_timer(0.8).timeout
 		"hallway":
 			place_player(Vector3(-17.5, 0, -7.5), -90.0, 0.0)
+		"breaker":
+			aim_player(Vector3(-1.4, 0, -6.8), Vector3(0.0, 1.3, -8.9))
+		"janitor":
+			aim_player(Vector3(17.4, 0, -10.2), Vector3(19.6, 0.9, -13.0))
+		"storage_east":
+			aim_player(Vector3(-4.8, 0, -10.0), Vector3(0.5, 0.6, -12.2))
+		"service":
+			aim_player(Vector3(11.0, 0, 10.6), Vector3(13.2, 0.9, 13.6))
+		"dairy":
+			aim_player(Vector3(-5.5, 0, -2.4), Vector3(-8.0, 0.6, -5.2))
+		"frozen":
+			aim_player(Vector3(-17.0, 0, 3.9), Vector3(-19.2, 1.1, 2.0))
+		"produce":
+			aim_player(Vector3(13.6, 0, 3.8), Vector3(11.0, 0.0, 0.0))
 		"checkout":
 			place_player(Vector3(4.5, 0, 10.0), 65.0, -4.0)

@@ -33,7 +33,7 @@ MATERIALS = {
 	"Products": ("products.tres", {"albedo_texture": "atlas_products.png"}, {"roughness": 0.78, "metallic_specular": 0.35}),
 	"Env": ("env.tres", {"albedo_texture": "atlas_env.png"}, {"roughness": 0.7, "metallic_specular": 0.4}),
 	"FloorTile": ("floor_tile.tres", {"albedo_texture": "floor_tiles.png", "roughness_texture": "floor_tiles_rough.png"},
-		{"roughness": 1.0, "metallic_specular": 0.6}),
+		{"roughness": 1.0, "metallic_specular": 1.0}),
 	"FloorConcrete": ("floor_concrete.tres", {"albedo_texture": "concrete.png"}, {"roughness": 0.72, "metallic_specular": 0.4}),
 	"CeilingTile": ("ceiling_tile.tres", {"albedo_texture": "ceiling_tiles.png"}, {"roughness": 0.95, "metallic_specular": 0.2}),
 	"WallSales": ("wall_sales.tres", {"albedo_texture": "wall_sales.png"}, {"roughness": 0.85, "metallic_specular": 0.3}),

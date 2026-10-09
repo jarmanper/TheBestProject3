@@ -74,8 +74,14 @@ func _natural_flicker(delta: float) -> void:
 		_quick_flicker()
 
 
+## The flicker clicks only carry a short way: about thirty lit fixtures each flicker every
+## 8-20 s, and at the default 30 m the whole store clicked a couple of times a second.
+const FLICKER_SOUND_DB := -8.0
+const FLICKER_SOUND_RANGE := 14.0
+
+
 func _quick_flicker() -> void:
-	Sfx.play_at(&"light_flicker", global_position)
+	Sfx.play_at(&"light_flicker", global_position, FLICKER_SOUND_DB, 1.0, FLICKER_SOUND_RANGE)
 	var tween := create_tween()
 	tween.tween_method(_set_energy_fraction, 1.0, 0.15, 0.05)
 	tween.tween_method(_set_energy_fraction, 0.15, 1.0, 0.1)
