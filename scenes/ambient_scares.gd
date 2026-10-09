@@ -1,8 +1,9 @@
 class_name AmbientScares
 extends Node
-## Far-off noises during the night: every INTERVAL seconds a bang, a metal creak or a cart
-## rattle plays positionally (quiet, on the Ambience bus) somewhere in the back of house or a
-## far aisle, MIN_DISTANCE..MAX_DISTANCE metres from the player -- never close to them.
+## Far-off noises during the night: every INTERVAL seconds a muffled thud, a slow creak or a
+## cart rattle plays positionally (quiet, on the Ambience bus) somewhere in the back of house or
+## a far aisle, MIN_DISTANCE..MAX_DISTANCE metres from the player -- never close to them, and
+## never on top of the previous one (a noise still playing skips the next turn).
 ## The game scene adds one (scenes/game.gd); it only runs while the night does.
 
 ## A noise played (tests, debugging).
@@ -10,9 +11,9 @@ signal scare_played(id: StringName, position: Vector3)
 
 const SOUNDS: Array[StringName] = [&"distant_bang", &"metal_creak", &"cart_rattle"]
 const INTERVAL := Vector2(30.0, 90.0)
-const MIN_DISTANCE := 12.0
+const MIN_DISTANCE := 14.0
 const MAX_DISTANCE := 36.0
-const VOLUME_DB := -10.0
+const VOLUME_DB := -16.0
 const HEAR_DISTANCE := 40.0
 const SPOT_TRIES := 16
 ## Where the noises come from: back of house and the far aisles (StoreZone ids).
@@ -23,6 +24,7 @@ const SOURCE_ZONES: Array[StringName] = [
 
 var rng := RandomNumberGenerator.new()
 var next_in := 0.0                      ## seconds until the next noise
+var _last: AudioStreamPlayer3D          ## the noise playing now, if any
 
 
 func _init() -> void:
@@ -52,12 +54,14 @@ func play_scare() -> bool:
 	var player := GameState.player
 	if not is_instance_valid(player) or not player.is_inside_tree():
 		return false
+	if is_instance_valid(_last) and _last.playing:
+		return false
 	var spot: Variant = pick_spot(player.global_position)
 	if spot == null:
 		return false
 	var id: StringName = SOUNDS[rng.randi() % SOUNDS.size()]
 	var position := (spot as Vector3) + Vector3.UP * rng.randf_range(0.3, 2.2)
-	Sfx.play_at(id, position, VOLUME_DB, rng.randf_range(0.88, 1.05), HEAR_DISTANCE, &"Ambience")
+	_last = Sfx.play_at(id, position, VOLUME_DB, rng.randf_range(0.88, 1.05), HEAR_DISTANCE, &"Ambience")
 	scare_played.emit(id, position)
 	return true
 
