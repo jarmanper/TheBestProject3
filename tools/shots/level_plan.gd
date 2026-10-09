@@ -25,6 +25,12 @@ func _run() -> void:
 	var level := (load(LEVEL) as PackedScene).instantiate() as Node3D
 	root.add_child(level)
 	await process_frame
+	# Seen from 40 m up: no area culling, no draw distance.
+	var culler := level.get_node_or_null("AreaCuller")
+	if culler:
+		culler.set(&"enabled", false)
+	for geometry in level.find_children("*", "GeometryInstance3D", true, false):
+		(geometry as GeometryInstance3D).visibility_range_end = 0.0
 	for node in level.find_children("*", "Node3D", true, false):
 		var node_name := String(node.name)
 		if node_name.begins_with("Ceiling") or node_name.begins_with("Fixture") or node_name.begins_with("Cable") \
