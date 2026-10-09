@@ -3,10 +3,15 @@ extends Node
 
 const BASIC_TASKS_PER_NIGHT := 6
 const MIN_TOOL_TASKS := 3
+## Balance: all coworkers together may take at most this many *basic* tasks per night
+## (completed + currently claimed), so the player still has to do most of the checklist.
+## Manager tasks are never capped (GDD seam 2: coworkers prioritise them).
+const MAX_COWORKER_BASIC_COMPLETIONS := 2
 
 var _basic_tasks: Array[TaskData] = []
 var _manager_tasks: Array[TaskData] = []
 var _next_id := 0
+var _coworker_basic_completions := 0
 
 
 func _ready() -> void:
@@ -32,6 +37,7 @@ func reset() -> void:
 	_basic_tasks.clear()
 	_manager_tasks.clear()
 	_next_id = 0
+	_coworker_basic_completions = 0
 
 
 ## Picks this night's basic tasks from stations in group "task_station" and activates them.
@@ -91,6 +97,8 @@ func complete_task(task: TaskData, by: Node) -> void:
 	if task == null or not task.is_open():
 		return
 	task.completed = true
+	if not task.is_manager_task and is_instance_valid(by) and not _is_player(by):
+		_coworker_basic_completions += 1
 	GameState.add_stat("tasks_completed")
 	if task.is_manager_task:
 		GameState.add_stat("manager_tasks_completed")
@@ -102,10 +110,17 @@ func complete_task(task: TaskData, by: Node) -> void:
 
 
 ## A coworker reserves a task so two workers do not walk to the same one.
+## Refuses a basic task to a non-player worker once coworkers have used up
+## MAX_COWORKER_BASIC_COMPLETIONS (completions plus open claims).
 func claim_task(task: TaskData, worker: Node) -> bool:
 	if task == null or not task.is_open():
 		return false
-	if task.claimed_by != null and task.claimed_by != worker:
+	if task.claimed_by == worker:
+		return true
+	if task.claimed_by != null:
+		return false
+	if not task.is_manager_task and not _is_player(worker) \
+			and _coworker_basic_completions + _coworker_basic_claims() >= MAX_COWORKER_BASIC_COMPLETIONS:
 		return false
 	task.claimed_by = worker
 	return true
@@ -151,6 +166,23 @@ func get_required_remaining() -> int:
 
 func all_required_done() -> bool:
 	return get_required_remaining() == 0
+
+
+## Basic tasks finished by someone other than the player this night.
+func get_coworker_basic_completions() -> int:
+	return _coworker_basic_completions
+
+
+func _coworker_basic_claims() -> int:
+	var count := 0
+	for task in _basic_tasks:
+		if task.is_open() and is_instance_valid(task.claimed_by) and not _is_player(task.claimed_by):
+			count += 1
+	return count
+
+
+static func _is_player(worker: Node) -> bool:
+	return worker != null and is_instance_valid(worker) and worker.is_in_group(&"player")
 
 
 func _activate_basic_task(station: TaskStation) -> TaskData:
