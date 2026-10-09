@@ -39,6 +39,11 @@ func is_active() -> bool:
 
 ## Called by Tasks when a task here becomes active / finishes.
 func set_task(new_task: TaskData) -> void:
+	if new_task != task:
+		## The task changed out from under a mid-hold player (manager task timed
+		## out, or someone else finished it) — the looping progress sound would
+		## otherwise never stop, since a looping stream never emits `finished`.
+		_stop_progress_sound()
 	task = new_task
 	_update_active_visual()
 
@@ -86,6 +91,11 @@ func _stop_progress_sound() -> void:
 	if _progress_player and is_instance_valid(_progress_player):
 		_progress_player.queue_free()
 	_progress_player = null
+
+
+## For tests / debugging: is the hold-progress emitter currently alive?
+func is_progress_sound_playing() -> bool:
+	return _progress_player != null and is_instance_valid(_progress_player)
 
 
 func _update_active_visual() -> void:

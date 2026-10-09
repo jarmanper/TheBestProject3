@@ -8,6 +8,8 @@ extends Interactable
 
 var occupant: Node3D
 
+var _door_tween: Tween
+
 
 func _ready() -> void:
 	super()
@@ -98,5 +100,7 @@ func _animate_door(opening: bool) -> void:
 	if door == null:
 		return
 	var target_degrees := -100.0 if opening else 0.0
-	var tween := create_tween()
-	tween.tween_property(door, "rotation_degrees:y", target_degrees, 0.3)
+	if _door_tween and _door_tween.is_valid():
+		_door_tween.kill()
+	_door_tween = create_tween()
+	_door_tween.tween_property(door, "rotation_degrees:y", target_degrees, 0.3)
