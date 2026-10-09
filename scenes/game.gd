@@ -8,8 +8,13 @@ extends Node
 ## Mouse events are forwarded into the SubViewport explicitly (the container ignores the mouse):
 ## with a captured/locked pointer the GUI does not route motion to the container reliably,
 ## and the player reads InputEventMouseMotion.screen_relative so look speed ignores the shrink.
+##
+## Gameplay only runs while the pointer is captured. Browsers grant pointer lock only on a
+## click (not a key press) and refuse it for ~1 s after the player leaves it with Esc, so
+## resuming requests capture and, until capture is actually observed, waits in RESUMING:
+## world paused, "CLICK TO RESUME" shown, clicks consumed (they never reach `interact`).
 
-enum State { LOADING, PLAYING, PAUSED, ENDED }
+enum State { LOADING, PLAYING, PAUSED, RESUMING, ENDED }
 
 ## Emitted once the night has started (state PLAYING).
 signal started
@@ -21,14 +26,19 @@ const SILENT_DB := -60.0
 const MUSIC_FADE := 1.6
 const NAV_WAIT_FRAMES := 120
 
-## Screenshot/test runs turn this off so they do not grab the desktop mouse.
+## Off for screenshot/test runs: the real mouse is never touched and capture is simulated
+## (requests succeed at once unless `simulated_capture_refused`). Headless runs always simulate.
 @export var capture_mouse_on_start := true
+## Simulated capture only: model a browser refusing pointer lock (Esc cooldown, no gesture).
+var simulated_capture_refused := false
 
 var state := State.LOADING
 var level: Node3D
 var player: Player
 
 var _had_capture := false
+var _simulate_capture := false
+var _simulated_captured := false
 var _ambience: AudioStreamPlayer
 var _music_dread: AudioStreamPlayer
 var _music_chase: AudioStreamPlayer
@@ -48,6 +58,7 @@ func _ready() -> void:
 	hud.process_mode = Node.PROCESS_MODE_PAUSABLE
 	get_tree().paused = false
 	GameState.world_root = world
+	_simulate_capture = not capture_mouse_on_start or DisplayServer.get_name() == "headless"
 	pause_menu.resume_requested.connect(resume_game)
 	pause_menu.quit_requested.connect(quit_to_menu)
 	end_screen.restart_requested.connect(restart)
@@ -64,9 +75,7 @@ func _ready() -> void:
 	Tasks.reset()
 	GameState.start_night()
 	Tasks.begin_night()
-	state = State.PLAYING
-	if capture_mouse_on_start:
-		_capture_mouse()
+	_request_play("CLICK TO START YOUR SHIFT")
 	started.emit()
 
 
@@ -80,60 +89,99 @@ func _exit_tree() -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if state != State.PLAYING or not (event is InputEventMouse):
+	if state == State.RESUMING and event is InputEventMouseButton:
+		# This click is for the pointer lock only: keep it from the GUI and the game.
+		get_viewport().set_input_as_handled()
+		if event.is_pressed():
+			_capture_mouse()
+			if is_mouse_captured():
+				_enter_playing()
+		return
+	if state != State.PLAYING or not (event is InputEventMouse) or not is_mouse_captured():
 		return
 	var shrink := float(maxi(world_view.stretch_shrink, 1))
 	sub_viewport.push_input(event.xformed_by(Transform2D.IDENTITY.scaled(Vector2.ONE / shrink)), true)
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(&"pause"):
-		if state == State.PLAYING:
+	if not event.is_action_pressed(&"pause"):
+		return
+	match state:
+		State.PLAYING:
 			pause_game()
-			get_viewport().set_input_as_handled()
-		elif state == State.PAUSED:
+		State.PAUSED:
 			if pause_menu.is_settings_open():
 				pause_menu.close_settings()
 			else:
 				resume_game()
-			get_viewport().set_input_as_handled()
-	elif state == State.PLAYING and event is InputEventMouseButton and event.is_pressed() \
-			and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
-		# Click back into the game (web: pointer lock needs a user gesture).
-		_capture_mouse()
+		State.RESUMING:
+			_show_pause_menu()
+		_:
+			return
+	get_viewport().set_input_as_handled()
 
 
 func _process(_delta: float) -> void:
-	if state != State.PLAYING:
-		return
-	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		_had_capture = true
-	elif _had_capture:
-		# Pointer lock lost: web Esc (the browser eats the key), alt-tab, focus change.
-		pause_game()
+	match state:
+		State.PLAYING:
+			if is_mouse_captured():
+				_had_capture = true
+			elif _had_capture:
+				# Pointer lock lost: web Esc (the browser eats the key), alt-tab, focus change.
+				pause_game()
+		State.RESUMING:
+			if is_mouse_captured():
+				_enter_playing()
 
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and state == State.PLAYING and _had_capture:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and state == State.PLAYING and not _simulate_capture:
 		pause_game()
 
 
 func pause_game() -> void:
 	if state != State.PLAYING:
 		return
+	_show_pause_menu()
+
+
+## Asks for the pointer again; play continues once capture is observed (see RESUMING).
+func resume_game() -> void:
+	if state != State.PAUSED:
+		return
+	_request_play("CLICK TO RESUME")
+
+
+func is_mouse_captured() -> bool:
+	if _simulate_capture:
+		return _simulated_captured
+	return Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+
+
+func _request_play(prompt: String) -> void:
+	_capture_mouse()
+	if is_mouse_captured():
+		_enter_playing()
+		return
+	state = State.RESUMING
+	get_tree().paused = true
+	pause_menu.show_click_prompt(prompt)
+
+
+func _enter_playing() -> void:
+	state = State.PLAYING
+	_had_capture = true
+	pause_menu.close()
+	get_tree().paused = false
+	if is_instance_valid(player):
+		player.ignore_held_actions()
+
+
+func _show_pause_menu() -> void:
 	state = State.PAUSED
 	get_tree().paused = true
 	_release_mouse()
 	pause_menu.open()
-
-
-func resume_game() -> void:
-	if state != State.PAUSED:
-		return
-	pause_menu.close()
-	state = State.PLAYING
-	get_tree().paused = false
-	_capture_mouse()
 
 
 func restart() -> void:
@@ -266,12 +314,17 @@ func _crossfade(fade_in: AudioStreamPlayer, in_db: float, fade_out: AudioStreamP
 
 func _capture_mouse() -> void:
 	_had_capture = false
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	if _simulate_capture:
+		_simulated_captured = not simulated_capture_refused
+	else:
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
 func _release_mouse() -> void:
 	_had_capture = false
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	_simulated_captured = false
+	if not _simulate_capture:
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 
 func _on_night_ended(result: StringName) -> void:

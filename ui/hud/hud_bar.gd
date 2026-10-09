@@ -14,6 +14,12 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
+func set_fill_color(color: Color) -> void:
+	if color != fill_color:
+		fill_color = color
+		queue_redraw()
+
+
 func set_value(new_value: float) -> void:
 	new_value = clampf(new_value, 0.0, 1.0)
 	if not is_equal_approx(new_value, value):

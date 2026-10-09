@@ -4,6 +4,14 @@ extends TestCase
 
 const GAME_SCENE := "res://scenes/game.tscn"
 
+
+class FakeStation extends Interactable:
+	var used := 0
+
+	func interact(_player: Node) -> void:
+		used += 1
+
+
 var game: Game
 
 
@@ -18,6 +26,7 @@ func before_each() -> void:
 
 
 func after_each() -> void:
+	Input.action_release(&"interact")
 	game.free()
 	tree.paused = false
 	GameState.night_running = false
@@ -53,20 +62,45 @@ func test_player_at_spawn_facing_the_door() -> void:
 	assert_eq(player.get_viewport(), game.get_node("WorldView/SubViewport"), "player renders in the SubViewport")
 
 
+func _motion(relative: Vector2) -> InputEventMouseMotion:
+	var motion := InputEventMouseMotion.new()
+	motion.position = Vector2(640, 360)
+	motion.relative = relative
+	motion.screen_relative = relative
+	return motion
+
+
+func _left_click(pressed := true) -> InputEventMouseButton:
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.position = Vector2(640, 360)
+	click.pressed = pressed
+	return click
+
+
 func test_mouse_look_through_the_subviewport_container() -> void:
+	# Capture is simulated in tests (headless cannot capture); the game starts captured.
+	assert_true(game.is_mouse_captured(), "playing implies a captured pointer")
 	var player := GameState.player as Player
 	var head := player.get_node("Head") as Node3D
 	var yaw := player.rotation.y
 	var pitch := head.rotation.x
-	var motion := InputEventMouseMotion.new()
-	motion.position = Vector2(640, 360)
-	motion.relative = Vector2(80, 40)
-	motion.screen_relative = Vector2(80, 40)
-	tree.root.push_input(motion)
+	tree.root.push_input(_motion(Vector2(80, 40)))
 	await wait_frames(1)
 	var sensitivity := GameState.mouse_sensitivity
 	assert_near(angle_difference(yaw, player.rotation.y), -80.0 * sensitivity, 0.0001, "yaw turned by screen pixels")
 	assert_near(head.rotation.x, pitch - 40.0 * sensitivity, 0.0001, "pitch turned by screen pixels")
+
+
+func test_uncaptured_motion_is_ignored() -> void:
+	var player := GameState.player as Player
+	var head := player.get_node("Head") as Node3D
+	var yaw := player.rotation.y
+	var pitch := head.rotation.x
+	game._simulated_captured = false   # the browser dropped the pointer lock
+	tree.root.push_input(_motion(Vector2(300, 120)))
+	assert_near(player.rotation.y, yaw, 0.00001, "no yaw from a free cursor")
+	assert_near(head.rotation.x, pitch, 0.00001, "no pitch from a free cursor")
 
 
 func test_pause_and_resume() -> void:
@@ -74,10 +108,74 @@ func test_pause_and_resume() -> void:
 	assert_eq(game.state, Game.State.PAUSED)
 	assert_true(tree.paused)
 	assert_true(game.get_node("Menus/PauseMenu").visible, "pause menu shown")
+	assert_false(game.is_mouse_captured(), "pointer released while paused")
 	game.resume_game()
 	assert_eq(game.state, Game.State.PLAYING)
 	assert_false(tree.paused)
+	assert_true(game.is_mouse_captured())
 	assert_false(game.get_node("Menus/PauseMenu").visible)
+
+
+func test_resume_waits_for_a_click_when_capture_is_refused() -> void:
+	var menu := game.get_node("Menus/PauseMenu") as PauseMenu
+	game.pause_game()
+	game.simulated_capture_refused = true   # web: Esc is no user gesture / ~1 s re-lock cooldown
+	game.resume_game()
+	assert_eq(game.state, Game.State.RESUMING, "waits for capture instead of playing")
+	assert_true(tree.paused, "world stays paused until capture is observed")
+	assert_true(menu.is_click_prompt_visible(), "CLICK TO RESUME shown")
+	tree.root.push_input(_left_click())
+	await wait_frames(2)
+	assert_eq(game.state, Game.State.RESUMING, "still waiting while the browser refuses")
+	game.simulated_capture_refused = false
+	tree.root.push_input(_left_click())
+	assert_eq(game.state, Game.State.PLAYING, "the click captured the pointer")
+	assert_false(tree.paused)
+	assert_false(menu.visible)
+
+
+func test_pause_key_while_waiting_for_capture_opens_the_menu() -> void:
+	var menu := game.get_node("Menus/PauseMenu") as PauseMenu
+	game.pause_game()
+	game.simulated_capture_refused = true
+	game.resume_game()
+	var press := InputEventAction.new()
+	press.action = &"pause"
+	press.pressed = true
+	tree.root.push_input(press)
+	assert_eq(game.state, Game.State.PAUSED)
+	assert_true(menu.visible and not menu.is_click_prompt_visible(), "back to the pause menu")
+
+
+func test_recapture_click_does_not_interact() -> void:
+	var player := GameState.player as Player
+	var station := FakeStation.new()
+	var shape := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(0.6, 0.6, 0.6)
+	shape.shape = box
+	station.add_child(shape)
+	game.get_node("WorldView/SubViewport/World").add_child(station)
+	station.global_position = player.get_eye_position() - player.global_transform.basis.z * 1.5
+	await wait_physics_frames(3)
+	game.pause_game()
+	game.simulated_capture_refused = true
+	game.resume_game()
+	game.simulated_capture_refused = false
+	# The left button is `interact`: hold it as the browser would while the click arrives.
+	Input.action_press(&"interact")
+	tree.root.push_input(_left_click())
+	assert_eq(game.state, Game.State.PLAYING)
+	await wait_physics_frames(6)
+	assert_eq(station.used, 0, "the click that resumed the game did not interact")
+	Input.action_release(&"interact")
+	tree.root.push_input(_left_click(false))
+	await wait_physics_frames(2)
+	Input.action_press(&"interact")
+	await wait_physics_frames(3)
+	Input.action_release(&"interact")
+	assert_eq(station.used, 1, "a fresh click interacts")
+	station.queue_free()
 
 
 func test_pause_action_toggles() -> void:
@@ -91,9 +189,8 @@ func test_pause_action_toggles() -> void:
 
 
 func test_lost_pointer_lock_pauses() -> void:
-	# Headless never captures the mouse, so pretend it was captured once (as after CLOCK IN):
-	# seeing it uncaptured while playing means the pointer lock was lost (web Esc, alt-tab).
-	game._had_capture = true
+	# The browser drops the lock on Esc (and eats the key): playing without capture pauses.
+	game._simulated_captured = false
 	await wait_frames(2)
 	assert_eq(game.state, Game.State.PAUSED, "lost capture pauses the game")
 

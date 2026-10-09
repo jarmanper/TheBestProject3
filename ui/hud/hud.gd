@@ -25,6 +25,8 @@ var checklist_collapsed := false
 
 var _tasks: Array[TaskData] = []
 var _rows: Array[Dictionary] = []
+var _row_labels: Array[Label] = []
+var _row_colors: Array[Color] = []
 var _subtitles: Array[Dictionary] = []      ## {label, panel, time_left}
 var _checklist_timer := 0.0
 var _intro_time := 0.0
@@ -92,9 +94,9 @@ func _process(delta: float) -> void:
 	if _checklist_timer <= 0.0:
 		_checklist_timer = CHECKLIST_TICK
 		render_checklist(_tasks)
-	_update_subtitles(delta)
+	update_subtitles(delta)
 	_flash = maxf(_flash - delta * 1.6, 0.0)
-	_damage_flash.color.a = _flash * 0.45
+	_set_alpha(_damage_flash, _flash * 0.45)
 	if _intro_time > 0.0:
 		_intro_time -= delta
 		_intro.modulate.a = clampf(_intro_time / 0.8, 0.0, 1.0)
@@ -115,21 +117,25 @@ func render_checklist(tasks: Array) -> void:
 	_rows.clear()
 	for task in _tasks:
 		_rows.append({"text": format_task(task), "color": color_for(task)})
-	var labels := _checklist_rows.get_children()
-	for i in maxi(labels.size(), _rows.size()):
-		if i >= _rows.size():
-			labels[i].queue_free()
+	# Row labels are pooled: surplus rows are hidden, never freed, so a re-render in the
+	# same frame cannot reuse a label that is about to be deleted.
+	while _row_labels.size() < _rows.size():
+		var label := _make_label(24)
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		label.custom_minimum_size.x = RIGHT_COLUMN_WIDTH - 24.0
+		_checklist_rows.add_child(label)
+		_row_labels.append(label)
+		_row_colors.append(Color(0, 0, 0, 0))
+	for i in _row_labels.size():
+		var label := _row_labels[i]
+		label.visible = i < _rows.size()
+		if not label.visible:
 			continue
-		var label: Label
-		if i < labels.size():
-			label = labels[i]
-		else:
-			label = _make_label(24)
-			label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			label.custom_minimum_size.x = RIGHT_COLUMN_WIDTH - 24.0
-			_checklist_rows.add_child(label)
 		label.text = _rows[i].text
-		label.add_theme_color_override(&"font_color", _rows[i].color)
+		var color: Color = _rows[i].color
+		if color != _row_colors[i]:
+			_row_colors[i] = color
+			label.add_theme_color_override(&"font_color", color)
 	_checklist_header.text = get_checklist_header() + ("  [TAB]" if checklist_collapsed else "")
 	_checklist_rows.visible = not checklist_collapsed
 
@@ -235,7 +241,8 @@ func get_subtitle_lines() -> PackedStringArray:
 	return lines
 
 
-func _update_subtitles(delta: float) -> void:
+## Ages subtitles by `delta` seconds and drops expired ones (called from _process).
+func update_subtitles(delta: float) -> void:
 	for i in range(_subtitles.size() - 1, -1, -1):
 		_subtitles[i].time_left -= delta
 		if _subtitles[i].time_left <= 0.0:
@@ -348,10 +355,10 @@ func _update_player_widgets(delta: float) -> void:
 	var fraction := clampf(player.health / maxf(player.max_health, 1.0), 0.0, 1.0)
 	_health_shown = move_toward(_health_shown, fraction, delta * 1.5)
 	_health_bar.set_value(_health_shown)
-	_low_health.color.a = clampf((0.35 - fraction) / 0.35, 0.0, 1.0) * 0.22
+	_set_alpha(_low_health, clampf((0.35 - fraction) / 0.35, 0.0, 1.0) * 0.22)
 
 	_stamina_bar.set_value(player.stamina / maxf(player.max_stamina, 1.0))
-	_stamina_bar.fill_color = Catalog.COLOR_RED if player.is_exhausted else Catalog.COLOR_CREAM
+	_stamina_bar.set_fill_color(Catalog.COLOR_RED if player.is_exhausted else Catalog.COLOR_CREAM)
 	var stamina_full := player.stamina >= player.max_stamina - 0.01
 	_stamina_alpha = move_toward(_stamina_alpha, 0.0 if stamina_full else 1.0, delta * 2.5)
 	_stamina_bar.modulate.a = _stamina_alpha
@@ -550,6 +557,12 @@ func _full_rect(node_name: String, color: Color) -> ColorRect:
 	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_root.add_child(rect)
 	return rect
+
+
+## ColorRect.color redraws on every assignment; only touch it when the alpha changes.
+static func _set_alpha(rect: ColorRect, alpha: float) -> void:
+	if not is_equal_approx(rect.color.a, alpha):
+		rect.color.a = alpha
 
 
 static func _set_mouse_ignore(node: Node) -> void:

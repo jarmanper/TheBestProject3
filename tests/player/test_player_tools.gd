@@ -61,16 +61,28 @@ func test_flashlight_toggle_action() -> void:
 
 
 func test_flashlight_flickers_near_monster() -> void:
+	# Deterministic: the player's own _process is off, time is stepped by hand, RNG seeded.
+	player.set_process(false)
+	player.flicker_rng.seed = 1234
 	var monster := Node3D.new()
 	world.add_child(monster)
-	monster.global_position = player.global_position + Vector3(0, 0, -1.0)
 	var previous := GameState.monster
 	GameState.monster = monster
 	var light := player.get_node("Head/Camera3D/Flashlight") as SpotLight3D
-	var dimmed := false
+
+	monster.global_position = player.global_position + Vector3(0, 0, -20.0)
+	assert_near(player.get_monster_disturbance(), 0.0, 0.0001, "no disturbance beyond 12 m")
+	for i in 20:
+		player.update_flashlight(0.05)
+		assert_near(light.light_energy, Player.FLASHLIGHT_ENERGY, 0.0001, "steady when far")
+
+	monster.global_position = player.global_position + Vector3(0, 0, -1.0)
+	assert_near(player.get_monster_disturbance(), 1.0 - 1.0 / Player.FLICKER_RADIUS, 0.0001)
+	var dimmed := 0
 	for i in 40:
-		await wait_frames(1)
+		player.update_flashlight(0.05)
 		if light.light_energy < Player.FLASHLIGHT_ENERGY * 0.5:
-			dimmed = true
+			dimmed += 1
 	GameState.monster = previous
-	assert_true(dimmed, "flashlight dipped while the monster was 1 m away")
+	assert_true(dimmed > 0, "flashlight dipped while the monster was 1 m away")
+	assert_true(dimmed < 40, "and recovered between dips")

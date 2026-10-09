@@ -72,6 +72,8 @@ var _bob_phase := 0.0
 var _bob_weight := 0.0
 var _camera_bob := Vector3.ZERO
 var _sprint_blend := 0.0
+## Random source for the flashlight flicker (tests seed it).
+var flicker_rng := RandomNumberGenerator.new()
 var _flicker_timer := 0.0
 var _flicker_level := 1.0
 var _was_pressed := {}
@@ -297,7 +299,7 @@ func _process(delta: float) -> void:
 	update_health(delta)
 	update_death(delta)
 	_update_camera(delta)
-	_update_flashlight(delta)
+	update_flashlight(delta)
 
 
 func _move(delta: float, move_input: Vector2) -> void:
@@ -316,6 +318,16 @@ func _move(delta: float, move_input: Vector2) -> void:
 	else:
 		velocity += get_gravity() * delta
 	move_and_slide()
+
+
+## Buttons already down (e.g. the click that resumed the game or recaptured the mouse) must
+## be released before they act; also blocks a just-pressed edge for the next tick.
+func ignore_held_actions() -> void:
+	_cancel_hold()
+	var frame := Engine.get_physics_frames()
+	for action in [&"interact", &"flashlight"]:
+		_was_pressed[action] = Input.is_action_pressed(action)
+		_edge_frames[action] = frame
 
 
 ## True on the physics tick `action` went down. Manual edge detection (works for
@@ -415,12 +427,10 @@ func _set_prompt(text: String) -> void:
 ## Interact pressed while hidden: let the spot handle it (it toggles), else leave ourselves.
 func _leave_hiding_spot() -> void:
 	var spot := current_hiding_spot
-	if is_instance_valid(spot) and spot.has_method(&"interact"):
+	if is_instance_valid(spot):
 		spot.interact(self)
 	if is_hidden:
-		exit_hiding()
-		if is_instance_valid(spot) and spot.get(&"occupant") == self:
-			spot.set(&"occupant", null)
+		exit_hiding()   # the spot is gone (freed) or did not release us
 
 
 # --- Camera -------------------------------------------------------------------------
@@ -492,18 +502,24 @@ func _footstep() -> void:
 
 # --- Flashlight ------------------------------------------------------------------------
 
-func _update_flashlight(delta: float) -> void:
-	var disturbance := 0.0
+## 0 beyond FLICKER_RADIUS from GameState.monster, rising to 1 at the player.
+func get_monster_disturbance() -> float:
 	var monster := GameState.monster
-	if is_instance_valid(monster) and monster.is_inside_tree():
-		var distance := monster.global_position.distance_to(global_position)
-		if distance < FLICKER_RADIUS:
-			disturbance = 1.0 - distance / FLICKER_RADIUS
+	if not is_instance_valid(monster) or not monster.is_inside_tree() or not is_inside_tree():
+		return 0.0
+	var distance := monster.global_position.distance_to(global_position)
+	return clampf(1.0 - distance / FLICKER_RADIUS, 0.0, 1.0)
+
+
+## Flashlight flicker step (called from _process). Random dips use `flicker_rng`.
+func update_flashlight(delta: float) -> void:
+	var disturbance := get_monster_disturbance()
 	if disturbance > 0.0:
 		_flicker_timer -= delta
 		if _flicker_timer <= 0.0:
-			_flicker_timer = randf_range(0.03, 0.16)
-			_flicker_level = randf_range(0.0, 0.35) if randf() < disturbance * 0.75 else randf_range(0.8, 1.0)
+			_flicker_timer = flicker_rng.randf_range(0.03, 0.16)
+			_flicker_level = flicker_rng.randf_range(0.0, 0.35) if flicker_rng.randf() < disturbance * 0.75 \
+				else flicker_rng.randf_range(0.8, 1.0)
 	else:
 		_flicker_level = 1.0
 	_apply_flashlight(_flicker_level)
@@ -516,6 +532,13 @@ func _apply_flashlight(level: float) -> void:
 
 
 func _die() -> void:
+	if is_hidden:
+		# Leave the spot first so the camera falls from the body, and the spot is free again.
+		var spot := current_hiding_spot
+		if is_instance_valid(spot) and spot.has_method(&"pull_out_occupant"):
+			spot.pull_out_occupant()
+		if is_hidden:
+			exit_hiding()
 	_dead = true
 	input_enabled = false
 	is_sprinting = false
