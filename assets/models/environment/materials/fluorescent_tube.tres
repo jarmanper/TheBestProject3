@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" load_steps=1 format=3]
+
+[resource]
+resource_name = "FluorescentTube"
+albedo_color = Color(0.8471, 0.8275, 0.6588, 1.000)
+emission_enabled = true
+emission = Color(0.8471, 0.8275, 0.6588, 1.000)
+emission_energy_multiplier = 3.0
+roughness = 0.4
+texture_filter = 2

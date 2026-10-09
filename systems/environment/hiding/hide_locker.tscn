@@ -1,0 +1,38 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://systems/environment/hiding_spot.gd" id="1"]
+[ext_resource type="Script" path="res://systems/environment/prop_placeholder.gd" id="2"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1"]
+size = Vector3(0.5, 1.9, 1.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_body"]
+size = Vector3(0.5, 1.9, 0.5)
+
+[node name="HideLocker" type="Area3D"]
+editor_description = "Origin at the locker's floor centre, door toward +Z. The locker.glb model carries the hinged Door the spot swings open."
+script = ExtResource("1")
+spot_kind = &"locker"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0.15)
+shape = SubResource("BoxShape3D_1")
+
+[node name="Cabinet" type="Node3D" parent="."]
+script = ExtResource("2")
+model_path = "res://assets/models/props/locker.glb"
+fallback_size = Vector3(0.5, 1.9, 0.5)
+fallback_color = Color(0.3843, 0.4275, 0.3451, 1)
+
+[node name="Body" type="StaticBody3D" parent="."]
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
+shape = SubResource("BoxShape3D_body")
+
+[node name="HidePoint" type="Marker3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 1.56, -0.02)
+
+[node name="ExitPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 0, 0.85)

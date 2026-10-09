@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" load_steps=1 format=3]
+
+[resource]
+resource_name = "CoolerLight"
+albedo_color = Color(0.8118, 0.8941, 0.9412, 1.000)
+emission_enabled = true
+emission = Color(0.8118, 0.8941, 0.9412, 1.000)
+emission_energy_multiplier = 1.6
+texture_filter = 2

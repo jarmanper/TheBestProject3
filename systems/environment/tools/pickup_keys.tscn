@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://systems/environment/tool_pickup.gd" id="1"]
+[ext_resource type="Script" path="res://systems/environment/prop_placeholder.gd" id="2"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1"]
+size = Vector3(0.45, 0.4, 0.3)
+
+[node name="PickupKeys" type="Area3D"]
+script = ExtResource("1")
+tool_id = &"keys"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.15)
+shape = SubResource("BoxShape3D_1")
+
+[node name="Tool" type="Node3D" parent="."]
+editor_description = "Wall prop: put the origin on a wall at y = 1.45 (key board)."
+script = ExtResource("2")
+model_path = "res://assets/models/props/pickup_keys.glb"
+fallback_size = Vector3(0.12, 0.12, 0.04)
+fallback_color = Color(0.8471, 0.8275, 0.6588, 1)

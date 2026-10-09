@@ -1,0 +1,34 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://systems/environment/task_station.gd" id="1"]
+[ext_resource type="Script" path="res://systems/environment/prop_placeholder.gd" id="2"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1"]
+size = Vector3(1.2, 1.6, 1.2)
+
+[node name="StationFaceShelf" type="Area3D"]
+script = ExtResource("1")
+task_kind = &"face_shelf"
+zone = &"aisle_1"
+title = "Face the shelves in Aisle 1"
+required_tool = &""
+hold_time = 3.0
+basic_task = true
+manager_line = "Aisle one's a mess, square it away."
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("BoxShape3D_1")
+
+[node name="WorkPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.9)
+
+[node name="ActiveVisual" type="Node3D" parent="."]
+visible = false
+
+[node name="MessyProducts" type="Node3D" parent="ActiveVisual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.35)
+script = ExtResource("2")
+model_path = "res://assets/models/props/messy_products.glb"
+fallback_size = Vector3(1.0, 0.45, 0.35)
+fallback_color = Color(0.3843, 0.4275, 0.3451, 1)
