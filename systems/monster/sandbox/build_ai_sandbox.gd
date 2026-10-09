@@ -1,8 +1,8 @@
 extends SceneTree
 ## Generates systems/monster/sandbox/ai_sandbox.tscn: walls, shelves and counters
 ## (StaticBody3D, world layer) under a NavigationRegion3D whose navmesh is baked
-## from the static colliders, StoreZones, spawn/patrol markers, stub TaskStations,
-## a HidingSpot, flickering sandbox lights, 3 coworkers and the monster (the player
+## from the static colliders, StoreZones, spawn/patrol markers, TaskStations,
+## a HidingSpot, StoreLights, 3 coworkers and the monster (the player
 ## is spawned at runtime by ai_sandbox.gd).
 ##   godot --headless --path . -s res://systems/monster/sandbox/build_ai_sandbox.gd
 ## Layout (x -16..16, z -13..13, +Z = front): sales floor with three shelf rows
@@ -135,7 +135,9 @@ func _build_environment() -> void:
 	env.ambient_light_energy = 0.6
 	world_env.environment = env
 	_add(scene, world_env)
-	var light_script := load("res://systems/monster/sandbox/sandbox_light.gd")
+	# Plain StoreLights (contract: child OmniLight3D "Light"); the real StoreLight
+	# shows the monster's flicker, the foundation stub keeps them steady.
+	var light_script := load("res://systems/environment/store_light.gd")
 	var lights := [Vector3(-10, 3.2, 2), Vector3(-6, 3.2, 2), Vector3(-2, 3.2, 8), Vector3(9, 3.2, 4),
 		Vector3(-7, 3.2, 10), Vector3(-8, 3.2, -9), Vector3(8, 3.2, -9), Vector3(9, 3.2, 10)]
 	for i in lights.size():
