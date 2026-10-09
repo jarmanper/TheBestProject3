@@ -2,7 +2,8 @@ class_name Game
 extends Node
 ## The game scene (docs/ARCHITECTURE.md §6). Loads the level into the half-resolution 3D
 ## viewport, spawns the player and (when their scenes exist) the coworkers, monster and store
-## manager at the level's markers, starts the night, runs ambience/music, and owns mouse
+## manager at the level's markers, starts the night, runs ambience/music (plus the far-off
+## AmbientScares noises and the 6 AM shift-end bell), and owns mouse
 ## capture, pausing and the end screen.
 ##
 ## Mouse events are forwarded into the SubViewport explicitly (the container ignores the mouse):
@@ -24,6 +25,7 @@ const DREAD_DB := -17.0
 const CHASE_DB := -7.0
 const SILENT_DB := -60.0
 const MUSIC_FADE := 1.6
+const SHIFT_END_BELL_DB := -2.0
 const NAV_WAIT_FRAMES := 120
 
 ## Off for screenshot/test runs: the real mouse is never touched and capture is simulated
@@ -43,6 +45,7 @@ var _ambience: AudioStreamPlayer
 var _music_dread: AudioStreamPlayer
 var _music_chase: AudioStreamPlayer
 var _music_tween: Tween
+var _scares: AmbientScares
 
 @onready var world_view: SubViewportContainer = $WorldView
 @onready var sub_viewport: SubViewport = $WorldView/SubViewport
@@ -276,6 +279,9 @@ func _start_audio() -> void:
 	_ambience = _make_player(&"amb_store_hum", &"Ambience", AMBIENCE_DB)
 	_music_dread = _make_player(&"music_dread", &"Music", DREAD_DB)
 	_music_chase = _make_player(&"music_chase", &"Music", SILENT_DB, false)
+	_scares = AmbientScares.new()
+	_scares.name = "AmbientScares"
+	add_child(_scares)
 
 
 func _make_player(id: StringName, bus: StringName, volume_db: float, autoplay := true) -> AudioStreamPlayer:
@@ -337,4 +343,6 @@ func _on_night_ended(result: StringName) -> void:
 	hud.visible = false
 	if _music_chase and _music_chase.playing:
 		_on_chase_ended()
+	if result == &"win" or result == &"fired":
+		Sfx.play(&"shift_end_bell", SHIFT_END_BELL_DB)   # 6:00 AM (the hourly PA line is skipped then)
 	end_screen.show_result(result)

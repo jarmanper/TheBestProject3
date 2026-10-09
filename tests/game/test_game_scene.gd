@@ -216,6 +216,37 @@ func test_night_end_shows_end_screen() -> void:
 	assert_false(game.get_node("HUD").visible, "HUD hidden behind the end screen")
 
 
+func _sounds_during(action: Callable) -> Array[StringName]:
+	var played: Array[StringName] = []
+	var record := func(id: StringName) -> void: played.append(id)
+	Sfx.played.connect(record)
+	action.call()
+	Sfx.played.disconnect(record)
+	return played
+
+
+func test_shift_end_bell_rings_at_six_am() -> void:
+	var played := _sounds_during(func() -> void: GameState.end_night(&"fired"))
+	assert_true(&"shift_end_bell" in played, "the bell rings for YOU'RE FIRED: %s" % [played])
+
+
+func test_shift_end_bell_rings_on_a_win() -> void:
+	var played := _sounds_during(func() -> void: GameState.end_night(&"win"))
+	assert_true(&"shift_end_bell" in played, "the bell rings for SHIFT COMPLETE: %s" % [played])
+
+
+func test_no_shift_end_bell_for_a_death() -> void:
+	var played := _sounds_during(func() -> void: GameState.end_night(&"dead"))
+	assert_false(&"shift_end_bell" in played, "no bell when the player died")
+
+
+func test_ambient_scares_run_in_the_game() -> void:
+	var scares := game.get_node_or_null(^"AmbientScares") as AmbientScares
+	assert_true(scares != null, "the game has an ambient-scares node")
+	if scares:
+		assert_eq(scares.process_mode, Node.PROCESS_MODE_PAUSABLE, "quiet while paused")
+
+
 func test_missing_actor_scenes_are_skipped() -> void:
 	var world := game.get_node("WorldView/SubViewport/World")
 	var expected := 2   # Level + Player

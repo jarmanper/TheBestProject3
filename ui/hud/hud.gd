@@ -4,6 +4,7 @@ extends CanvasLayer
 ## stamina bar. Top-right: minimap, clock, task checklist. Centre: crosshair dot, interaction
 ## prompt, hold bar. Bottom: subtitles ([RADIO] / [INTERCOM] / Events.subtitle). Full screen:
 ## damage flash, low-health tint, hiding overlay, intro card. Never takes mouse input.
+## Player-side 2D audio lives here too: the walkie radio, the heartbeat, and the task_fail sting.
 
 const THEME := preload("res://ui/theme/game_theme.tres")
 
@@ -12,6 +13,7 @@ const RIGHT_COLUMN_WIDTH := 340.0
 const SUBTITLE_MAX_LINES := 3
 const CHECKLIST_TICK := 0.25
 const INTRO_TIME := 3.5
+const TASK_FAIL_DB := -4.0
 const MARK_OPEN := "[ ]"
 const MARK_MANAGER := "[!]"
 const MARK_DONE := "[√]"
@@ -56,6 +58,7 @@ var _hide_overlay: HudHideOverlay
 var _intro: Control
 var _intro_label: Label
 var _radio: WalkieRadio
+var _heartbeat: Heartbeat
 
 
 func _ready() -> void:
@@ -65,6 +68,9 @@ func _ready() -> void:
 	_radio.name = "WalkieRadio"
 	add_child(_radio)
 	_radio.message_started.connect(_on_radio_message)
+	_heartbeat = Heartbeat.new()
+	_heartbeat.name = "Heartbeat"
+	add_child(_heartbeat)
 	Events.interaction_prompt_changed.connect(_on_prompt_changed)
 	Events.interaction_progress.connect(_on_progress)
 	Events.player_damaged.connect(_on_player_damaged)
@@ -77,7 +83,7 @@ func _ready() -> void:
 	Events.tasks_changed.connect(refresh_checklist)
 	Events.task_added.connect(_on_task_event)
 	Events.task_completed.connect(_on_task_completed)
-	Events.task_failed.connect(_on_task_event)
+	Events.task_failed.connect(_on_task_failed)
 	refresh_checklist()
 
 
@@ -288,6 +294,10 @@ func get_radio() -> WalkieRadio:
 	return _radio
 
 
+func get_heartbeat() -> Heartbeat:
+	return _heartbeat
+
+
 # --- Event handlers ----------------------------------------------------------------
 
 func _on_prompt_changed(text: String) -> void:
@@ -343,6 +353,12 @@ func _on_task_event(_task: TaskData) -> void:
 
 
 func _on_task_completed(_task: TaskData, _by: Node) -> void:
+	refresh_checklist()
+
+
+## A manager task ran out of time: the checklist row turns red and a short sting plays.
+func _on_task_failed(_task: TaskData) -> void:
+	Sfx.play(&"task_fail", TASK_FAIL_DB)
 	refresh_checklist()
 
 

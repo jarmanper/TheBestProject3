@@ -176,6 +176,19 @@ func test_intro_card_on_night_start() -> void:
 	assert_eq(hud.get_intro_text(), "12:00 AM — CLOCK IN")
 
 
+func test_failed_task_plays_the_fail_sound() -> void:
+	var played: Array[StringName] = []
+	var record := func(id: StringName) -> void: played.append(id)
+	Sfx.played.connect(record)
+	Events.task_failed.emit(_task("Lock the safe", true, 0.0, false, true))
+	Sfx.played.disconnect(record)
+	assert_eq(played.count(&"task_fail"), 1, "task_fail plays on Events.task_failed: %s" % [played])
+
+
+func test_hud_has_a_heartbeat() -> void:
+	assert_true(hud.get_heartbeat() is Heartbeat, "the HUD owns the player's heartbeat")
+
+
 func test_hud_never_blocks_mouse() -> void:
 	for control in hud.find_children("*", "Control", true, false):
 		assert_eq((control as Control).mouse_filter, Control.MOUSE_FILTER_IGNORE, "%s ignores the mouse" % control.name)

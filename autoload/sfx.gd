@@ -3,6 +3,9 @@ extends Node
 ## Each id maps to one or more base paths without an extension; ".ogg" is tried
 ## first, then ".wav". Missing files warn once and play nothing.
 
+## Informational (tests, debugging): `id` started playing through play() or play_at().
+signal played(id: StringName)
+
 const SFX := "res://assets/audio/sfx/"
 const AMB := "res://assets/audio/ambience/"
 const MUS := "res://assets/audio/music/"
@@ -114,6 +117,7 @@ func play(id: StringName, volume_db := 0.0, pitch := 1.0, bus := &"SFX") -> Audi
 	add_child(player)
 	player.finished.connect(player.queue_free)
 	player.play()
+	played.emit(id)
 	return player
 
 
@@ -134,6 +138,7 @@ func play_at(id: StringName, position: Vector3, volume_db := 0.0, pitch := 1.0, 
 	player.global_position = position
 	player.finished.connect(player.queue_free)
 	player.play()
+	played.emit(id)
 	return player
 
 
