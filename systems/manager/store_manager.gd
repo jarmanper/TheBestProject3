@@ -75,8 +75,16 @@ func _on_night_started() -> void:
 	_next_pa_flavour_at = _elapsed + _rng.randf_range(pa_flavour_min_interval, pa_flavour_max_interval)
 
 
+## Seeds the manager's coin flips and picks (intercom or walkie, which station, when), so a
+## test or a replay gets the same night of announcements.
+func set_seed(value: int) -> void:
+	_rng.seed = value
+
+
+## Hourly PA line from 1 AM to 5 AM. 6:00 AM has none: the night ends then and the end screen
+## would cut it off; the shift-end bell (scenes/game.gd) marks it instead.
 func _on_hour_changed(hour: int) -> void:
-	if hour > 0:
+	if hour > 0 and hour < GameState.END_HOUR:
 		_announce(ManagerLines.random_hourly(GameState.get_clock_text()))
 
 

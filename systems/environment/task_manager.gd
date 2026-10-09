@@ -18,7 +18,10 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_PAUSABLE
 
 
+## Manager deadlines count down only while the night runs (not on the menu after quitting).
 func _process(delta: float) -> void:
+	if not GameState.night_running:
+		return
 	for task in _manager_tasks:
 		if task.is_open() and task.time_limit > 0.0:
 			task.time_left -= delta

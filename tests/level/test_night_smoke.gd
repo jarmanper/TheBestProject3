@@ -132,7 +132,7 @@ func test_a_whole_night_runs_clean() -> void:
 	var manager := game.get_node_or_null("WorldView/SubViewport/World/StoreManager")
 	assert_true(manager != null, "the store manager is in the world")
 	if manager:
-		manager._rng.seed = MANAGER_SEED   # deterministic intercom/walkie coin flips
+		(manager as StoreManager).set_seed(MANAGER_SEED)   # deterministic intercom/walkie coin flips
 	var player := GameState.player as Player
 	player.max_health = 1.0e9
 	player.health = 1.0e9

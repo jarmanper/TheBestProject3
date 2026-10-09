@@ -11,6 +11,7 @@ func before_each() -> void:
 
 
 func after_each() -> void:
+	GameState.night_running = false
 	Tasks.reset()
 	for station in _stations:
 		if is_instance_valid(station):
@@ -75,6 +76,7 @@ func test_manager_task_fails_after_its_time_limit() -> void:
 	Events.task_failed.connect(record)
 	var before_failed: int = GameState.stats.get("manager_tasks_failed", 0)
 	var task := Tasks.add_manager_task(station, 2.0)
+	GameState.night_running = true
 	Tasks._process(2.5)
 	Events.task_failed.disconnect(record)
 	assert_true(task.failed)
@@ -162,3 +164,15 @@ func test_required_remaining_counts_only_incomplete_basic_tasks() -> void:
 		Tasks.complete_task(task, null)
 	assert_eq(Tasks.get_required_remaining(), 0)
 	assert_true(Tasks.all_required_done())
+
+
+func test_manager_deadlines_only_run_during_the_night() -> void:
+	var station := _make_station(&"safe", &"office", &"", false)
+	var task := Tasks.add_manager_task(station, 1.0)
+	GameState.night_running = false   # e.g. quit to the menu with a task open
+	Tasks._process(5.0)
+	assert_false(task.failed, "no deadline runs outside the night")
+	assert_near(task.time_left, 1.0, 0.001)
+	GameState.night_running = true
+	Tasks._process(1.5)
+	assert_true(task.failed, "runs again once the night does")

@@ -20,6 +20,7 @@ func before_each() -> void:
 
 
 func after_each() -> void:
+	GameState.night_running = false
 	Tasks.reset()
 	_station.free()
 	_player.free()
@@ -84,6 +85,7 @@ func test_set_task_stops_the_progress_sound_when_the_task_is_cleared_mid_hold() 
 	# The manager task times out while the player is still mid-hold; Tasks
 	# clears the station via set_task(null) without the player ever calling
 	# interact()/hold_stopped().
+	GameState.night_running = true
 	Tasks._process(2.5)
 	assert_true(task.failed)
 	assert_false(_station.is_progress_sound_playing())
