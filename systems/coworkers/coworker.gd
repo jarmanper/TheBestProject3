@@ -96,7 +96,8 @@ func tick(delta: float) -> void:
 	state_time += delta
 	_clock += delta
 	_panic_cooldown = maxf(_panic_cooldown - delta, 0.0)
-	_nav_ok = AiNav.is_ready(_agent.get_navigation_map(), global_position)
+	if not _nav_ok:   # once the map has synced it stays usable
+		_nav_ok = AiNav.is_ready(_agent.get_navigation_map(), global_position)
 	if state != FLEEING and _sees_true_monster():
 		_start_flee()
 	match state:
@@ -395,14 +396,11 @@ func _update_animation() -> void:
 	if _anim == null:
 		return
 	var speed := Vector2(velocity.x, velocity.z).length()
-	if speed > 3.2:
-		CharacterModel.play(_anim, Catalog.ANIM_RUN, clampf(speed / FLEE_SPEED, 0.6, 1.6))
-	elif speed > 0.15:
-		CharacterModel.play(_anim, Catalog.ANIM_WALK, clampf(speed / WALK_SPEED, 0.5, 2.0))
-	elif state == WORKING:
+	if speed < CharacterModel.IDLE_BELOW and state == WORKING:
 		CharacterModel.play(_anim, Catalog.ANIM_WORK)
 	else:
-		CharacterModel.play(_anim, Catalog.ANIM_IDLE)
+		# Clip and speed_scale from the employee clips' measured ground speed: no foot sliding.
+		CharacterModel.play_locomotion(_anim, &"employee", speed)
 
 
 func _roll(span: Vector2) -> float:
