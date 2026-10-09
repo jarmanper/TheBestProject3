@@ -118,6 +118,8 @@ func omni(position: Vector3, color: Color, energy: float, radius: float, shadows
 	light.omni_range = radius
 	light.omni_attenuation = 1.2
 	light.shadow_enabled = shadows
+	light.shadow_bias = 0.08
+	light.shadow_normal_bias = 2.5
 	world.add_child(light)
 	light.position = position
 	return light
@@ -131,6 +133,8 @@ func spot(position: Vector3, target: Vector3, color: Color, energy: float, radiu
 	light.spot_range = radius
 	light.spot_angle = angle
 	light.shadow_enabled = shadows
+	light.shadow_bias = 0.08
+	light.shadow_normal_bias = 2.5
 	world.add_child(light)
 	light.position = position
 	light.look_at(target, Vector3.UP if absf((target - position).normalized().y) < 0.99 else Vector3.FORWARD)

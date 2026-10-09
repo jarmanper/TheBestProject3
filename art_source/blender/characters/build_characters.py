@@ -411,6 +411,7 @@ class Animator:
         self.ground_points = ground_points or []
         self.actions = {}
         self.loops = {}
+        self.ground_speed = {}
         for pb in rig.pose.bones:
             pb.rotation_mode = "QUATERNION"
 
@@ -421,6 +422,17 @@ class Animator:
             pb.rotation_quaternion = (self.rest_inv[pb.name] @ r @ self.rest[pb.name]).to_quaternion()
             pb.location = (0.0, 0.0, 0.0)
         self.rig.pose.bones["hips"].location = self.rest_inv["hips"] @ Vector(hips_offset)
+
+    def _contact(self):
+        """(ground point index, armature y) of the lowest ground point (the planted foot)."""
+        bpy.context.view_layer.update()
+        best = None
+        for i, (bone, end, rest_h) in enumerate(self.ground_points):
+            pb = self.rig.pose.bones[bone]
+            p = pb.head if end == "head" else pb.tail
+            key = (p.z - rest_h, i, p.y)
+            best = key if best is None or key < best else best
+        return (best[1] % 2 if len(self.ground_points) == 4 else best[1], best[2])  # 0 = left foot, 1 = right
 
     def _ground_error(self):
         bpy.context.view_layer.update()
@@ -441,6 +453,7 @@ class Animator:
         ad = self.rig.animation_data or self.rig.animation_data_create()
         ad.action = act
         prev = {}
+        contacts = []
         for f in range(frames + 1):
             t = f / frames
             if loop and f == frames:
@@ -451,6 +464,7 @@ class Animator:
             if ground and self.ground_points:
                 offset.z -= self._ground_error() - pose.get("@lift", 0.0)
                 self._apply(pose, offset)
+                contacts.append(self._contact())
             for pb in self.rig.pose.bones:
                 q = pb.rotation_quaternion.copy()
                 if pb.name in prev and prev[pb.name].dot(q) < 0.0:
@@ -463,6 +477,17 @@ class Animator:
         for fc in bag.fcurves:
             for kp in fc.keyframe_points:
                 kp.interpolation = "LINEAR"
+        if contacts and name in ("walk", "run"):
+            # Ground speed: how fast the planted foot slides backward; move the character at this
+            # speed and the feet do not skate.
+            speeds = []
+            for (k0, y0), (k1, y1) in zip(contacts, contacts[1:]):
+                if k0 == k1:
+                    speeds.append((y1 - y0) * FPS)
+            speeds.sort()
+            v = speeds[len(speeds) // 2] if speeds else 0.0
+            self.ground_speed[name] = v
+            print("[characters] %-16s %-6s ground speed %.2f m/s" % (self.prefix, name, v))
         track = ad.nla_tracks.new()
         track.name = name
         strip = track.strips.new(name, 0, act)
@@ -605,9 +630,14 @@ def paint_cloth(r, tones, rng, grad=0.30, base=0.30, blotch=0.30, speck=0.10, ce
 
 
 def paint_skin(r, tones, rng, base=0.30, blotch=0.25, cell=4):
-    field = base + blotch * (value_noise(r.h, r.w, cell, rng) - 0.5) \
-        + 0.08 * (rng.random((r.h, r.w)).astype(np.float32) - 0.5)
-    r.tones(tones, field)
+    """Low-contrast skin: mostly tone 1, soft blotches toward tones 0 and 2."""
+    n = value_noise(r.h, r.w, cell, rng) + (base - 0.3) + 0.06 * (rng.random((r.h, r.w)) - 0.5)
+    r.fill(tones[1])
+    v = r.view
+    hi = n < 0.5 - blotch
+    lo = n > 0.5 + blotch
+    v[hi] = lerp(tones[1], tones[0], 0.55)
+    v[lo] = lerp(tones[1], tones[2], 0.55)
 
 
 def paint_badge(r, text, bg, ink, frame=None):
@@ -621,6 +651,13 @@ def paint_badge(r, text, bg, ink, frame=None):
     r.text((r.w - tw) // 2, (r.h - 5) // 2 + (1 if r.h % 2 == 0 else 0), text, ink)
 
 
+def bounce_light(r, from_row, amount):
+    """Brightens the rows below `from_row` (the jaw faces away from overhead lights)."""
+    v = r.view
+    rows = np.clip((np.arange(r.h) - from_row) / max(1, r.h - from_row), 0.0, 1.0)[:, None, None]
+    v[:] = np.clip(v * (1.0 + amount * rows), 0.0, 1.0)
+
+
 def paint_employee_face(r, spec, pal, rng):
     """Face region (front of the head): 32 x 32, top row = top of the head."""
     skin = pal["skin"]
@@ -628,24 +665,30 @@ def paint_employee_face(r, spec, pal, rng):
     w, h = r.w, r.h
     # Volume: darker cheeks/jaw edges and under the chin.
     for x in range(w):
-        edge = min(x, w - 1 - x)
-        if edge <= 1:
+        if min(x, w - 1 - x) == 0:
             r.rect(x, 0, 1, h, skin[2])
-    r.rect(0, h - 2, w, 2, skin[2])
+    r.rect(1, h - 1, w - 2, 1, lerp(skin[1], skin[2], 0.6))
+    bounce_light(r, 19, 0.07)
     eye_y = 14
     lx, rx = 9, 20  # left edge of the character's right eye / left eye (viewer's left / right)
     # Brow ridge shadow + brows.
     brow = spec.get("brow", col("#3A2A20"))
     r.rect(lx - 1, eye_y - 2, 5, 1, skin[2])
     r.rect(rx - 1, eye_y - 2, 5, 1, skin[2])
-    r.rect(lx, eye_y - 3, 4, 1, brow)
-    r.rect(rx, eye_y - 3, 4, 1, brow)
+    if spec.get("feminine"):
+        r.rect(lx, eye_y - 3, 3, 1, brow)
+        r.rect(rx + 1, eye_y - 3, 3, 1, brow)
+    else:
+        r.rect(lx, eye_y - 3, 4, 1, brow)
+        r.rect(rx, eye_y - 3, 4, 1, brow)
     # Eyes: dark sockets, flat pale whites and small dark pupils that stare a little too straight.
     for ex in (lx, rx):
-        r.rect(ex - 1, eye_y - 1, 5, 3, skin[3])
+        r.rect(ex - 1, eye_y - 1, 5, 3, lerp(skin[2], skin[3], 0.5))
         r.rect(ex, eye_y, 3, 1, col("#CFC9BC"))
         r.dot(ex + 1, eye_y, col("#141210"))
         r.rect(ex, eye_y + 1, 3, 1, skin[2])
+        if spec.get("feminine"):
+            r.rect(ex - 1, eye_y - 1, 5, 1, col("#1A1412"))  # lashes / liner
     # Nose: shadow down the side and under the tip.
     r.rect(15, eye_y + 1, 1, 4, skin[2])
     r.rect(14, eye_y + 5, 4, 1, skin[3])
@@ -656,7 +699,10 @@ def paint_employee_face(r, spec, pal, rng):
     r.rect(13, my, 7, 1, mouth)
     r.dot(12, my + 1, mouth)
     r.dot(20, my + 1, mouth)
-    r.rect(13, my + 1, 7, 1, skin[0])
+    if spec.get("feminine"):
+        r.rect(14, my + 1, 5, 1, lerp(mouth, skin[1], 0.35))   # lower lip
+    else:
+        r.rect(13, my + 1, 7, 1, skin[0])
     # Ears at the extreme edges of the front projection.
     r.rect(0, eye_y - 1, 1, 5, skin[3])
     r.rect(w - 1, eye_y - 1, 1, 5, skin[3])
@@ -666,19 +712,18 @@ def paint_employee_face(r, spec, pal, rng):
         r.rect(0, 9, 2, 5, hair)        # sideburns
         r.rect(w - 2, 9, 2, 5, hair)
     if spec.get("beard") is not None:
+        # short boxed beard: jawline, chin and moustache in one colour with a few lighter hairs
         stub = spec["beard"]
-        light = lerp(stub, skin[2], 0.45)
+        light = lerp(stub, skin[1], 0.35)
         for y in range(eye_y + 4, h):
             for x in range(1, w - 1):
                 if 13 <= x <= 19 and my <= y <= my + 1:
                     continue  # lips stay clear
-                jaw = y >= my + 3 or x <= 4 or x >= w - 5
+                jaw = (y >= my + 3) or ((x <= 4 or x >= w - 5) and y >= eye_y + 5)
                 lip = y == my - 1 and 12 <= x <= 20
-                chin = y >= my + 2 and 10 <= x <= 22
+                chin = y >= my + 2 and 11 <= x <= 21
                 if jaw or lip or chin:
-                    r.dot(x, y, stub if (x + y) % 3 else light)
-                elif y >= eye_y + 6 and rng.random() < 0.3:
-                    r.dot(x, y, light)
+                    r.dot(x, y, light if rng.random() < 0.18 else stub)
     if spec.get("glasses"):
         frame = col("#121212")
         lens = col("#5E6A70")
@@ -788,8 +833,8 @@ def build_human(scene, spec):
     r.rect(0, 0, 1, r.h, shirt[2])
     r.rect(r.w - 1, 0, 1, r.h, shirt[2])
     if spec.get("front_tag"):
-        r.rect(5, 9, 6, 3, col("#D6D6D0"))     # plain white name tag on the right chest
-        r.rect(6, 10, 4, 1, col("#8A8A88"))
+        r.rect(5, 5, 6, 3, col("#D6D6D0"))     # plain white name tag above the right pocket
+        r.rect(6, 6, 4, 1, col("#8A8A88"))
     spec.get("paint_shirt_front", lambda *_: None)(r, shirt, rng)
     r = atlas["shirt_back"]
     paint_cloth(r, shirt, rng, grad=0.28, base=0.30, folds=3)
@@ -1014,27 +1059,40 @@ def employee_actions(anim):
                  twist=9.0, bob=0.05, foot_follow=0.55, arm_out=8.0)
         return p
 
+    # Stocking shelves: bend and pick an item off a low shelf, straighten, place it at chest height.
+    place = {
+        "spine": (4.0, 0.0, 0.0), "chest": (2.0, 0.0, 0.0), "neck": (2.0, 0.0, 0.0), "head": (-4.0, 0.0, 0.0),
+        "upper_arm.L": (-62.0, -4.0, -6.0), "upper_arm.R": (-66.0, 4.0, 6.0),
+        "forearm.L": (-34.0, 0.0, -8.0), "forearm.R": (-30.0, 0.0, 8.0),
+        "hand.L": (6.0, 0.0, 0.0), "hand.R": (6.0, 0.0, 0.0),
+    }
+    lower = {
+        "hips": (8.0, 0.0, 0.0), "spine": (12.0, 0.0, 0.0), "chest": (6.0, 0.0, 0.0), "neck": (-4.0, 0.0, 0.0),
+        "upper_arm.L": (-24.0, -4.0, -4.0), "upper_arm.R": (-26.0, 4.0, 4.0),
+        "forearm.L": (-50.0, 0.0, -6.0), "forearm.R": (-46.0, 0.0, 6.0),
+        "thigh.L": (-10.0, 0.0, 0.0), "thigh.R": (-10.0, 0.0, 0.0),
+        "shin.L": (16.0, 0.0, 0.0), "shin.R": (16.0, 0.0, 0.0), "foot.L": (-6.0, 0.0, 0.0), "foot.R": (-6.0, 0.0, 0.0),
+    }
+    pick = {
+        "hips": (20.0, 0.0, 0.0), "spine": (22.0, 0.0, 3.0), "chest": (12.0, 0.0, 3.0), "neck": (-12.0, 0.0, 0.0),
+        "head": (-6.0, 0.0, 0.0),
+        "upper_arm.L": (-22.0, -6.0, -8.0), "upper_arm.R": (-30.0, 6.0, 8.0),
+        "forearm.L": (-22.0, 0.0, -6.0), "forearm.R": (-18.0, 0.0, 6.0),
+        "hand.L": (-10.0, 0.0, 0.0), "hand.R": (-10.0, 0.0, 0.0),
+        "thigh.L": (-34.0, 0.0, -3.0), "thigh.R": (-30.0, 0.0, 3.0),
+        "shin.L": (52.0, 0.0, 0.0), "shin.R": (46.0, 0.0, 0.0),
+        "foot.L": (-18.0, 0.0, 0.0), "foot.R": (-16.0, 0.0, 0.0),
+    }
+    carry = {
+        "hips": (6.0, 0.0, 0.0), "spine": (6.0, 0.0, -2.0), "chest": (2.0, 0.0, -2.0), "neck": (0.0, 0.0, 0.0),
+        "upper_arm.L": (-30.0, -4.0, -8.0), "upper_arm.R": (-34.0, 4.0, 8.0),
+        "forearm.L": (-72.0, 0.0, -10.0), "forearm.R": (-68.0, 0.0, 10.0),
+        "thigh.L": (-8.0, 0.0, 0.0), "thigh.R": (-6.0, 0.0, 0.0),
+        "shin.L": (12.0, 0.0, 0.0), "shin.R": (10.0, 0.0, 0.0),
+    }
+
     def work(t):
-        # Stocking a shelf at chest height: reach in, place, pull back; hands slightly out of sync.
-        reach_l = 0.5 - 0.5 * wavec(t)
-        reach_r = 0.5 - 0.5 * wavec(t, 1.0, -0.08)
-        sweep = wave(t, 2.0)
-        return {
-            "hips": (4.0 * reach_l, 0.0, 0.0),
-            "spine": (6.0 * reach_l, 0.0, 2.0 * sweep),
-            "chest": (4.0 * reach_l, 0.0, 3.0 * sweep),
-            "neck": (4.0, 0.0, 0.0),
-            "head": (6.0 - 4.0 * reach_l, 0.0, 4.0 * sweep),
-            "upper_arm.L": (-30.0 - 45.0 * reach_l, -6.0, -8.0 - 4.0 * sweep),
-            "upper_arm.R": (-30.0 - 45.0 * reach_r, 6.0, 8.0 - 4.0 * sweep),
-            "forearm.L": (-48.0 + 26.0 * reach_l, 0.0, -10.0),
-            "forearm.R": (-48.0 + 26.0 * reach_r, 0.0, 10.0),
-            "hand.L": (-10.0 + 12.0 * reach_l, 0.0, 6.0 * sweep),
-            "hand.R": (-10.0 + 12.0 * reach_r, 0.0, 6.0 * sweep),
-            "thigh.L": (-6.0 * reach_l, 0.0, -2.0), "thigh.R": (2.0, 0.0, 2.0),
-            "shin.L": (8.0 * reach_l, 0.0, 0.0), "shin.R": (4.0, 0.0, 0.0),
-            "foot.L": (-2.0 * reach_l, 0.0, 0.0), "foot.R": (-6.0, 0.0, 0.0),
-        }
+        return keyed(t, [(0.0, place), (0.22, lower), (0.45, pick), (0.72, carry), (1.0, place)])
 
     anim.action("idle", 2.0, idle)
     anim.action("walk", 1.0, walk)
@@ -1068,14 +1126,14 @@ def manager_actions(anim):
             "chest": (1.5 * wave(t, 2.0, 0.2), 0.0, 4.0 * lift),
             "neck": (2.0 + 3.0 * wave(t, 4.0), 0.0, 3.0 * lift),
             "head": (2.5 * wave(t, 4.0, 0.15), 3.0 * wave(t, 1.0, 0.2), 4.0 * lift),
-            # right hand gestures (open palm up, beats on the words)
-            "upper_arm.R": (-25.0 - 25.0 * lift - 6.0 * g, 10.0 + 8.0 * lift, 10.0),
-            "forearm.R": (-55.0 - 20.0 * lift + 10.0 * g, 0.0, 20.0),
-            "hand.R": (-10.0 + 10.0 * g, 0.0, 20.0 * wave(t, 2.0, 0.1)),
-            # left hand by the belly, small counter gestures
-            "upper_arm.L": (-15.0 + 4.0 * g, -6.0, -5.0),
-            "forearm.L": (-70.0 + 6.0 * wave(t, 2.0, 0.3), 0.0, -25.0),
-            "hand.L": (0.0, 0.0, 6.0 * g),
+            # right hand explains: forearm raised and opened outward, beats on the words
+            "upper_arm.R": (-18.0 - 18.0 * lift - 5.0 * g, 14.0 + 8.0 * lift, 0.0),
+            "forearm.R": (-58.0 - 22.0 * lift + 12.0 * g, 0.0, -28.0 - 10.0 * lift),
+            "hand.R": (-8.0 + 10.0 * g, 18.0, -10.0 * wave(t, 2.0, 0.1)),
+            # left arm relaxed, a smaller echo of the gesture
+            "upper_arm.L": (-8.0 + 3.0 * g, -7.0, 0.0),
+            "forearm.L": (-28.0 + 8.0 * wave(t, 2.0, 0.3), 0.0, 8.0),
+            "hand.L": (0.0, 0.0, 4.0 * g),
             "thigh.L": (0.0, 0.0, -4.0), "thigh.R": (0.0, 0.0, 4.0),
         }
 
@@ -1101,6 +1159,10 @@ def rita_extras():
                "head", {"all": "hair"})
         B.loft([(0, 0.112, 1.705), (0, 0.142, 1.675)], [sec_rect(0.03, 0.03, 0.01)], "head", {"all": "hair_tie"},
                hint=(1, 0, 0))
+        for m in (1, -1):
+            B.loft([(m * 0.104, -0.035, 1.735), (m * 0.106, -0.045, 1.64), (m * 0.098, -0.04, 1.565)],
+                   [sec_rect(0.012, 0.05, 0.004), sec_rect(0.014, 0.05, 0.004), sec_rect(0.01, 0.036, 0.004)],
+                   "head", {"all": "hair"}, hint=(1, 0, 0))
         B.loft([(0, 0.13, 1.69), (0, 0.168, 1.62), (0, 0.172, 1.54), (0, 0.158, 1.47)],
                [sec_rect(0.038, 0.034, 0.012), sec_rect(0.042, 0.036, 0.012), sec_rect(0.034, 0.03, 0.01),
                 sec_rect(0.016, 0.016, 0.005)],
@@ -1134,10 +1196,16 @@ def make_specs():
         beard=col("#5C4636"), brow=col("#4A3628"))
     head, paint = rita_extras()
     specs["employee_rita"] = employee_spec(
-        "employee_rita", 23, "#C08A67", "#231A15", badge="RITA", cap=False, long_hair=True,
+        "employee_rita", 23, "#C08A67", "#231A15", badge="RITA", cap=False, long_hair=True, feminine=True,
         brow=col("#1E1612"), mouth=col("#7A4038"),
         extra_head=[head], extra_paint=[paint], extra_regions=[("hair_tie", 4, 4)],
-        props={"head_top": 1.775})
+        props={"head_top": 1.775,
+               "head": [(1.52, 0.052, 0.062, -0.014), (1.555, 0.079, 0.094, -0.005), (1.615, 0.096, 0.106, 0.0),
+                        (1.695, 0.098, 0.11, 0.004), (1.755, 0.08, 0.095, 0.006), (1.775, 0.05, 0.06, 0.006)],
+               # slightly narrower shoulders and waist than the men
+               "torso": [(z, hx * 0.94, hy * 0.97, cy) for z, hx, hy, cy in EMPLOYEE_PROPS["torso"]],
+               "shoulder": (0.195, 0.0, 1.405), "elbow": (0.238, 0.015, 1.14), "wrist": (0.257, 0.0, 0.885),
+               "hand_end": (0.262, -0.005, 0.77)})
     specs["employee_marcus"] = employee_spec(
         "employee_marcus", 37, "#6B4632", "#151110", badge="MARCUS", glasses=True,
         brow=col("#120E0C"), mouth=col("#3A2219"))
@@ -1167,9 +1235,16 @@ def manager_spec():
         paint_cloth(r, apron, rng, grad=0.3, base=0.4, cell=5)
         r.rect(0, 0, r.w, 2, apron[0])
         r = atlas["shirt_front"]
-        # Collar points and the white name tag on the right chest; MANAGER badge is the 3D tag.
-        r.rect(11, 0, 4, 2, mul(shirt[0], 1.05))
-        r.rect(17, 0, 4, 2, mul(shirt[0], 1.05))
+        # Collar points, breast-pocket flaps; the MANAGER badge is the 3D tag on the left pocket.
+        for i in range(3):
+            r.rect(10 + i, i, 5 - i, 1, shirt[0])
+            r.rect(17, i, 5 - i, 1, shirt[0])
+        r.rect(4, 9, 8, 1, shirt[3])
+        r.rect(4, 10, 8, 1, shirt[0])
+        r.rect(20, 9, 8, 1, shirt[3])
+        r.rect(20, 10, 8, 1, shirt[0])
+        r.rect(4, 15, 8, 1, shirt[2])
+        r.rect(20, 15, 8, 1, shirt[2])
 
     def torso(B, p):
         # Work apron from the waist to just above the knee; wraps the front and sides.
@@ -1253,11 +1328,7 @@ def paint_manager_face(r, pal, rng):
     r.rect(13, my + 2, 6, 1, mul(skin[2], 0.95))
     r.rect(0, eye_y - 1, 1, 5, skin[3])
     r.rect(w - 1, eye_y - 1, 1, 5, skin[3])
-    # five o'clock shadow
-    for y in range(my + 3, h - 2):
-        for x in range(5, w - 5):
-            if rng.random() < 0.15:
-                r.dot(x, y, lerp(skin[1], skin[2], 0.6))
+    bounce_light(r, 18, 0.07)
 
 
 # =============================================================================
@@ -1471,7 +1542,7 @@ def paint_monster_atlas(atlas, rng):
     v = r.view
     yy, xx = np.mgrid[0:r.h, 0:r.w].astype(np.float32)
     d = np.hypot((xx - r.w * 0.5) / (r.w * 0.5), (yy - r.h * 0.42) / (r.h * 0.55))
-    v[:] = lerp(v, MON["skin"][0][None, None, :], np.clip(0.55 - d, 0.0, 0.5)[..., None])
+    v[:] = lerp(v, MON["skin"][0][None, None, :], np.clip(0.45 - d, 0.0, 0.4)[..., None])
     v[:] = lerp(v, MON["skin"][3][None, None, :], np.clip((d - 0.75) * 1.4, 0.0, 0.6)[..., None])
     v[:] = lerp(v, col("#C49C9C")[None, None, :], 0.25)
     stitch_line(r, 7, 7, 14, 27, MON["stitch"], every=3)
@@ -1784,20 +1855,20 @@ def monster_actions(anim):
         s, c = wave(t), wavec(t)
         pose = {}
         for side, m in (("L", 1.0), ("R", -1.0)):
-            th = -40.0 * s * m
+            th = -52.0 * s * m
             swing = max(0.0, c * m)
-            pose["thigh." + side] = (th - 6.0, 0.0, 0.0)
-            pose["shin." + side] = (60.0 * swing, 0.0, 0.0)
-            pose["foot." + side] = (-(th + 60.0 * swing) * 0.5, 0.0, 0.0)
+            pose["thigh." + side] = (th - 8.0, 0.0, 0.0)
+            pose["shin." + side] = (72.0 * swing, 0.0, 0.0)
+            pose["foot." + side] = (-(th + 72.0 * swing) * 0.5, 0.0, 0.0)
             # arms thrown forward, clawing alternately
             pose["upper_arm." + side] = (-62.0 + 26.0 * s * m, -m * 8.0, 0.0)
             pose["forearm." + side] = (-18.0 + 20.0 * s * m, 0.0, 0.0)
             pose["hand." + side] = (-15.0 + 10.0 * s * m, 0.0, 0.0)
-        pose["hips"] = (10.0, 5.0 * s, -9.0 * s)
-        pose["spine"] = (10.0, -3.0 * s, 6.0 * s)
-        pose["chest"] = (8.0 + 3.0 * wave(t, 2.0), -2.0 * s, 8.0 * s)
-        pose["neck"] = (-18.0, 0.0, -5.0 * s)
-        pose["head"] = (-12.0 + 3.0 * wave(t, 2.0, 0.2), 4.0 * s, -4.0 * s)
+        pose["hips"] = (12.0, 5.0 * s, -10.0 * s)
+        pose["spine"] = (12.0, -3.0 * s, 7.0 * s)
+        pose["chest"] = (8.0 + 4.0 * wave(t, 2.0), -2.0 * s, 9.0 * s)
+        pose["neck"] = (-20.0, 0.0, -5.0 * s)
+        pose["head"] = (-14.0 + 4.0 * wave(t, 2.0, 0.2), 4.0 * s, -4.0 * s)
         pose["jaw"] = (10.0 + 4.0 * wave(t, 2.0), 0.0, 0.0)
         pose["ear.L"] = (14.0 + 6.0 * wave(t, 2.0, 0.3), 0.0, 0.0)
         pose["ear.R"] = (8.0, 10.0 * wave(t, 2.0, 0.4), 0.0)
@@ -1838,21 +1909,21 @@ def monster_actions(anim):
         return keyed(t, [(0.0, rest), (0.32, windup), (0.5, strike), (0.66, follow), (1.0, rest)])
 
     upright = {
-        "hips": (-6.0, 0.0, 0.0), "spine": (-20.0, 0.0, 0.0), "chest": (-24.0, 0.0, 0.0),
-        "neck": (-6.0, 0.0, 0.0), "head": (14.0, 0.0, 0.0), "jaw": (6.0, 0.0, 0.0),
+        "hips": (-4.0, 0.0, 0.0), "spine": (-14.0, 0.0, 0.0), "chest": (-16.0, 0.0, 0.0),
+        "neck": (6.0, 0.0, 0.0), "head": (20.0, 0.0, 0.0), "jaw": (6.0, 0.0, 0.0),
         "thigh.L": (12.0, 0.0, 0.0), "thigh.R": (12.0, 0.0, 0.0),
         "shin.L": (-14.0, 0.0, 0.0), "shin.R": (-14.0, 0.0, 0.0),
         "foot.L": (4.0, 0.0, 0.0), "foot.R": (4.0, 0.0, 0.0),
         "upper_arm.L": (-10.0, -10.0, 0.0), "upper_arm.R": (-10.0, 10.0, 0.0),
-        "ear.L": (-14.0, 0.0, 0.0), "ear.R": (0.0, -16.0, 0.0),
+        "ear.L": (-8.0, 0.0, 0.0), "ear.R": (0.0, 14.0, 0.0),
     }
     spread = dict(upright)
     spread.update({
         "upper_arm.L": (-22.0, -26.0, 0.0), "upper_arm.R": (-22.0, 26.0, 0.0),
         "forearm.L": (-12.0, -48.0, 0.0), "forearm.R": (-12.0, 48.0, 0.0),
         "hand.L": (-8.0, -22.0, 0.0), "hand.R": (-8.0, 22.0, 0.0),
-        "neck": (-2.0, 0.0, 0.0), "head": (10.0, 26.0, 0.0), "jaw": (36.0, 0.0, 0.0),
-        "ear.L": (-20.0, 0.0, 0.0), "ear.R": (0.0, -24.0, 0.0),
+        "neck": (8.0, 0.0, 0.0), "head": (22.0, 26.0, 0.0), "jaw": (36.0, 0.0, 0.0),
+        "ear.L": (-10.0, 0.0, 0.0), "ear.R": (0.0, 22.0, 0.0),
     })
 
     def reveal(t):
@@ -1869,7 +1940,7 @@ def monster_actions(anim):
 
     anim.action("idle", 2.4, idle)
     anim.action("walk", 1.4, walk)
-    anim.action("run", 0.7, run)
+    anim.action("run", 0.6, run)
     anim.action("attack", 0.8, attack, loop=False)
     anim.action("reveal", 1.5, reveal, loop=False)
 
@@ -1927,7 +1998,7 @@ def export_character(scene, name, rig, mesh, anim):
         export_skins=True, export_def_bones=False, export_leaf_bone=False,
         export_animations=True, export_animation_mode="ACTIONS", export_anim_single_armature=False,
         export_force_sampling=True, export_frame_step=1, export_anim_slide_to_zero=True,
-        export_reset_pose_bones=True, export_optimize_animation_size=False,
+        export_reset_pose_bones=True, export_optimize_animation_size=True,
         export_morph=False,
     )
     for clip, act in anim.actions.items():

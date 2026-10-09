@@ -16,7 +16,7 @@ const EMPLOYEE_CLIPS := {
 }
 const MANAGER_CLIPS := {&"idle": [true, 2.5], &"talk": [true, 2.0], &"walk": [true, 1.1]}
 const MONSTER_CLIPS := {
-	&"idle": [true, 2.4], &"walk": [true, 1.4], &"run": [true, 0.7],
+	&"idle": [true, 2.4], &"walk": [true, 1.4], &"run": [true, 0.6],
 	&"attack": [false, 0.8], &"reveal": [false, 1.5],
 }
 
