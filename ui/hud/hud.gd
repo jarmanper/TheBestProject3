@@ -12,6 +12,10 @@ const MARGIN := 40.0
 const RIGHT_COLUMN_WIDTH := 340.0
 const SUBTITLE_MAX_LINES := 3
 const CHECKLIST_TICK := 0.25
+## Done/failed rows fold into the header counts this long after they finish, and only the
+## newest few show at once, so the list stays clear of the subtitles at 720p.
+const FINISHED_ROW_TIME := 20.0
+const MAX_FINISHED_ROWS := 3
 const INTRO_TIME := 3.5
 const TASK_FAIL_DB := -4.0
 const MARK_OPEN := "[ ]"
@@ -31,6 +35,10 @@ var _row_labels: Array[Label] = []
 var _row_colors: Array[Color] = []
 var _subtitles: Array[Dictionary] = []      ## {label, panel, time_left}
 var _checklist_timer := 0.0
+var _now := 0.0                             ## HUD clock (seconds, stops while paused)
+var _finished_at := {}                      ## TaskData -> _now when it was first shown finished
+var _folded_done := 0
+var _folded_failed := 0
 var _intro_time := 0.0
 var _flash := 0.0
 var _health_shown := 1.0
@@ -94,6 +102,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(delta: float) -> void:
+	_now += delta
 	_update_player_widgets(delta)
 	_clock.text = GameState.get_clock_text()
 	_checklist_timer -= delta
@@ -117,12 +126,38 @@ func refresh_checklist() -> void:
 
 
 ## Renders `tasks` (any order): open manager tasks (soonest deadline first), open basic tasks,
-## then finished ones (done dimmed with a check, failed in red).
+## then finished ones (done dimmed with a check, failed in red). A finished row shows for
+## FINISHED_ROW_TIME (at most MAX_FINISHED_ROWS, newest first), then folds into the header.
 func render_checklist(tasks: Array) -> void:
 	_tasks = sort_for_checklist(tasks)
 	_rows.clear()
+	var seen := {}
+	var finished: Array[TaskData] = []
 	for task in _tasks:
-		_rows.append({"text": format_task(task), "color": color_for(task)})
+		if task.is_open():
+			_rows.append({"text": format_task(task), "color": color_for(task)})
+			continue
+		seen[task] = _finished_at.get(task, _now)
+		finished.append(task)
+	_finished_at = seen   # forget tasks that left the list (a new night)
+	var order := {}   # newest first; ties keep the list order (sort_custom is not stable)
+	for i in finished.size():
+		order[finished[i]] = i
+	finished.sort_custom(func(a: TaskData, b: TaskData) -> bool:
+		if _finished_at[a] != _finished_at[b]:
+			return _finished_at[a] > _finished_at[b]
+		return order[a] < order[b])
+	_folded_done = 0
+	_folded_failed = 0
+	var shown := 0
+	for task in finished:
+		if shown < MAX_FINISHED_ROWS and _now - float(_finished_at[task]) < FINISHED_ROW_TIME:
+			shown += 1
+			_rows.append({"text": format_task(task), "color": color_for(task)})
+		elif task.failed:
+			_folded_failed += 1
+		else:
+			_folded_done += 1
 	# Row labels are pooled: surplus rows are hidden, never freed, so a re-render in the
 	# same frame cannot reuse a label that is about to be deleted.
 	while _row_labels.size() < _rows.size():
@@ -204,7 +239,12 @@ func get_checklist_header() -> String:
 	for task in _tasks:
 		if task.is_open() and not task.is_manager_task:
 			left += 1
-	return "TASKS - %d LEFT" % left
+	var header := "TASKS - %d LEFT" % left
+	if _folded_done > 0:
+		header += "  √%d" % _folded_done
+	if _folded_failed > 0:
+		header += "  ×%d" % _folded_failed
+	return header
 
 
 func toggle_checklist() -> void:

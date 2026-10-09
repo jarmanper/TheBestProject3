@@ -176,6 +176,27 @@ func test_intro_card_on_night_start() -> void:
 	assert_eq(hud.get_intro_text(), "12:00 AM — CLOCK IN")
 
 
+func test_finished_rows_fold_into_the_header_after_twenty_seconds() -> void:
+	hud.set_process(false)   # step time by hand
+	hud.render_checklist([_task("Open"), _task("Done", false, 0.0, true), _task("Missed", true, 0.0, false, true)])
+	assert_eq(_texts(), ["[ ] Open", "[√] Done", "[×] Missed"] as Array[String], "fresh finished rows show")
+	hud._process(GameHud.FINISHED_ROW_TIME - 1.0)
+	assert_eq(_texts().size(), 3, "still shown before %.0f s" % GameHud.FINISHED_ROW_TIME)
+	hud._process(1.5)
+	assert_eq(_texts(), ["[ ] Open"] as Array[String], "finished rows fold away")
+	assert_eq(hud.get_checklist_header(), "TASKS - 1 LEFT  √1  ×1", "their counts stay in the header")
+
+
+func test_at_most_a_few_finished_rows_show() -> void:
+	hud.set_process(false)
+	var tasks := [_task("Open")]
+	for i in 6:
+		tasks.append(_task("Done %d" % i, false, 0.0, true))
+	hud.render_checklist(tasks)
+	assert_eq(_texts().size(), 1 + GameHud.MAX_FINISHED_ROWS, "finished rows capped")
+	assert_eq(hud.get_checklist_header(), "TASKS - 1 LEFT  √%d" % (6 - GameHud.MAX_FINISHED_ROWS))
+
+
 func test_failed_task_plays_the_fail_sound() -> void:
 	var played: Array[StringName] = []
 	var record := func(id: StringName) -> void: played.append(id)
