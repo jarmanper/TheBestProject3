@@ -4,19 +4,19 @@
 [ext_resource type="Script" path="res://systems/environment/prop_placeholder.gd" id="2"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_1"]
-size = Vector3(0.5, 0.6, 0.5)
+size = Vector3(0.45, 0.3, 0.4)
 
 [node name="PickupPriceGun" type="Area3D"]
 script = ExtResource("1")
 tool_id = &"price_gun"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0)
 shape = SubResource("BoxShape3D_1")
 
 [node name="Tool" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+editor_description = "Counter prop: put the origin on a counter top (tray bottom centre)."
 script = ExtResource("2")
 model_path = "res://assets/models/props/pickup_price_gun.glb"
-fallback_size = Vector3(0.25, 0.3, 0.15)
+fallback_size = Vector3(0.25, 0.1, 0.15)
 fallback_color = Color(0.9098, 0.4745, 0.1961, 1)

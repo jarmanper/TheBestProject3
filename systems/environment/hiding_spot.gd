@@ -98,6 +98,8 @@ func _play_exit_effects() -> void:
 func _animate_door(opening: bool) -> void:
 	var door := get_node_or_null(^"Door") as Node3D
 	if door == null:
+		door = find_child("Door", true, false) as Node3D   # inside the locker.glb model
+	if door == null:
 		return
 	var target_degrees := -100.0 if opening else 0.0
 	if _door_tween and _door_tween.is_valid():

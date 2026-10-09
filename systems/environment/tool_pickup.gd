@@ -47,9 +47,20 @@ func return_tool() -> void:
 
 
 func _update_visual() -> void:
-	var tool_mesh := get_node_or_null(^"Tool")
+	var tool_mesh := _tool_node()
 	if tool_mesh:
 		tool_mesh.visible = has_tool
+
+
+## The node to hide while the tool is taken. A child "Tool" that loads a pickup_*.glb
+## carries that model's own "Rack" and "Tool" meshes: hide only the inner Tool so the
+## rack stays on the wall.
+func _tool_node() -> Node3D:
+	var outer := get_node_or_null(^"Tool") as Node3D
+	if outer == null:
+		return null
+	var inner := outer.find_child("Tool", true, false) as Node3D
+	return inner if inner else outer
 
 
 static func find_rack(tree: SceneTree, id: StringName) -> ToolPickup:

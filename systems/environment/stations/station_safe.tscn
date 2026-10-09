@@ -27,6 +27,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.9)
 visible = false
 
 [node name="SafeBox" type="Node3D" parent="ActiveVisual"]
+transform = Transform3D(0.5, 0, -0.866, 0, 1, 0, 0.866, 0, 0.5, 0.42, 0.06, 0.42)
 script = ExtResource("2")
-fallback_size = Vector3(0.8, 0.8, 0.8)
+fallback_size = Vector3(0.04, 0.56, 0.48)
 fallback_color = Color(0.2667, 0.2902, 0.2824, 1)

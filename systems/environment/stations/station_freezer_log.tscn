@@ -27,7 +27,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.9)
 visible = false
 
 [node name="Clipboard" type="Node3D" parent="ActiveVisual"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0.1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35, 0)
 script = ExtResource("2")
 model_path = "res://assets/models/props/clipboard.glb"
 fallback_size = Vector3(0.3, 0.42, 0.05)

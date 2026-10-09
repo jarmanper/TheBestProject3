@@ -27,7 +27,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.9)
 visible = false
 
 [node name="MessyProducts" type="Node3D" parent="ActiveVisual"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 0.85, 0.15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.35)
 script = ExtResource("2")
 model_path = "res://assets/models/props/messy_products.glb"
 fallback_size = Vector3(1.0, 0.45, 0.35)

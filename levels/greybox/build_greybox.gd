@@ -24,6 +24,25 @@ const LIGHT_COOL := Color(0.86, 0.9, 0.8)
 const LIGHT_WARM := Color(0.95, 0.88, 0.72)
 const LIGHT_RED := Color(0.85, 0.2, 0.16)
 
+## The 14 StoreZones (docs/ARCHITECTURE.md §7): [zone_id, x0, x1, z0, z1, ceiling height].
+## Single source of truth: the final store (tools/build_store_level.gd) reads this table too.
+const ZONE_BOUNDS := [
+	[&"aisle_1", -15.4, -12.6, -3.0, 7.0, SALES_CEILING],
+	[&"aisle_2", -11.4, -8.6, -3.0, 7.0, SALES_CEILING],
+	[&"aisle_3", -7.4, -4.6, -3.0, 7.0, SALES_CEILING],
+	[&"aisle_4", -3.4, -0.6, -3.0, 7.0, SALES_CEILING],
+	[&"dairy", -20.0, 2.0, -6.0, -3.0, SALES_CEILING],
+	[&"frozen", -20.0, -16.6, -3.0, 7.0, SALES_CEILING],
+	[&"produce", 2.0, 20.0, -6.0, 9.0, SALES_CEILING],
+	[&"checkout", -20.0, 6.0, 7.0, 16.0, SALES_CEILING],
+	[&"service_desk", 6.0, 20.0, 9.0, 16.0, SALES_CEILING],
+	[&"hallway", -20.0, 20.0, -9.0, -6.0, BACK_CEILING],
+	[&"storage", -20.0, 2.0, -16.0, -9.0, BACK_CEILING],
+	[&"break_room", 2.0, 10.0, -16.0, -9.0, BACK_CEILING],
+	[&"office", 10.0, 16.0, -16.0, -9.0, BACK_CEILING],
+	[&"janitor", 16.0, 20.0, -16.0, -9.0, BACK_CEILING],
+]
+
 const PALETTES := {
 	&"cereal": [Color("b8442f"), Color("d1a03a"), Color("c7682c"), Color("3f5e95"), Color("e0d2a0")],
 	&"snacks": [Color("d06a2a"), Color("c43d32"), Color("e2b33c"), Color("3c6aa8"), Color("6a9a3c")],
@@ -392,23 +411,7 @@ func _label(text: String, position: Vector3, facing: Vector3, font_size: int, co
 
 func _build_zones() -> void:
 	var holder := _group(level, "Zones")
-	var zones := [
-		[&"aisle_1", -15.4, -12.6, -3.0, 7.0, SALES_CEILING],
-		[&"aisle_2", -11.4, -8.6, -3.0, 7.0, SALES_CEILING],
-		[&"aisle_3", -7.4, -4.6, -3.0, 7.0, SALES_CEILING],
-		[&"aisle_4", -3.4, -0.6, -3.0, 7.0, SALES_CEILING],
-		[&"dairy", -20.0, 2.0, -6.0, -3.0, SALES_CEILING],
-		[&"frozen", -20.0, -16.6, -3.0, 7.0, SALES_CEILING],
-		[&"produce", 2.0, 20.0, -6.0, 9.0, SALES_CEILING],
-		[&"checkout", -20.0, 6.0, 7.0, 16.0, SALES_CEILING],
-		[&"service_desk", 6.0, 20.0, 9.0, 16.0, SALES_CEILING],
-		[&"hallway", -20.0, 20.0, -9.0, -6.0, BACK_CEILING],
-		[&"storage", -20.0, 2.0, -16.0, -9.0, BACK_CEILING],
-		[&"break_room", 2.0, 10.0, -16.0, -9.0, BACK_CEILING],
-		[&"office", 10.0, 16.0, -16.0, -9.0, BACK_CEILING],
-		[&"janitor", 16.0, 20.0, -16.0, -9.0, BACK_CEILING],
-	]
-	for z: Array in zones:
+	for z: Array in ZONE_BOUNDS:
 		var zone := StoreZone.new()
 		zone.name = "Zone_%s" % z[0]
 		zone.zone_id = z[0]

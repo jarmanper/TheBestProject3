@@ -27,6 +27,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.9)
 visible = false
 
 [node name="BoxStack" type="Node3D" parent="ActiveVisual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.4)
 script = ExtResource("2")
+model_path = "res://assets/models/props/cardboard_box_b.glb"
 fallback_size = Vector3(0.6, 0.7, 0.5)
 fallback_color = Color(0.3843, 0.4275, 0.3451, 1)

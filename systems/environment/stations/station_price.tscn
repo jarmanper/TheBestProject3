@@ -27,7 +27,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.9)
 visible = false
 
 [node name="PriceGunProp" type="Node3D" parent="ActiveVisual"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0.1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.3)
 script = ExtResource("2")
+model_path = "res://assets/models/props/cardboard_box_c.glb"
 fallback_size = Vector3(0.25, 0.3, 0.25)
 fallback_color = Color(0.9098, 0.4745, 0.1961, 1)

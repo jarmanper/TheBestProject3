@@ -89,6 +89,13 @@ func _spawn_hiding_spots() -> void:
 		spot.spot_kind = kind
 		add_child(spot)
 		spot.global_position = Vector3(-16.0 + i * 5.0, 0.0, -14.0)
+		if kind == &"counter":
+			# A counter spot is a cavity in level art; stand in a counter box here.
+			var counter := PropPlaceholder.new()
+			counter.fallback_size = Vector3(1.3, 0.95, 0.7)
+			counter.fallback_color = Catalog.COLOR_CREAM
+			counter.position = Vector3(0.0, 0.0, -0.1)
+			spot.add_child(counter)
 		i += 1
 
 

@@ -17,6 +17,7 @@ const NATURAL_FLICKER_MAX := 20.0
 var _light: OmniLight3D
 var _fixture: MeshInstance3D
 var _fixture_material: StandardMaterial3D
+var _fixture_emission := 1.0          ## the tube material's own emission energy at full brightness
 var _disturbance := 0.0
 var _flicker_elapsed := 0.0
 var _next_flicker_at := 0.0
@@ -26,15 +27,12 @@ func _ready() -> void:
 	add_to_group(&"store_light")
 	_light = get_node_or_null(^"Light") as OmniLight3D
 	if _light:
-		_light.omni_range = 7.0
+		# Range and colour come from the scene (the level tunes them); never cast shadows.
 		_light.shadow_enabled = false
-		_light.light_color = Color(0.78, 0.86, 1.0)
 	if not fixture_path.is_empty():
 		_fixture = get_node_or_null(fixture_path) as MeshInstance3D
 		if _fixture:
-			var base_mat := _fixture.get_active_material(0)
-			_fixture_material = base_mat.duplicate() as StandardMaterial3D if base_mat is StandardMaterial3D else StandardMaterial3D.new()
-			_fixture.material_override = _fixture_material
+			_bind_fixture_material()
 	if starts_off:
 		_set_energy_fraction(0.0)
 	else:
@@ -92,7 +90,32 @@ func _set_energy_fraction(fraction: float) -> void:
 	if _light:
 		_light.light_energy = base_energy * fraction
 	if _fixture_material:
-		_fixture_material.emission_energy_multiplier = fraction
+		_fixture_material.emission_energy_multiplier = _fixture_emission * fraction
+
+
+## Gives this light its own copy of the fixture's emissive (tube) surface material, so dimming
+## one fixture does not dim the others that share it. Only that surface is overridden: real
+## fixtures have a housing surface and a tube surface.
+func _bind_fixture_material() -> void:
+	var surface := 0
+	var mesh := _fixture.mesh
+	if mesh:
+		for i in mesh.get_surface_count():
+			var candidate := _fixture.get_active_material(i) as BaseMaterial3D
+			if candidate and candidate.emission_enabled:
+				surface = i
+				break
+	var base_mat := _fixture.get_active_material(surface)
+	if base_mat is StandardMaterial3D:
+		_fixture_material = base_mat.duplicate() as StandardMaterial3D
+	else:
+		_fixture_material = StandardMaterial3D.new()
+		_fixture_material.emission_enabled = true
+	_fixture_emission = _fixture_material.emission_energy_multiplier
+	if mesh and mesh.get_surface_count() > 1:
+		_fixture.set_surface_override_material(surface, _fixture_material)
+	else:
+		_fixture.material_override = _fixture_material
 
 
 func _start_buzz() -> void:
