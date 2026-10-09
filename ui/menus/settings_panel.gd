@@ -14,6 +14,8 @@ var _sensitivity: HSlider
 var _sensitivity_value: Label
 var _volume: HSlider
 var _volume_value: Label
+var _brightness: HSlider
+var _brightness_value: Label
 var _crt: CheckButton
 var _fullscreen: CheckButton
 var _back: Button
@@ -38,6 +40,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func open() -> void:
 	_sensitivity.set_value_no_signal(GameState.mouse_sensitivity)
 	_volume.set_value_no_signal(GameState.master_volume)
+	_brightness.set_value_no_signal(GameState.brightness)
 	_crt.set_pressed_no_signal(GameState.crt_enabled)
 	_fullscreen.set_pressed_no_signal(_is_fullscreen())
 	_update_value_labels()
@@ -63,9 +66,20 @@ func set_volume(value: float) -> void:
 	_update_value_labels()
 
 
+func set_brightness(value: float) -> void:
+	GameState.brightness = value
+	_brightness.set_value_no_signal(GameState.brightness)
+	_update_value_labels()
+
+
 func set_crt(on: bool) -> void:
 	GameState.crt_enabled = on
 	_crt.set_pressed_no_signal(on)
+
+
+## For tests: the brightness slider's allowed range.
+func get_brightness_range() -> Vector2:
+	return Vector2(_brightness.min_value, _brightness.max_value)
 
 
 func set_fullscreen(on: bool) -> void:
@@ -83,6 +97,7 @@ func _is_fullscreen() -> bool:
 func _update_value_labels() -> void:
 	_sensitivity_value.text = "x%.1f" % (GameState.mouse_sensitivity / SENSITIVITY_DEFAULT)
 	_volume_value.text = "%d%%" % roundi(GameState.master_volume * 100.0)
+	_brightness_value.text = "%d%%" % roundi(GameState.brightness * 100.0)
 
 
 func _build() -> void:
@@ -106,6 +121,9 @@ func _build() -> void:
 	_volume = _slider(grid, "MASTER VOLUME", 0.0, 1.0, 0.05)
 	_volume_value = _value_label(grid)
 	_volume.value_changed.connect(set_volume)
+	_brightness = _slider(grid, "BRIGHTNESS", GameState.BRIGHTNESS_MIN, 1.0, 0.05)
+	_brightness_value = _value_label(grid)
+	_brightness.value_changed.connect(set_brightness)
 
 	_crt = CheckButton.new()
 	_crt.text = "CRT SCREEN EFFECT"

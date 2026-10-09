@@ -19,6 +19,9 @@ uniform float shadow_lift : hint_range(0.0, 1.0) = 0.65;
 uniform float desaturation : hint_range(0.0, 1.0) = 0.2;
 uniform vec4 bezel_color : source_color = vec4(0.028, 0.032, 0.03, 1.0);
 uniform float flicker_strength : hint_range(0.0, 0.1) = 0.012;
+// Horror brightness setting (GameState.brightness): 0.4..1.0, applied to the 3D view
+// regardless of the CRT toggle above.
+uniform float brightness : hint_range(0.4, 1.0) = 1.0;
 
 float hash(vec2 p) {
 	return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
@@ -53,7 +56,7 @@ void fragment() {
 
 	float vignette = 1.0 - vignette_strength * pow(clamp(length(c * vec2(0.82, 1.0)) / 1.3, 0.0, 1.0), 2.4);
 	float flicker = 1.0 + flicker_strength * (hash(vec2(floor(TIME * 24.0), 3.7)) - 0.5);
-	col *= vignette * flicker;
+	col *= vignette * flicker * brightness;
 
 	// Bezel: dark plastic with a faint inner glow near the glass edge.
 	vec3 bezel = bezel_color.rgb + vec3(0.02) * smoothstep(0.06, 0.0, dist);

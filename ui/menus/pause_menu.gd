@@ -57,6 +57,15 @@ func is_settings_open() -> bool:
 	return _settings.visible
 
 
+func get_button_texts() -> Array[String]:
+	var texts: Array[String] = []
+	for child in _buttons.get_children():
+		var button := child as Button
+		if button and button.visible:
+			texts.append(button.text)
+	return texts
+
+
 func close_settings() -> void:
 	if _settings.visible:
 		_settings.close()
@@ -113,6 +122,8 @@ func _build() -> void:
 		_buttons.visible = false
 		_settings.open())
 	_button("QUIT TO MENU", func() -> void: quit_requested.emit())
+	var quit_game := _button("QUIT GAME", func() -> void: get_tree().quit())
+	quit_game.visible = not OS.has_feature("web")
 
 	_settings = SETTINGS_SCENE.instantiate()
 	add_child(_settings)
