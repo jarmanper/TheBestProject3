@@ -13,6 +13,9 @@ monster that mimics them hunts them down.
 - **Single-player adaptation.** The game must run on GitHub Pages (static hosting, no
   game server), so the other three employees are AI coworkers. The monster mimics
   *them*: their look, their behaviour and their walkie-talkie voices.
+  Walkie voices are shared radio-babble variants (`walkie_voice_*`), not one voice per
+  coworker; the mimic's set (`walkie_voice_mimic_*`: a touch lower, more distorted, reversed
+  syllables) is a subtle audio tell **by design** — the subtitle never gives it away.
 - **Night:** 12:00 AM to 6:00 AM, `GameState.SECONDS_PER_HOUR` = 90 real seconds per hour (9 minutes total).
 - **Win:** reach 6:00 AM alive with every basic task done ("SHIFT COMPLETE").
 - **Fired:** reach 6:00 AM alive with basic tasks left ("YOU'RE FIRED").
@@ -41,6 +44,8 @@ monster that mimics them hunts them down.
    manager tasks first; the HUD checklist lists them first.
 3. **Tasks ↔ Tools.** Some tasks need a tool (`TaskData.required_tool`). The player picks
    tools up from `ToolPickup` racks; `TaskStation.can_interact()` reads `player.held_tool`.
+   Coworkers deliberately ignore `required_tool` (a simplification: they never fetch tools);
+   only the player is held to it.
 
 ### Monster rules (GDD §5) — exact values live in `systems/monster/monster.gd` constants
 
@@ -73,7 +78,9 @@ lights flicker when it is within ~12 m.
 
 - Godot **4.7.2**, GDScript, **Compatibility renderer** (`gl_compatibility`) because the
   web export only supports it. Physics: Jolt (existing setting).
-- Web export with **threads disabled** (GitHub Pages cannot send COOP/COEP headers).
+- Web export with **threads disabled** (GitHub Pages cannot send COOP/COEP headers). The preset
+  excludes `tests/*`, `systems/*/sandbox/*`, `tools/*` and the greybox generator scripts (nothing
+  shipped loads them); the Pages workflow runs the test suite before it exports.
 - Audio buses: `Master`, `Music`, `SFX`, `Ambience`, `Voice` (volume only — the web build plays
   audio as Web Audio samples, which ignores bus effects, so radio/PA filtering is baked into
   the audio files).
@@ -134,7 +141,8 @@ Bit constants live in `Catalog.LAYER_*`.
 
 `player`, `monster`, `coworker`, `employee` (coworkers + manager NPC), `task_station`,
 `tool_pickup`, `hiding_spot`, `store_zone`, `store_light`, `intercom_speaker`,
-`player_spawn`, `coworker_spawn`, `monster_spawn`, `manager_spot`, `patrol_point`.
+`player_spawn`, `coworker_spawn`, `monster_spawn`, `manager_spot`, `patrol_point`,
+`store_manager` (the StoreManager node).
 
 ## 5. Autoload APIs
 
@@ -147,13 +155,16 @@ Night clock (`start_night()`, `advance(delta)`, `get_clock_text()`, `get_hour()`
 `get_night_progress()`), `end_night(result)`, stats dictionary, settings
 (`mouse_sensitivity`, `master_volume`, `crt_enabled`) persisted to `user://settings.cfg`,
 and registered references: `player`, `monster`, `world_root` (the `Node3D` that holds the level,
-inside the game's 3D viewport).
+inside the game's 3D viewport). At 6:00 AM `advance` ends the night as `win` / `fired` — unless
+`is_player_dead()`: a player who died just before 6:00 AM gets `dead` from their own death
+path (`Player.DEATH_END_DELAY`).
 
 ### `Sfx` (`autoload/sfx.gd`)
 `Sfx.play(id)` (2D/UI), `Sfx.play_at(id, position)` (one-shot 3D, parented under
 `GameState.world_root`), `Sfx.get_stream(id)` (for looping emitters you own). Sound ids map to
 base paths without an extension; `.ogg` is tried first, then `.wav`. Ids with several variants
-pick one at random. `Sfx.LOOPING` ids are returned with looping enabled.
+pick one at random. `Sfx.LOOPING` ids are returned with looping enabled. `Sfx.played(id)` is an
+informational signal (tests) emitted by `play` / `play_at`.
 
 ### `Tasks` (`systems/environment/task_manager.gd`)
 See the file's public methods; summary:
@@ -161,7 +172,8 @@ See the file's public methods; summary:
 `complete_task(task, by)`, `claim_task(task, worker) -> bool`, `release_task(task, worker)`,
 `get_open_tasks() -> Array[TaskData]` (manager tasks first), `get_tasks_for_checklist()`,
 `get_required_remaining() -> int`, `all_required_done() -> bool`,
-`get_coworker_basic_completions() -> int`.
+`get_coworker_basic_completions() -> int`. Manager-task deadlines count down only while
+`GameState.night_running`.
 **Balance:** coworkers together may take at most `Tasks.MAX_COWORKER_BASIC_COMPLETIONS = 2`
 basic tasks per night: `claim_task` refuses a basic task to a non-player worker once coworker
 basic completions + open coworker claims reach the cap. Manager tasks are never capped.
@@ -191,6 +203,12 @@ the player must hold `interact` that long; the player drives the progress bar an
 - **Intercom** (`Events.intercom_announced`): `StoreManager` plays `intercom_chime` + `intercom_voice`
   positionally at every `intercom_speaker`; the HUD shows `[INTERCOM] message`.
 - `Events.subtitle`: HUD only.
+- Other player-side 2D audio: the HUD plays `task_fail` on `Events.task_failed` and owns the
+  `Heartbeat` loop (`ui/hud/heartbeat.gd`: fades in below 35% health or with the true form
+  hunting within 8 m). The game scene rings `shift_end_bell` when the night ends as `win` /
+  `fired` (the StoreManager announces hours 1–5 only) and runs `AmbientScares`
+  (`scenes/ambient_scares.gd`: a quiet `distant_bang` / `metal_creak` / `cart_rattle` from the back
+  of house or a far aisle every 30–90 s, 12–36 m from the player).
 
 ### Model orientation and scale
 1 Blender unit = 1 m. Models are authored facing Blender **-Y** (Blender's front view), which the
@@ -338,7 +356,8 @@ stop drawing at 20 m (small) / 27 m. Keep layers 11–16 free elsewhere; charact
 layer 1. Budget: < 600 draw calls (sweep of 552 views: max 594, median 239).
 
 **Shutdown.** `Sfx` stops every audio player when the engine quits and lets the audio thread
-run a few mix steps; otherwise the paused playbacks are reported as leaked at exit.
+run a few mix steps; otherwise the paused playbacks are reported as leaked at exit. The wait
+is skipped on the Web (`OS.delay_msec` is unsupported there).
 
 ## 9. Art direction (GDD §6 + reference pictures)
 
@@ -356,4 +375,6 @@ run a few mix steps; otherwise the paused playbacks are reported as leaked at ex
 - Screen: CRT-style framing (reference image 1): vignette, rounded dark corners, faint scanlines/grain,
   3D rendered at half resolution with nearest upscaling.
 - HUD (reference images 2/3): white pixel/terminal font, red HEALTH bar top-left with item slots below
-  (flashlight, held tool), minimap top-right. **No ammo counter.**
+  (flashlight, held tool), minimap top-right. **No ammo counter.** The task checklist shows
+  finished rows for 20 s (newest three at most), then folds them into header counts
+  (`TASKS - 2 LEFT  √3  ×1`) so it stays clear of the subtitles at 720p.

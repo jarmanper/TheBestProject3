@@ -1,6 +1,8 @@
 extends Node
 ## Global signal bus. Systems emit and connect here instead of holding
 ## references to each other. Keep this list in sync with docs/ARCHITECTURE.md.
+## Signals marked "Informational" are emitted for tests, the AI sandbox and tools; no game
+## system depends on them (the HUD reads the player directly every frame).
 
 # --- Night flow -------------------------------------------------------------
 signal night_started
@@ -12,9 +14,9 @@ signal player_damaged(amount: float, health_left: float)
 signal player_died
 signal player_hid(spot: Node3D)
 signal player_unhid(spot: Node3D)
-signal stamina_changed(value: float, max_value: float)
-signal held_tool_changed(tool_id: StringName) ## &"" when empty-handed
-signal flashlight_toggled(on: bool)
+signal stamina_changed(value: float, max_value: float)   ## Informational (HUD reads Player.stamina)
+signal held_tool_changed(tool_id: StringName) ## Informational (HUD reads Player.held_tool). &"" when empty-handed
+signal flashlight_toggled(on: bool)           ## Informational (HUD reads Player.flashlight_on)
 signal interaction_prompt_changed(text: String) ## "" hides the prompt
 signal interaction_progress(fraction: float)    ## < 0 hides the hold bar
 
@@ -31,8 +33,10 @@ signal intercom_announced(message: String, zone: StringName)
 signal walkie_message(speaker: String, message: String, origin: Vector3, is_mimic: bool)
 
 # --- Monster ----------------------------------------------------------------
-signal monster_state_changed(state: StringName)
-signal monster_sighted                         ## monster entered the player's view
+signal monster_state_changed(state: StringName)   ## Informational (tests, AI sandbox)
+## Informational (tests, AI sandbox): a new rule-3 sighting -- the player made the
+## monster out (close, central, lit, for Monster.PERCEIVE_TIME).
+signal monster_sighted
 signal chase_started
 signal chase_ended
 signal coworker_missing(coworker_name: String)
