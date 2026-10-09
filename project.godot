@@ -98,6 +98,11 @@ pause={
 3d_physics/layer_4="npc"
 3d_physics/layer_5="interact"
 
+[navigation]
+
+3d/default_cell_size=0.1
+3d/default_cell_height=0.1
+
 [physics]
 
 3d/physics_engine="Jolt Physics"
