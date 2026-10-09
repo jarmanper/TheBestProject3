@@ -82,14 +82,38 @@ func _natural_flicker(delta: float) -> void:
 		_quick_flicker()
 
 
-## The flicker clicks only carry a short way: about thirty lit fixtures each flicker every
-## 8-20 s, and at the default 30 m the whole store clicked a couple of times a second.
-const FLICKER_SOUND_DB := -8.0
-const FLICKER_SOUND_RANGE := 14.0
+## Natural flicker sounds are rare and local: about thirty lit fixtures each flicker every
+## 8-20 s (~100 flickers a minute store-wide), and playing all of them made the store a constant
+## stream of zaps. Only a fixture within FLICKER_SOUND_RANGE of the player makes a sound, and
+## only one fixture store-wide per FLICKER_SOUND_COOLDOWN; the rest flicker silently.
+const FLICKER_SOUND_DB := -10.0
+const FLICKER_SOUND_RANGE := 9.0
+const FLICKER_SOUND_COOLDOWN := 6.0
+
+## Time.get_ticks_msec() of the last natural flicker sound, shared by every fixture.
+static var last_flicker_sound_ms := -1000000
+
+
+## True when a natural flicker `distance` metres from the player may make a sound at `now_ms`.
+static func flicker_sound_allowed(distance: float, now_ms: int) -> bool:
+	if distance > FLICKER_SOUND_RANGE:
+		return false
+	return (now_ms - last_flicker_sound_ms) / 1000.0 >= FLICKER_SOUND_COOLDOWN
+
+
+func _flicker_sound() -> void:
+	var player: Node = GameState.player
+	if not is_instance_valid(player) or not player is Node3D or not player.is_inside_tree():
+		return
+	var now := Time.get_ticks_msec()
+	if not flicker_sound_allowed((player as Node3D).global_position.distance_to(global_position), now):
+		return
+	last_flicker_sound_ms = now
+	Sfx.play_at(&"light_flicker", global_position, FLICKER_SOUND_DB, randf_range(0.9, 1.1), FLICKER_SOUND_RANGE)
 
 
 func _quick_flicker() -> void:
-	Sfx.play_at(&"light_flicker", global_position, FLICKER_SOUND_DB, 1.0, FLICKER_SOUND_RANGE)
+	_flicker_sound()
 	var tween := create_tween()
 	tween.tween_method(_set_energy_fraction, 1.0, 0.15, 0.05)
 	tween.tween_method(_set_energy_fraction, 0.15, 1.0, 0.1)
@@ -135,6 +159,6 @@ func _bind_fixture_material() -> void:
 
 
 func _start_buzz() -> void:
-	var emitter := Sfx.play_at(&"amb_fluorescent_buzz", global_position, -18.0)
+	var emitter := Sfx.play_at(&"amb_fluorescent_buzz", global_position, -18.0, 1.0, 6.0)
 	if emitter:
 		emitter.max_distance = 6.0

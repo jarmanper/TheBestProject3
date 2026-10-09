@@ -8,6 +8,8 @@ assets/audio/CREDITS.md.
 Run with Blender's bundled Python (has numpy; stdlib `wave` writes the files):
 
     blender -b --factory-startup -P art_source/audio/generate_audio.py
+    blender -b --factory-startup -P art_source/audio/generate_audio.py -- light_flicker cart_rattle
+        (regenerates only the files whose names start with the given prefixes)
 
 Deterministic: every file's RNG is seeded from its own relative path (via
 zlib.crc32), so re-running this script regenerates byte-identical output.
@@ -365,6 +367,152 @@ def distant_bang_gen(sr: int, rng: np.random.Generator) -> np.ndarray:
     hit = impact_hit(sr, rng, dur=0.3, band=(60, 3000))
     hit = fft_lowpass(hit, sr, 2500)
     return apply_reverb(hit, sr, decay=0.8, dur=0.6, mix=0.5, rng=rng)
+
+
+# --- sound pass 2: quieter, more literal store noises -----------------------
+# Playtest feedback: "very loud noises that don't exactly make sense". These replace the
+# harshest one-shots with sounds that read as the real thing: everything is low-passed (no
+# hiss above ~5 kHz), has soft attacks/fades, and the low-detail ones are rendered at
+# 22.05 kHz (half the bytes for the web download).
+
+def soft_tick(sr: int, rng: np.random.Generator, freq: float, decay: float = 0.004) -> np.ndarray:
+    """A tiny damped 'tk': a short resonant ping plus a breath of band-limited noise."""
+    n = max(8, int(sr * decay * 8))
+    t = np.arange(n) / sr
+    ping = np.sin(2 * math.pi * freq * t) * np.exp(-t / decay)
+    grit = fft_bandpass(rng.standard_normal(n), sr, 600, 3500) * np.exp(-t / (decay * 0.6)) * 0.3
+    return ping + grit
+
+
+def light_flicker_soft_gen(sr: int, rng: np.random.Generator, dur: float = 0.35) -> np.ndarray:
+    """A fluorescent tube stuttering: a couple of soft relay ticks and a short, dull 120 Hz buzz."""
+    n = int(dur * sr)
+    t = np.arange(n) / sr
+    buzz = np.tanh(2.0 * np.sin(2 * math.pi * 120 * t)) * 0.6 + 0.25 * np.sin(2 * math.pi * 240 * t)
+    buzz = fft_lowpass(buzz, sr, 900)
+    # Stepped on/off gating, smoothed so the steps don't click.
+    gate = np.zeros(n)
+    pos = 0
+    on = True
+    while pos < n:
+        length = int(sr * rng.uniform(0.025, 0.07))
+        gate[pos:pos + length] = rng.uniform(0.5, 1.0) if on else rng.uniform(0.0, 0.15)
+        on = not on
+        pos += length
+    k = max(4, int(sr * 0.006))
+    gate = np.convolve(gate, np.ones(k) / k, mode="same")
+    sig = buzz * gate * 0.5
+    for _ in range(int(rng.integers(2, 4))):
+        tick = soft_tick(sr, rng, rng.uniform(1400, 2200))
+        p = int(rng.integers(0, max(1, n - len(tick))))
+        sig[p:p + len(tick)] += tick * rng.uniform(0.35, 0.6)
+    fade = np.minimum(1.0, (n - np.arange(n)) / (sr * 0.08))
+    return fft_lowpass(sig * fade, sr, 4000)
+
+
+def distant_thud_gen(sr: int, rng: np.random.Generator) -> np.ndarray:
+    """Something heavy dropped far away in the back room: a muffled low thud with a dull tail."""
+    dur = 1.1
+    n = int(dur * sr)
+    t = np.arange(n) / sr
+    body = thump(rng.uniform(48, 62), dur, sr, decay=0.11)
+    knock = fft_lowpass(rng.standard_normal(n), sr, 450) * np.exp(-t / 0.035) * 0.6
+    sig = body + knock
+    sig = apply_reverb(sig, sr, decay=1.1, dur=0.7, mix=0.35, rng=rng)
+    sig = fft_lowpass(sig, sr, 500)
+    return sig[: int(1.5 * sr)]
+
+
+def slow_creak_gen(sr: int, rng: np.random.Generator, dur: float = 1.8) -> np.ndarray:
+    """A shelf or door hinge flexing: slow stick-slip pulses ringing a few low resonances."""
+    n = int(dur * sr)
+    t = np.arange(n) / sr
+    rate = (rng.uniform(16, 26) + rng.uniform(6, 14)
+            * np.sin(2 * math.pi * rng.uniform(0.3, 0.7) * t + rng.uniform(0, 2 * math.pi)))
+    phase = np.cumsum(rate / sr)
+    pulses = np.zeros(n)
+    idx = np.where(np.diff(np.floor(phase)) > 0)[0]
+    pulses[idx] = rng.uniform(0.5, 1.0, len(idx))
+    f1 = rng.uniform(260, 360)
+    body = (formant_filter(pulses, sr, f1, 30, dur=0.08)
+            + 0.5 * formant_filter(pulses, sr, f1 * 2.4, 45, dur=0.06)
+            + 0.2 * formant_filter(pulses, sr, f1 * 4.3, 70, dur=0.05))
+    env = np.clip(np.sin(math.pi * np.clip(t / dur, 0, 1)), 0, 1) ** 0.8
+    return fft_lowpass(body * env, sr, 2000)
+
+
+def cart_rattle_soft_gen(sr: int, rng: np.random.Generator, dur: float = 1.1) -> np.ndarray:
+    """A shopping cart nudged a little way: a wire basket jingling over a wheel rumble."""
+    n = int(dur * sr)
+    t = np.arange(n) / sr
+    rumble = fft_bandpass(rng.standard_normal(n), sr, 60, 260)
+    rumble *= 0.5 + 0.5 * np.abs(np.sin(2 * math.pi * rng.uniform(5, 8) * t))
+    sig = rumble * 0.35
+    for _ in range(int(rng.integers(8, 13))):
+        f = rng.uniform(1300, 2600)
+        cl_n = int(sr * 0.06)
+        ct = np.arange(cl_n) / sr
+        clink = (np.sin(2 * math.pi * f * ct) + 0.5 * np.sin(2 * math.pi * f * 1.47 * ct)) * np.exp(-ct / 0.012)
+        p = int(rng.integers(0, max(1, n - cl_n)))
+        sig[p:p + cl_n] += clink * rng.uniform(0.15, 0.4)
+    env = np.minimum(1.0, t / 0.05) * np.minimum(1.0, (dur - t) / 0.3)
+    return fft_lowpass(sig * env, sr, 4500)
+
+
+def footstep_soft_gen(sr: int, rng: np.random.Generator) -> np.ndarray:
+    """A work shoe on vinyl tile: a dull heel tap and a short scuff, no hiss."""
+    dur = 0.18
+    n = int(dur * sr)
+    t = np.arange(n) / sr
+    body = thump(rng.uniform(105, 125), dur, sr, decay=0.025)
+    tap = fft_bandpass(rng.standard_normal(n), sr, 250, 2200) * np.exp(-t / 0.008)
+    scuff_start = int(sr * rng.uniform(0.02, 0.04))
+    scuff = fft_bandpass(rng.standard_normal(n), sr, 500, 2800) * np.exp(-t / 0.03)
+    out = body * 0.7 + tap * 0.5
+    out[scuff_start:] += scuff[: n - scuff_start] * 0.12
+    return fft_lowpass(out, sr, 3500)
+
+
+def rustle_loop_gen(n: int, sr: int, rng: np.random.Generator) -> np.ndarray:
+    """Hands working at a shelf: soft, irregular cardboard/plastic rustle (task in progress)."""
+    noise = fft_bandpass(rng.standard_normal(n), sr, 350, 2600)
+    # Irregular gesture envelope: a few overlapping bumps per second.
+    env = np.zeros(n)
+    pos = 0
+    while pos < n:
+        length = int(sr * rng.uniform(0.15, 0.45))
+        bump = np.hanning(length) * rng.uniform(0.3, 1.0)
+        end = min(n, pos + length)
+        env[pos:end] += bump[: end - pos]
+        pos += int(sr * rng.uniform(0.12, 0.35))
+    k = max(4, int(sr * 0.004))
+    grain = np.convolve(np.abs(rng.standard_normal(n)), np.ones(k) / k, mode="same")
+    grain /= np.max(grain) + 1e-9
+    return noise * env * (0.4 + 0.6 * grain)
+
+
+def soft_fail_gen(sr: int, rng: np.random.Generator) -> np.ndarray:
+    """A low two-note 'bonk-bonk' (wrong), rounded instead of a square-wave buzz."""
+    a = tone_ping(330.0, 0.22, sr, decay=0.09, harmonics=(1, 2), amp_ratios=(1.0, 0.25))
+    b = tone_ping(247.0, 0.35, sr, decay=0.14, harmonics=(1, 2), amp_ratios=(1.0, 0.25))
+    out = np.concatenate([a, np.zeros(int(0.03 * sr)), b])
+    return fft_lowpass(out, sr, 2500)
+
+
+def soft_ui_gen(sr: int, rng: np.random.Generator, freq: float, dur: float) -> np.ndarray:
+    """A short muted menu tick (sine blip), instead of a white-noise click."""
+    return fft_lowpass(tone_ping(freq, dur, sr, decay=dur / 4, harmonics=(1, 2), amp_ratios=(1.0, 0.2)), sr, 4000)
+
+
+def soft_click_gen(sr: int, rng: np.random.Generator) -> np.ndarray:
+    """A plastic flashlight switch: a dull press tick and a lighter release."""
+    a = soft_tick(sr, rng, 1600, decay=0.003)
+    b = soft_tick(sr, rng, 2100, decay=0.002) * 0.5
+    out = np.zeros(int(0.07 * sr))
+    out[: len(a)] += a
+    p = int(0.035 * sr)
+    out[p:p + len(b)] += b[: len(out) - p]
+    return fft_lowpass(out, sr, 5000)
 
 
 # --- footsteps --------------------------------------------------------------
@@ -817,31 +965,31 @@ def loop(relpath, out_dir, sr, db, duration, fn):
 
 # Player
 for i in range(1, 7):
-    one(f"footstep_tile_{i:02d}", SFX_DIR, SR_SFX, -12, lambda sr, rng: footstep_tile_gen(sr, rng))
+    one(f"footstep_tile_{i:02d}", SFX_DIR, SR_LOOP, -14, lambda sr, rng: footstep_soft_gen(sr, rng))
 one("breath_exhausted", SFX_DIR, SR_SFX, -10, lambda sr, rng: breath_exhausted_gen(sr, rng))
 loop("heartbeat_loop", SFX_DIR, SR_SFX, -6, 4.5, heartbeat_loop_gen)
-one("flashlight_click", SFX_DIR, SR_SFX, -14, lambda sr, rng: click(0.06, sr, rng, band=(1000, 9000)))
+one("flashlight_click", SFX_DIR, SR_LOOP, -16, lambda sr, rng: soft_click_gen(sr, rng))
 one("player_hurt", SFX_DIR, SR_SFX, -8, lambda sr, rng: player_hurt_gen(sr, rng))
 one("player_death", SFX_DIR, SR_SFX, -6, lambda sr, rng: player_death_gen(sr, rng))
 
 # Interaction / tasks
-loop("task_progress_loop", SFX_DIR, SR_SFX, -14, 4.0, task_progress_loop_gen)
+loop("task_progress_loop", SFX_DIR, SR_LOOP, -20, 4.0, rustle_loop_gen)
 one("task_complete", SFX_DIR, SR_SFX, -8, lambda sr, rng: two_tone_chime(523.25, 659.25, sr, dur_each=0.18, gap=0.03, decay=0.25))
-one("task_fail", SFX_DIR, SR_SFX, -8, lambda sr, rng: descending_buzz(sr, rng))
+one("task_fail", SFX_DIR, SR_LOOP, -12, lambda sr, rng: soft_fail_gen(sr, rng))
 one("tool_pickup", SFX_DIR, SR_SFX, -10, lambda sr, rng: tool_pickup_gen(sr, rng))
 one("locker_open", SFX_DIR, SR_SFX, -8, lambda sr, rng: locker_open_gen(sr, rng))
 one("locker_close", SFX_DIR, SR_SFX, -8, lambda sr, rng: impact_hit(sr, rng, dur=0.3, band=(200, 5000)))
 one("box_rustle", SFX_DIR, SR_SFX, -10, lambda sr, rng: box_rustle_gen(sr, rng))
-one("cart_rattle", SFX_DIR, SR_SFX, -9, lambda sr, rng: cart_rattle_gen(sr, rng))
+one("cart_rattle", SFX_DIR, SR_LOOP, -14, lambda sr, rng: cart_rattle_soft_gen(sr, rng))
 one("time_clock_punch", SFX_DIR, SR_SFX, -8, lambda sr, rng: impact_hit(sr, rng, dur=0.25, band=(200, 6000)))
 
 # Store
 for i in range(1, 4):
-    one(f"light_flicker_{i:02d}", SFX_DIR, SR_SFX, -10, lambda sr, rng: light_flicker_gen(sr, rng))
+    one(f"light_flicker_{i:02d}", SFX_DIR, SR_LOOP, -20, lambda sr, rng: light_flicker_soft_gen(sr, rng))
 for i in range(1, 4):
-    one(f"distant_bang_{i:02d}", SFX_DIR, SR_SFX, -6, lambda sr, rng: distant_bang_gen(sr, rng))
+    one(f"distant_bang_{i:02d}", SFX_DIR, SR_LOOP, -12, lambda sr, rng: distant_thud_gen(sr, rng))
 for i in range(1, 3):
-    one(f"metal_creak_{i:02d}", SFX_DIR, SR_SFX, -9, lambda sr, rng: metal_creak_gen(sr, rng))
+    one(f"metal_creak_{i:02d}", SFX_DIR, SR_LOOP, -15, lambda sr, rng: slow_creak_gen(sr, rng))
 one("shift_end_bell", SFX_DIR, SR_SFX, -5, lambda sr, rng: shift_end_bell_gen(sr, rng))
 
 # Manager / radio
@@ -880,8 +1028,8 @@ one("abduct_distant", SFX_DIR, SR_SFX, -10, lambda sr, rng: abduct_distant_gen(s
 one("chase_stinger", SFX_DIR, SR_SFX, -2, lambda sr, rng: dissonant_cluster(1.5, sr, rng))
 
 # UI
-one("ui_click", SFX_DIR, SR_SFX, -18, lambda sr, rng: click(0.04, sr, rng, band=(1500, 9000)))
-one("ui_hover", SFX_DIR, SR_SFX, -20, lambda sr, rng: click(0.03, sr, rng, band=(2500, 10000)))
+one("ui_click", SFX_DIR, SR_LOOP, -20, lambda sr, rng: soft_ui_gen(sr, rng, 880.0, 0.06))
+one("ui_hover", SFX_DIR, SR_LOOP, -26, lambda sr, rng: soft_ui_gen(sr, rng, 1320.0, 0.035))
 
 # Ambience (loops, lower sample rate)
 loop("amb_store_hum", AMB_DIR, SR_LOOP, -16, 12.0, store_hum_gen)
@@ -899,9 +1047,18 @@ loop("music_chase_loop", MUS_DIR, SR_LOOP, -6, 24.0, chase_music_gen)
 # Driver
 # ---------------------------------------------------------------------------
 
+def _selected(relpath: str) -> bool:
+    """Optional filter: names after `--` on the command line regenerate only matching files."""
+    import sys
+    args = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    return not args or any(relpath.startswith(a) for a in args)
+
+
 def main() -> None:
     count = 0
     for relpath, out_dir, sr, db, fn in ONESHOT:
+        if not _selected(relpath):
+            continue
         rng = seeded_rng(relpath)
         raw = fn(sr, rng)
         samples = finalize(raw, sr, db)
@@ -911,6 +1068,8 @@ def main() -> None:
         print(f"  oneshot  {relpath:28s} {len(samples) / sr:6.2f}s  peak {amp_to_db(np.max(np.abs(samples))):6.1f} dBFS")
 
     for relpath, out_dir, sr, db, duration, fn in LOOP:
+        if not _selected(relpath):
+            continue
         rng = seeded_rng(relpath)
         raw = make_loop(fn, duration, sr, rng)
         samples = finalize(raw, sr, db)
