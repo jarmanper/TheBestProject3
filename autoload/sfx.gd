@@ -89,7 +89,9 @@ func _exit_tree() -> void:
 			if node is AudioStreamPlayer or node is AudioStreamPlayer3D or node is AudioStreamPlayer2D:
 				node.stop()
 	# Also covers players freed during the last frame (already stopping, not yet freed).
-	OS.delay_msec(SHUTDOWN_DRAIN_MS)
+	# Not on the Web: the page just closes there, and OS.delay_msec is unsupported.
+	if not OS.has_feature("web"):
+		OS.delay_msec(SHUTDOWN_DRAIN_MS)
 
 
 ## Returns a stream for `id` (random variant). Looping ids come back looping.
