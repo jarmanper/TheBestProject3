@@ -1,5 +1,7 @@
 extends TestCase
 
+const PlayerHelper := preload("res://tests/helpers/player_helper.gd")
+
 var _stations: Array[TaskStation] = []
 
 
@@ -131,8 +133,7 @@ func test_complete_task_returns_a_consumed_tool_to_its_rack_for_the_player() -> 
 	rack.tool_id = &"stock_box"
 	rack.has_tool = false
 	tree.root.add_child(rack)
-	var player := Player.new()
-	tree.root.add_child(player)
+	var player := PlayerHelper.make_player(tree)
 	player.set_held_tool(&"stock_box")
 	var task := Tasks.add_manager_task(station, 30.0)
 	Tasks.complete_task(task, player)
@@ -144,8 +145,7 @@ func test_complete_task_returns_a_consumed_tool_to_its_rack_for_the_player() -> 
 
 func test_complete_task_keeps_a_non_consumed_tool_in_the_players_hand() -> void:
 	var station := _make_station(&"mop_spill", &"aisle_3", &"mop")
-	var player := Player.new()
-	tree.root.add_child(player)
+	var player := PlayerHelper.make_player(tree)
 	player.set_held_tool(&"mop")
 	var task := Tasks.add_manager_task(station, 30.0)
 	Tasks.complete_task(task, player)

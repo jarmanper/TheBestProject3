@@ -1,5 +1,7 @@
 extends TestCase
 
+const PlayerHelper := preload("res://tests/helpers/player_helper.gd")
+
 var _spot: HidingSpot
 var _player: Player
 
@@ -8,8 +10,7 @@ func before_each() -> void:
 	_spot = HidingSpot.new()
 	_spot.spot_kind = &"counter"
 	tree.root.add_child(_spot)
-	_player = Player.new()
-	tree.root.add_child(_player)
+	_player = PlayerHelper.make_player(tree)
 
 
 func after_each() -> void:
@@ -39,8 +40,7 @@ func test_interact_again_exits_hiding() -> void:
 
 func test_occupied_spot_blocks_a_different_player() -> void:
 	_spot.interact(_player)
-	var other := Player.new()
-	tree.root.add_child(other)
+	var other := PlayerHelper.make_player(tree)
 	assert_false(_spot.can_interact(other))
 	assert_eq(_spot.get_prompt(other), "")
 	other.free()

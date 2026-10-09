@@ -1,5 +1,7 @@
 extends TestCase
 
+const PlayerHelper := preload("res://tests/helpers/player_helper.gd")
+
 var _station: TaskStation
 var _player: Player
 
@@ -14,8 +16,7 @@ func before_each() -> void:
 	_station.hold_time = 4.0
 	_station.basic_task = true
 	tree.root.add_child(_station)
-	_player = Player.new()
-	tree.root.add_child(_player)
+	_player = PlayerHelper.make_player(tree)
 
 
 func after_each() -> void:

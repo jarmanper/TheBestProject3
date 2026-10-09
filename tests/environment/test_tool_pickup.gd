@@ -1,5 +1,7 @@
 extends TestCase
 
+const PlayerHelper := preload("res://tests/helpers/player_helper.gd")
+
 var _mop_rack: ToolPickup
 var _price_rack: ToolPickup
 var _player: Player
@@ -12,8 +14,7 @@ func before_each() -> void:
 	_price_rack = ToolPickup.new()
 	_price_rack.tool_id = &"price_gun"
 	tree.root.add_child(_price_rack)
-	_player = Player.new()
-	tree.root.add_child(_player)
+	_player = PlayerHelper.make_player(tree)
 
 
 func after_each() -> void:
