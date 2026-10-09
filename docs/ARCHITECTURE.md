@@ -115,7 +115,7 @@ running `SceneTree`; add nodes under `tree.root` and free them at the end of the
 | 4 | 8 | npc | Coworkers, manager NPC |
 | 5 | 16 | interact | `Interactable` Area3Ds (task stations, tools, hiding spots) |
 
-Masks: Player = world+npc (9). Monster = world (1). Coworker = world (1).
+Masks: Player = world+npc+monster (13) — the player must bump into a disguised monster exactly like a real coworker. Monster = world (1). Coworker = world (1).
 Bit constants live in `Catalog.LAYER_*`.
 
 ## 4. Groups

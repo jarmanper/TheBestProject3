@@ -97,7 +97,7 @@ var _last_prompt := ""
 func _ready() -> void:
 	add_to_group(&"player")
 	collision_layer = Catalog.LAYER_PLAYER
-	collision_mask = Catalog.LAYER_WORLD | Catalog.LAYER_NPC
+	collision_mask = Catalog.LAYER_WORLD | Catalog.LAYER_NPC | Catalog.LAYER_MONSTER
 	GameState.player = self
 	_camera.fov = FOV
 	_flashlight.light_cull_mask &= ~PlayerViewmodel.RENDER_LAYER

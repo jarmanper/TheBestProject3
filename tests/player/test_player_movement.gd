@@ -68,7 +68,7 @@ func test_hidden_player_is_silent() -> void:
 
 func test_layers_and_shape() -> void:
 	assert_eq(player.collision_layer, Catalog.LAYER_PLAYER)
-	assert_eq(player.collision_mask, Catalog.LAYER_WORLD | Catalog.LAYER_NPC)
+	assert_eq(player.collision_mask, Catalog.LAYER_WORLD | Catalog.LAYER_NPC | Catalog.LAYER_MONSTER, "player bumps into the disguised monster like a coworker")
 	var capsule := (player.get_node("CollisionShape3D") as CollisionShape3D).shape as CapsuleShape3D
 	assert_near(capsule.height, 1.8)
 	assert_near(capsule.radius, 0.35)

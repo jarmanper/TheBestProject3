@@ -40,8 +40,10 @@ func get_random_point() -> Vector3:
 		randf_range(bounds.position.x + 0.5, bounds.end.x - 0.5),
 		0.0,
 		randf_range(bounds.position.z + 0.5, bounds.end.z - 0.5))
+	# The navigation map syncs asynchronously after a level loads; until a region
+	# owns the closest point, the snapped result is (0, 0, 0), so keep the raw point.
 	var map := get_world_3d().navigation_map
-	if NavigationServer3D.map_get_iteration_id(map) > 0:
+	if NavigationServer3D.map_get_closest_point_owner(map, point).is_valid():
 		point = NavigationServer3D.map_get_closest_point(map, point)
 	return point
 
