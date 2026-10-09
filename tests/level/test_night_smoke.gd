@@ -72,6 +72,13 @@ func _on_monster_state(state: StringName) -> void:
 	_states.append(state)
 
 
+func _on_monster_sighted() -> void:
+	_count("monster_sighted")
+	var monster := GameState.monster as Monster
+	if monster and monster.state == Monster.SIGHTING:
+		_count("staged_sighting_seen")
+
+
 func _on_hour(hour: int) -> void:
 	_count("hours")
 	if hour == Monster.SIGHTING_DEADLINE_HOUR and not _hour_two_done:
@@ -108,7 +115,7 @@ func test_a_whole_night_runs_clean() -> void:
 	_hook(Events.walkie_message, _on_walkie)
 	_hook(Events.task_completed, _on_task_completed)
 	_hook(Events.monster_state_changed, _on_monster_state)
-	_hook(Events.monster_sighted, func() -> void: _count("monster_sighted"))
+	_hook(Events.monster_sighted, _on_monster_sighted)
 	_hook(Events.night_ended, func(_result: StringName) -> void: _count("night_ended"))
 	_hook(Events.coworker_missing, func(_name: String) -> void: _count("coworkers_missing"))
 	_hook(Events.hour_changed, _on_hour)
@@ -161,6 +168,7 @@ func test_a_whole_night_runs_clean() -> void:
 	assert_true(_states.size() >= 3, "the monster changed state at least 3 times (%d)" % _states.size())
 	assert_true(&"sighting" in _states, "rule 3: the monster staged a sighting")
 	assert_true(_counts.get("monster_sighted", 0) >= 1, "the player saw the monster")
+	assert_true(_counts.get("staged_sighting_seen", 0) >= 1, "rule 3: the staged sighting was close, central and lit enough to count")
 	assert_true(Tasks.get_coworker_basic_completions() <= Tasks.MAX_COWORKER_BASIC_COMPLETIONS, "coworkers stay under the cap")
 	assert_true(basic_left >= Tasks.BASIC_TASKS_PER_NIGHT - Tasks.MAX_COWORKER_BASIC_COMPLETIONS,
 		"the player still has most basic tasks to do (%d left)" % basic_left)

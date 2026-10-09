@@ -52,6 +52,18 @@ monster that mimics them hunts them down.
 3. **Appears to everyone at least once.** If the player has not seen it (true or disguised) by
    `SIGHTING_DEADLINE_HOUR = 2` (2:00 AM), the monster stages a sighting: it appears inside the
    player's view at a distance, holds, and leaves. It does not have to approach.
+   *Seen* means a human could make it out (GDD: "it will be in your LOS"): a body point within
+   `PERCEIVE_RANGE = 18.0` m of the player's eye, inside the middle `PERCEIVE_VIEW_FRACTION = 0.7`
+   of the view (both axes), in line of sight, **lit** (inside the flashlight's beam while it is on,
+   or within range of a `StoreLight` that is on — `StoreLight.lights_point()`), continuously for
+   `PERCEIVE_TIME = 0.75` s. A fogged shape at 26 m, a frame at the screen edge or a figure in the
+   dark does not count. Staged sightings land `SIGHTING_DISTANCE = 8–15` m ahead (relaxed cap
+   17 m after failed attempts), preferring a lit spot; it holds until seen for
+   `SIGHTING_HOLD_TIME = 3` s (at most 8 s). The monster's own sight (and its "never teleport or
+   change form while on screen" check) still reaches `SIGHT_RANGE = 30` m over the whole frustum.
+   A true form watched from a hiding spot during its walk-off slips sideways out of view for at
+   most `SIGHTING_HIDDEN_WATCH_MAX = 10` s, then ends the sighting still in its true form and puts
+   the disguise back on once nobody can see it.
 
 Disguise tells for observant players: no footstep sounds, head twitches, standing still
 facing shelves/walls, "working" on things that are not tasks, flashlight and nearby store

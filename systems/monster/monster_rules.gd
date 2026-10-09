@@ -23,8 +23,9 @@ var reveal_cooldown_left := 0.0     ## after a chase: no reveal until this runs 
 # Rule 3: appears to the player at least once.
 var has_been_sighted := false
 var sightings := 0
-var in_view := false                ## debounced "the player is looking at it"
+var in_view := false                ## debounced "the player has seen it" (a sighting is on)
 var _out_of_view_time := 0.0
+var _perceive_time := 0.0           ## seconds the player has made it out without a break
 var sighting_retry_left := 0.0
 
 # Mimicry / abduction schedule (counts down only from the start hour).
@@ -110,17 +111,20 @@ func get_reveal_fraction() -> float:
 
 # --- Rule 3 ------------------------------------------------------------------
 
-## Feed whether the player can see the monster this frame. Returns true on a
-## new sighting (first view, or first view after SIGHTING_GAP out of view).
-func update_view(visible_now: bool, delta: float) -> bool:
+## Feed whether the player can make the monster out this frame (close, near the middle of the
+## view, lit: Monster._is_perceivable_at). Returns true on a new sighting: PERCEIVE_TIME of
+## unbroken perception, the first time or after SIGHTING_GAP without any.
+func update_view(perceived_now: bool, delta: float) -> bool:
 	sighting_retry_left = maxf(sighting_retry_left - delta, 0.0)
-	if not visible_now:
+	if not perceived_now:
+		_perceive_time = 0.0
 		_out_of_view_time += delta
 		if _out_of_view_time >= Monster.SIGHTING_GAP:
 			in_view = false
 		return false
 	_out_of_view_time = 0.0
-	if in_view:
+	_perceive_time += delta
+	if in_view or _perceive_time < Monster.PERCEIVE_TIME - EPSILON:
 		return false
 	in_view = true
 	has_been_sighted = true

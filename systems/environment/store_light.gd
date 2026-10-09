@@ -62,6 +62,14 @@ func get_disturbance() -> float:
 	return _disturbance
 
 
+## True while this fixture is on (not dead or switched off) and `point` is within its light's
+## range. The monster's rule 3 asks this: a player only counts a sighting of something lit.
+func lights_point(point: Vector3) -> bool:
+	if starts_off or _light == null or base_energy <= 0.0:
+		return false
+	return _light.global_position.distance_to(point) <= _light.omni_range
+
+
 func _schedule_next_flicker() -> void:
 	_flicker_elapsed = 0.0
 	_next_flicker_at = randf_range(NATURAL_FLICKER_MIN, NATURAL_FLICKER_MAX)

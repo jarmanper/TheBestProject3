@@ -62,7 +62,8 @@ func add_marker(group: StringName, at: Vector3) -> Marker3D:
 
 
 ## A player double (Player contract API, settable noise) with a Camera3D at eye
-## height looking at `look_target`.
+## height looking at `look_target` and, like the real Player, a flashlight on that
+## camera (18 m, 28 degrees; switch it with set_flashlight()).
 func add_player(at: Vector3, look_target: Vector3) -> CharacterBody3D:
 	var player: CharacterBody3D = FakePlayer.new()
 	player.name = "Player"
@@ -78,6 +79,11 @@ func add_player(at: Vector3, look_target: Vector3) -> CharacterBody3D:
 	camera.fov = 95.0
 	camera.position.y = 1.6
 	player.add_child(camera)
+	var flashlight := SpotLight3D.new()
+	flashlight.name = "Flashlight"
+	flashlight.spot_range = 18.0
+	flashlight.spot_angle = 28.0
+	camera.add_child(flashlight)
 	add_child(player)
 	player.global_position = at
 	aim_player(player, look_target)
@@ -89,6 +95,23 @@ func aim_player(player: Node3D, look_target: Vector3) -> void:
 	var flat := Vector3(look_target.x, camera.global_position.y, look_target.z)
 	if flat.distance_to(camera.global_position) > 0.01:
 		camera.look_at(flat, Vector3.UP)
+
+
+func set_flashlight(player: Node3D, on: bool) -> void:
+	(player.get_node(^"Camera3D/Flashlight") as SpotLight3D).visible = on
+
+
+## A ceiling StoreLight at `at` (on, or a dead/switched-off fixture) reaching `reach` m.
+func add_store_light(at: Vector3, on := true, reach := 5.5) -> StoreLight:
+	var light := StoreLight.new()
+	light.starts_off = not on
+	var omni := OmniLight3D.new()
+	omni.name = "Light"
+	omni.omni_range = reach
+	light.add_child(omni)
+	add_child(light)
+	light.global_position = at
+	return light
 
 
 func add_monster(at: Vector3) -> Monster:

@@ -7,9 +7,11 @@ extends CharacterBody3D
 ##   2. Disguised, it turns once the player lingers within REVEAL_RANGE in line of
 ##      sight for REVEAL_TIME (it stops and stares first).
 ##   3. If the player has not seen it by SIGHTING_DEADLINE_HOUR, it stages a sighting.
+##      Seen means a human could make it out: within PERCEIVE_RANGE, in the middle of the
+##      view, lit (flashlight beam or a store light that is on), for PERCEIVE_TIME.
 ## Rule timers live in MonsterRules, sight checks in Perception. It never
-## teleports or changes form while the player can see it, except the deliberate
-## reveal and the staged sighting's appearance.
+## teleports or changes form while the player can see it (anywhere on screen within
+## SIGHT_RANGE), except the deliberate reveal and the staged sighting's appearance.
 
 # --- GDD rules (see docs/ARCHITECTURE.md "Monster rules") ---------------------
 const SPRINT_MAX_TIME := 13.0           ## rule 1: seconds of sprinting before it is winded
@@ -17,6 +19,12 @@ const WINDED_TIME := 6.0                ## rule 1: seconds slow and wheezing
 const REVEAL_RANGE := 7.0               ## rule 2: metres
 const REVEAL_TIME := 4.0                ## rule 2: seconds of lingering before it turns
 const SIGHTING_DEADLINE_HOUR := 2       ## rule 3: 2:00 AM
+## Rule 3 counts a sighting only when the player can really make it out ("it will be in your
+## LOS"): a fogged shape at 26 m, a frame at the edge of the screen or a figure in the dark is
+## not one. The fog is opaque at 26 m (tools/level/store_environment.gd); the flashlight reaches 18 m.
+const PERCEIVE_RANGE := 18.0            ## rule 3: metres from the player's eye
+const PERCEIVE_VIEW_FRACTION := 0.7     ## rule 3: inside the middle 70% of the view (both axes)
+const PERCEIVE_TIME := 0.75             ## rule 3: seconds of unbroken view
 
 # --- Hunting ------------------------------------------------------------------
 const ATTACK_RANGE := 1.7
@@ -54,11 +62,14 @@ const RETREAT_UNSEEN_TIME := 2.0
 const RETREAT_MIN_DISTANCE := 15.0
 const RETREAT_GIVE_UP := 25.0           ## then any out-of-view spot will do; still watched: turns on the player
 const SIGHTING_WALKOFF_MAX := 15.0      ## still watched this long after walking off: stops pretending
-const SIGHTING_DISTANCE := Vector2(12.0, 22.0)
-const SIGHTING_DISTANCE_RELAXED := Vector2(6.0, 28.0)  ## after a few failed attempts (small rooms)
-const SIGHTING_HOLD_TIME := 3.0         ## seconds in view before it walks off
+const SIGHTING_HIDDEN_WATCH_MAX := 10.0 ## watched from a hiding spot: slips out sideways at most this long
+const SIGHTING_DISTANCE := Vector2(8.0, 15.0)          ## staged in a lit spot this far ahead
+const SIGHTING_DISTANCE_RELAXED := Vector2(8.0, 17.0)  ## after a few failed attempts
+const SIGHTING_SPOT_TRIES := 32
+const FRUSTUM_EXIT_STEPS: Array[float] = [2.0, 4.0, 6.0, 9.0, 12.0, 16.0, 20.0, 25.0]
+const SIGHTING_HOLD_TIME := 3.0         ## seconds seen (PERCEIVE_* rules) before it walks off
 const SIGHTING_MAX_HOLD := 8.0
-const SIGHTING_CLOSE_DISTANCE := 8.0
+const SIGHTING_CLOSE_DISTANCE := 6.0
 const SIGHTING_TRUE_FORM_CHANCE := 0.6
 const SIGHTING_GAP := 3.0               ## out of view this long -> the next view is a new sighting
 const SIGHTING_RETRY_DELAY := 8.0
@@ -118,7 +129,9 @@ var _player_distance := INF
 var _player_hidden := false
 var _has_los := false                   ## line of sight to the player's eyes (hidden or not)
 var _sees_player := false               ## line of sight and not hidden
-var _in_view := false                   ## the player can see the monster
+var _in_view := false                   ## on the player's screen within SIGHT_RANGE (never teleports then)
+var _perceived := false                 ## rule 3: the player can make it out (close, central, lit)
+var _flashlight: SpotLight3D
 var _out_of_view_time := 0.0
 var _last_known := Vector3.ZERO
 var _unseen_time := 0.0
@@ -255,7 +268,7 @@ func investigate_zone(zone_id: StringName) -> bool:
 ## Mimicry: from out of view, appears far from the player wearing a coworker's
 ## face (preferring a missing one) and calls for help on the walkie.
 func try_mimic_lure() -> bool:
-	if not state in CALM_STATES or _in_view or _player == null:
+	if not state in CALM_STATES or _in_view or _player == null or _true_form_active:
 		return false
 	var spot: Variant = _find_lure_spot()
 	if spot == null:
@@ -272,7 +285,7 @@ func try_mimic_lure() -> bool:
 ## Takes a coworker the player cannot see who is far from the player. Only an
 ## unseen, roaming monster does it: it then stands in their place wearing their face.
 func try_abduction() -> bool:
-	if rules.abductions >= MAX_ABDUCTIONS or state != DISGUISED_ROAM or _in_view:
+	if rules.abductions >= MAX_ABDUCTIONS or state != DISGUISED_ROAM or _in_view or _true_form_active:
 		return false
 	var victims: Array[Coworker] = []
 	for node in get_tree().get_nodes_in_group(&"coworker"):
@@ -296,24 +309,26 @@ func try_abduction() -> bool:
 	return true
 
 
-## Rule 3: from out of view, appears 12-22 m ahead of the player inside their view.
+## Rule 3: from out of view, appears 8-15 m ahead of the player in the middle of their
+## view, preferring a lit spot (a store light that is on, or the flashlight's beam).
 func try_stage_sighting() -> bool:
 	if not state in CALM_STATES or _in_view or _player == null or _camera == null:
 		return false
 	rules.note_sighting_attempt()
-	var spot: Variant = _find_sighting_spot()
+	var true_form := rng.randf() < SIGHTING_TRUE_FORM_CHANCE
+	var spot: Variant = _find_sighting_spot(HEIGHT_TRUE if true_form else HEIGHT_DISGUISED)
 	if spot == null:
 		_sighting_failures += 1
 		return false
-	_begin_sighting(spot, rng.randf() < SIGHTING_TRUE_FORM_CHANCE)
+	_begin_sighting(spot, true_form)
 	return true
 
 
 ## Multi-line summary for the sandbox overlay.
 func get_debug_text() -> String:
-	return "MONSTER %s (%s)%s\nreveal %.1f/%.0f s  cooldown %.0f\nsprint %.1f/%.0f s  winded %.1f\nsighted %s (%d)  abductions %d  mimic in %.0f s" % [
+	return "MONSTER %s (%s)%s%s\nreveal %.1f/%.0f s  cooldown %.0f\nsprint %.1f/%.0f s  winded %.1f\nsighted %s (%d)  abductions %d  mimic in %.0f s" % [
 		String(state).to_upper(), "TRUE FORM" if _true_form_active else "as " + disguise_name,
-		"  [in view]" if _in_view else "",
+		"  [in view]" if _in_view else "", "  [seen]" if _perceived else "",
 		rules.reveal_progress, REVEAL_TIME, rules.reveal_cooldown_left,
 		rules.sprint_time, SPRINT_MAX_TIME, rules.winded_left,
 		rules.has_been_sighted, rules.sightings, rules.abductions, maxf(rules.next_mimic_in, 0.0),
@@ -334,10 +349,12 @@ func _sense(delta: float) -> void:
 		_has_los = false
 		_sees_player = false
 		_in_view = false
+		_perceived = false
 		_out_of_view_time += delta
 		return
 	if _camera == null or not is_instance_valid(_camera) or not _camera.is_inside_tree():
 		_camera = Perception.find_player_camera(_player)
+		_flashlight = Perception.find_flashlight(_player)
 	var my_eye := global_position + Vector3.UP * (_height() * 0.9)
 	var player_eye: Vector3 = _player.call(&"get_eye_position")
 	_player_distance = _flat_distance(global_position, _player.global_position)
@@ -349,13 +366,32 @@ func _sense(delta: float) -> void:
 		_last_known = _player.global_position
 		witnessed_spot = null   # they are out in the open: whatever it saw them hide in is stale
 	_in_view = _is_visible_at(global_position, _height())
+	_perceived = _in_view and _is_perceivable_at(global_position, _height())
 	_out_of_view_time = 0.0 if _in_view else _out_of_view_time + delta
 
 
+## Anywhere on the player's screen within SIGHT_RANGE, not behind a wall: it must not
+## teleport or change form here.
 func _is_visible_at(base: Vector3, height: float) -> bool:
 	if _camera == null:
 		return false
 	return Perception.is_any_point_visible(_camera, Perception.body_points(base, height), SIGHT_RANGE)
+
+
+## Rule 3: the player could make out a body standing at `base` -- a point of it within
+## PERCEIVE_RANGE, in the middle PERCEIVE_VIEW_FRACTION of the view, in line of sight and
+## (when `need_light`) lit by the flashlight's beam or a store light that is on.
+func _is_perceivable_at(base: Vector3, height: float, need_light := true) -> bool:
+	if _camera == null:
+		return false
+	if _flashlight != null and not is_instance_valid(_flashlight):
+		_flashlight = null
+	for point in Perception.body_points(base, height):
+		if Perception.is_point_in_view_center(_camera, point, PERCEIVE_VIEW_FRACTION) \
+				and Perception.is_point_visible_to_camera(_camera, point, PERCEIVE_RANGE) \
+				and (not need_light or Perception.is_point_lit(get_tree(), point, _flashlight)):
+			return true
+	return false
 
 
 func _hears_player() -> bool:
@@ -374,8 +410,8 @@ func _can_abduct_unseen(coworker: Coworker) -> bool:
 # --- Rules --------------------------------------------------------------------------
 
 func _tick_rules(delta: float) -> void:
-	# Rule 3 bookkeeping: count every new time the player lays eyes on it.
-	if rules.update_view(_in_view, delta):
+	# Rule 3 bookkeeping: count every new time the player properly sees it.
+	if rules.update_view(_perceived, delta):
 		Events.monster_sighted.emit()
 		GameState.add_stat("monster_sightings")
 	var hour := GameState.get_hour()
@@ -388,6 +424,12 @@ func _tick_rules(delta: float) -> void:
 		_begin_hunt()
 		return
 	if not state in CALM_STATES:
+		return
+	if _true_form_active:
+		# A sighting that ended still watched (from a hiding spot) left the true form roaming:
+		# the face goes back on once nobody can see it, and until then it does nothing sly.
+		if _out_of_view_time >= 1.0:
+			_set_form(false)
 		return
 	if _hears_player():
 		investigate(_player.global_position)
@@ -725,7 +767,10 @@ func _finish_retreat() -> void:
 
 # sighting (rule 3): holds in the player's view (phase 0), then walks out of it
 # (phase 1). Still watched after SIGHTING_WALKOFF_MAX: a disguise just carries on
-# as a coworker, the true form (which cannot vanish in view) turns on the player.
+# as a coworker, the true form (which cannot vanish in view) turns on a player it can
+# see. A player watching from a hiding spot cannot be charged: it slips out of their view
+# sideways (phase 2) and, after SIGHTING_HIDDEN_WATCH_MAX, ends the sighting anyway
+# without transforming in view (_tick_rules puts the face back on once it is unseen).
 func _begin_sighting(spot: Vector3, true_form: bool) -> void:
 	_set_form(true_form)
 	_teleport(spot)
@@ -742,7 +787,7 @@ func _tick_sighting(delta: float) -> void:
 	if _phase == 0:
 		if _player != null:
 			_face_point = _player.global_position
-		if _in_view:
+		if _perceived:
 			_seen_time += delta
 		var close := _player != null and _player_distance <= SIGHTING_CLOSE_DISTANCE
 		if _seen_time >= SIGHTING_HOLD_TIME or close or state_time >= SIGHTING_MAX_HOLD:
@@ -753,9 +798,7 @@ func _tick_sighting(delta: float) -> void:
 			_leave_view()
 		return
 	if _out_of_view_time >= 1.0:
-		if _true_form_active:
-			_set_form(false)
-		_set_state(DISGUISED_ROAM)
+		_end_sighting()
 		return
 	_phase_left -= delta
 	if _phase_left <= 0.0:
@@ -765,14 +808,36 @@ func _tick_sighting(delta: float) -> void:
 		if _sees_player:
 			_begin_hunt()
 			return
-		_phase_left = 1.0   # watched from a hiding spot: keep walking, check again
+		if _phase == 1:   # watched from a hiding spot: the shortest way out of their view
+			_phase = 2
+			_phase_left = SIGHTING_HIDDEN_WATCH_MAX
+			_leave_frustum()
+		else:
+			_set_state(DISGUISED_ROAM)   # still in its true form until nobody is looking
+			return
 	if not _moving:
-		_leave_view()
+		if _phase == 2:
+			_leave_frustum()
+		else:
+			_leave_view()
+
+
+## Out of view: the sighting is over and it can put the disguise back on.
+func _end_sighting() -> void:
+	if _true_form_active:
+		_set_form(false)
+	_set_state(DISGUISED_ROAM)
 
 
 func _leave_view() -> void:
 	var spot: Variant = _find_escape_point()
 	_go_to(spot if spot != null else _pick_far_point(), DISGUISED_SPEED)
+
+
+## Phase 2: hurries sideways across the player's line of sight to the nearest spot they cannot see.
+func _leave_frustum() -> void:
+	var spot: Variant = _find_frustum_exit()
+	_go_to(spot if spot != null else _pick_far_point(), RETREAT_SPEED)
 
 
 # --- State helpers ----------------------------------------------------------------
@@ -909,6 +974,25 @@ func _away_points() -> Array[Vector3]:
 	return away if not away.is_empty() else points
 
 
+## The nearest point sideways (across the player's line of sight, the side it is already
+## on first) where the player cannot see it. null if none within FRUSTUM_EXIT_STEPS.
+func _find_frustum_exit() -> Variant:
+	if _camera == null:
+		return null
+	var side := _camera.global_basis.x
+	side.y = 0.0
+	if side.length() < 0.01:
+		return null
+	side = side.normalized()
+	var first := 1.0 if side.dot(global_position - _camera.global_position) >= 0.0 else -1.0
+	for step: float in FRUSTUM_EXIT_STEPS:
+		for direction: float in [first, -first]:
+			var snapped := _snap_to_nav(global_position + side * direction * step)
+			if _flat_distance(snapped, global_position) > 1.0 and not _is_visible_at(snapped, _height()):
+				return snapped
+	return null
+
+
 func _find_lure_spot() -> Variant:
 	var from := _player.global_position
 	var points: Array[Vector3] = []
@@ -931,7 +1015,9 @@ func _find_lure_spot() -> Variant:
 	return null
 
 
-func _find_sighting_spot() -> Variant:
+## Rule 3: a spot SIGHTING_DISTANCE ahead in the middle of the player's view where a body of
+## `height` could be made out, lit if possible (a dark spot is used only when no lit one is found).
+func _find_sighting_spot(height := HEIGHT_DISGUISED) -> Variant:
 	var span := SIGHTING_DISTANCE if _sighting_failures < 3 else SIGHTING_DISTANCE_RELAXED
 	var forward := -_camera.global_basis.z
 	forward.y = 0.0
@@ -940,15 +1026,18 @@ func _find_sighting_spot() -> Variant:
 	forward = forward.normalized()
 	var half_angle := deg_to_rad(_camera.fov) * 0.5 * 0.75
 	var base := _player.global_position
-	for attempt in 24:
+	var dark_spot: Variant = null
+	for attempt in SIGHTING_SPOT_TRIES:
 		var direction := forward.rotated(Vector3.UP, rng.randf_range(-half_angle, half_angle))
 		var point := _snap_to_nav(base + direction * rng.randf_range(span.x, span.y))
 		var distance := _flat_distance(point, base)
-		if distance < span.x - 0.5 or distance > span.y + 0.5:
+		if distance < span.x or distance > span.y + 0.5:
 			continue
-		if Perception.is_point_visible_to_camera(_camera, point + Vector3.UP * 1.2, SIGHT_RANGE):
+		if _is_perceivable_at(point, height):
 			return point
-	return null
+		if dark_spot == null and _is_perceivable_at(point, height, false):
+			dark_spot = point
+	return dark_spot
 
 
 ## Patrol points plus the centre of every zone.

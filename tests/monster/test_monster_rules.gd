@@ -109,19 +109,45 @@ func test_no_reveal_during_cooldown() -> void:
 
 # --- Rule 3: appears to the player at least once by 2 AM ---------------------
 
+func test_rule3_perception_values() -> void:
+	assert_true(Monster.PERCEIVE_RANGE >= 16.0 and Monster.PERCEIVE_RANGE <= 18.0, "a sighting counts within ~16-18 m")
+	assert_true(Monster.PERCEIVE_RANGE < Monster.SIGHT_RANGE, "the monster itself still sees farther")
+	assert_near(Monster.PERCEIVE_VIEW_FRACTION, 0.7, 0.001, "central 70% of the view")
+	assert_near(Monster.PERCEIVE_TIME, 0.75, 0.001, "seen continuously for 0.75 s")
+	assert_eq(Monster.SIGHTING_DISTANCE, Vector2(8.0, 15.0), "staged 8-15 m away")
+	assert_true(Monster.SIGHTING_DISTANCE_RELAXED.x >= 8.0 and Monster.SIGHTING_DISTANCE_RELAXED.y <= 18.0, "relaxed cap ~18 m")
+	assert_true(Monster.SIGHTING_DISTANCE_RELAXED.y + 0.5 <= Monster.PERCEIVE_RANGE, "a relaxed spot can still be perceived")
+	assert_true(Monster.SIGHTING_CLOSE_DISTANCE < Monster.SIGHTING_DISTANCE.x - 0.5, "a staged spot is not already 'too close'")
+
+
+func test_a_short_look_is_not_a_sighting() -> void:
+	for i in 7:   # 0.7 s
+		assert_false(rules.update_view(true, 0.1), "not yet at %.1f s" % ((i + 1) * 0.1))
+	assert_false(rules.has_been_sighted)
+	rules.update_view(false, 0.1)
+	for i in 7:   # the clock starts over after a break
+		assert_false(rules.update_view(true, 0.1))
+	assert_false(rules.has_been_sighted, "two glances are not a sighting")
+
+
 func test_first_view_is_a_new_sighting() -> void:
 	assert_false(rules.has_been_sighted)
-	assert_true(rules.update_view(true, 0.1), "first time in view")
+	for i in 7:
+		rules.update_view(true, 0.1)
+	assert_true(rules.update_view(true, 0.1), "0.8 s of continuous view")
 	assert_true(rules.has_been_sighted)
+	assert_eq(rules.sightings, 1)
 	assert_false(rules.update_view(true, 0.1), "still the same sighting")
 
 
 func test_brief_glance_away_is_not_a_new_sighting() -> void:
-	rules.update_view(true, 0.1)
+	rules.update_view(true, 0.8)
 	rules.update_view(false, 1.0)
-	assert_false(rules.update_view(true, 0.1), "out of view only briefly")
+	assert_false(rules.update_view(true, 0.8), "out of view only briefly")
 	rules.update_view(false, Monster.SIGHTING_GAP + 0.1)
-	assert_true(rules.update_view(true, 0.1), "new sighting after a real gap")
+	assert_false(rules.update_view(true, 0.1), "a new sighting needs PERCEIVE_TIME again")
+	assert_true(rules.update_view(true, 0.7), "new sighting after a real gap")
+	assert_eq(rules.sightings, 2)
 
 
 func test_sighting_staged_at_deadline_when_unsighted() -> void:
@@ -132,7 +158,7 @@ func test_sighting_staged_at_deadline_when_unsighted() -> void:
 
 
 func test_no_staged_sighting_when_already_sighted() -> void:
-	rules.update_view(true, 0.1)
+	rules.update_view(true, Monster.PERCEIVE_TIME)
 	assert_false(rules.should_stage_sighting(2))
 	assert_false(rules.should_stage_sighting(5))
 

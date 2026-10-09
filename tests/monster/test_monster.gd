@@ -198,13 +198,16 @@ func test_sighting_staged_at_two_am_when_unsighted() -> void:
 	assert_eq(monster.state, Monster.SIGHTING, "staged at 2 AM")
 	var camera := Perception.find_player_camera(player)
 	var distance := Vector2(monster.global_position.x, monster.global_position.z).length()
-	assert_true(distance >= 11.5 and distance <= 22.5, "12-22 m from the player (got %.1f)" % distance)
-	assert_true(Perception.is_point_visible_to_camera(camera, monster.global_position + Vector3.UP * 1.2), "inside the view")
-	await _run(monster, STEP)
+	assert_true(distance >= 8.0 and distance <= 15.5, "8-15 m from the player (got %.1f)" % distance)
+	assert_true(Perception.is_point_in_view_center(camera, monster.global_position + Vector3.UP * 1.0, Monster.PERCEIVE_VIEW_FRACTION), "in the middle of the view")
+	assert_true(Perception.is_point_lit(tree, monster.global_position + Vector3.UP * 1.0, Perception.find_flashlight(player)), "lit (the flashlight is on)")
+	await _run(monster, Monster.PERCEIVE_TIME * 0.8)
+	assert_eq(events.count("sighted"), 0, "not counted at a glance")
+	await _run(monster, Monster.PERCEIVE_TIME * 0.4)
 	assert_eq(events.count("sighted"), 1, "monster_sighted emitted")
 	assert_eq(GameState.stats.get("monster_sightings", 0), 1)
 	# Holds ~3 s, then walks out of view (away from the player) and goes back to roaming.
-	await _run(monster, 3.2)
+	await _run(monster, 2.5)
 	assert_eq(monster._phase, 1, "leaving after the hold")
 	var flat := func(point: Vector3) -> float: return Vector2(point.x, point.z).length()
 	assert_true(flat.call(monster._target) > flat.call(monster.global_position), "walks away from the player")
@@ -212,11 +215,12 @@ func test_sighting_staged_at_two_am_when_unsighted() -> void:
 
 func test_no_staged_sighting_when_already_sighted() -> void:
 	world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
-	var monster := _spawn_monster(Vector3(0, 0, -10))   # in plain view
+	var monster := _spawn_monster(Vector3(0, 0, -10))   # in plain view, in the flashlight beam
 	world.bake_navigation()
 	await world.settle_navigation()
 	_set_hour(1)
-	await _run(monster, STEP)
+	monster.force_state(Monster.LURE)   # stands still
+	await _run(monster, 1.0)
 	assert_true(monster.rules.has_been_sighted, "seen naturally at 1 AM")
 	assert_eq(events.count("sighted"), 1)
 	monster.global_position = Vector3(0, 0, 25)   # out of view
@@ -230,13 +234,95 @@ func test_new_sighting_counted_after_a_real_gap() -> void:
 	var monster := _spawn_monster(Vector3(0, 0, -10))
 	await world.settle()
 	monster.force_state(Monster.LURE)
-	await _run(monster, STEP)
+	await _run(monster, 1.0)
 	monster.global_position = Vector3(0, 0, 25)
 	await _run(monster, Monster.SIGHTING_GAP + 0.5)
 	monster.global_position = Vector3(0, 0, -10)
-	await _run(monster, STEP)
+	await _run(monster, 1.0)
 	assert_eq(events.count("sighted"), 2)
 	assert_eq(GameState.stats.get("monster_sightings", 0), 2)
+
+
+# Rule 3 counts only what a player can actually make out: close (PERCEIVE_RANGE), near the
+# middle of the view, lit, for PERCEIVE_TIME without a break.
+
+## A still (LURE) monster at `at` in front of a player at the origin looking down -Z.
+func _watched_monster(at: Vector3, flashlight := true) -> Monster:
+	var player: FakePlayer = world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
+	world.set_flashlight(player, flashlight)
+	var monster := _spawn_monster(at)
+	await world.settle()
+	monster.force_state(Monster.LURE)
+	monster._face_now(Vector3.ZERO)
+	return monster
+
+
+func test_a_far_fogged_monster_is_not_a_sighting() -> void:
+	world.add_store_light(Vector3(0, 3.5, -26))
+	var monster: Monster = await _watched_monster(Vector3(0, 0, -26))   # in the fog, under a light
+	await _run(monster, 3.0)
+	assert_true(monster.is_in_player_view(), "on screen: it still never teleports there")
+	assert_eq(events.count("sighted"), 0, "26 m away in the fog is not a sighting")
+	assert_false(monster.rules.has_been_sighted)
+
+
+func test_a_monster_at_the_edge_of_the_view_is_not_a_sighting() -> void:
+	var at := Vector3(10.0 * tan(deg_to_rad(43.0)), 0, -10)   # inside the frustum, outside its middle 70%
+	world.add_store_light(at + Vector3.UP * 3.5)
+	var monster: Monster = await _watched_monster(at)
+	await _run(monster, 3.0)
+	assert_true(monster.is_in_player_view(), "on screen")
+	assert_eq(events.count("sighted"), 0, "a shape at the edge of the screen is not a sighting")
+
+
+func test_a_monster_in_the_dark_is_not_a_sighting() -> void:
+	world.add_store_light(Vector3(0, 3.5, -10), false)   # a dead fixture above it
+	var monster: Monster = await _watched_monster(Vector3(0, 0, -10), false)
+	await _run(monster, 3.0)
+	assert_true(monster.is_in_player_view(), "on screen")
+	assert_eq(events.count("sighted"), 0, "unlit, flashlight off: not a sighting")
+	world.set_flashlight(world.get_node(^"Player"), true)
+	await _run(monster, Monster.PERCEIVE_TIME + 0.05)
+	assert_eq(events.count("sighted"), 1, "the flashlight finds it")
+
+
+func test_a_lit_central_monster_counts_after_three_quarters_of_a_second() -> void:
+	world.add_store_light(Vector3(1, 3.5, -12))
+	var monster: Monster = await _watched_monster(Vector3(1, 0, -12), false)   # store light only
+	await _run(monster, Monster.PERCEIVE_TIME - 0.1)
+	assert_eq(events.count("sighted"), 0, "not yet")
+	await _run(monster, 0.15)
+	assert_eq(events.count("sighted"), 1, "seen")
+	assert_true(monster.rules.has_been_sighted)
+	assert_eq(GameState.stats.get("monster_sightings", 0), 1)
+
+
+func test_staged_sightings_land_in_a_lit_spot_eight_to_eighteen_metres_away() -> void:
+	var player: FakePlayer = world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
+	world.set_flashlight(player, false)
+	var lit: StoreLight = world.add_store_light(Vector3(3, 3.5, -12))
+	world.add_store_light(Vector3(-5, 3.5, -10), false)
+	var monster := _spawn_monster(Vector3(0, 0, 25))   # behind the player
+	world.bake_navigation()
+	await world.settle_navigation()
+	await _run(monster, STEP)
+	for attempt in 8:
+		monster.rng.seed = 100 + attempt
+		var spot: Variant = monster._find_sighting_spot(Monster.HEIGHT_DISGUISED)
+		assert_true(spot != null, "found a spot (attempt %d)" % attempt)
+		if spot == null:
+			continue
+		var distance := Vector2((spot as Vector3).x, (spot as Vector3).z).length()
+		assert_true(distance >= 8.0 and distance <= 18.0, "8-18 m away (got %.1f)" % distance)
+		var lit_body := false
+		for point in Perception.body_points(spot, Monster.HEIGHT_DISGUISED):
+			lit_body = lit_body or lit.lights_point(point)
+		assert_true(lit_body, "under the lit fixture, not in the dark (%s)" % spot)
+	_set_hour(2)
+	await _run(monster, STEP)
+	assert_eq(monster.state, Monster.SIGHTING, "staged at 2 AM")
+	await _run(monster, Monster.PERCEIVE_TIME + 0.05)
+	assert_eq(events.count("sighted"), 1, "and the player saw it")
 
 
 ## A staged sighting `distance` m ahead of a player at the origin looking down -Z.
@@ -272,6 +358,46 @@ func test_watched_disguised_sighting_walk_off_carries_on_as_a_coworker() -> void
 	assert_near(ticks * STEP, cap, 0.1)
 	assert_eq(monster.state, Monster.DISGUISED_ROAM, "just another coworker walking around")
 	assert_eq(events.count("chase_started"), 0)
+
+
+## A hidden player watching through the slats can neither be charged (it cannot see them)
+## nor keep the true form hanging around forever: it slips out sideways, and if it cannot,
+## it ends the sighting anyway -- still in its true form until nobody is looking.
+func test_hidden_watcher_cannot_stall_a_true_form_sighting() -> void:
+	var monster: Monster = await _staged_sighting(14.0, true)
+	var player: FakePlayer = world.get_node(^"Player")
+	player.is_hidden = true
+	var pin := func() -> void: monster.global_position = Vector3(0, 0, -14)   # cannot get out of view
+	var cap := Monster.SIGHTING_MAX_HOLD + Monster.SIGHTING_WALKOFF_MAX + Monster.SIGHTING_HIDDEN_WATCH_MAX
+	var ticks: int = await _ticks_until_leaving(monster, Monster.SIGHTING, roundi((cap + 2.0) / STEP), pin)
+	assert_true(ticks > 0 and ticks * STEP <= cap + 0.1, "the sighting ends within %.0f s (took %.1f s)" % [cap, ticks * STEP])
+	assert_eq(monster.state, Monster.DISGUISED_ROAM)
+	assert_true(monster.is_true_form(), "never transforms while watched")
+	assert_eq(events.count("chase_started"), 0, "it never saw the player")
+	ticks = await _ticks_until_leaving(monster, Monster.DISGUISED_ROAM, roundi(2.0 / STEP), pin)
+	assert_eq(ticks, -1, "roams on (no lure, no abduction, no new sighting)")
+	assert_true(monster.is_true_form(), "still watched: still the true form")
+	monster.global_position = Vector3(0, 0, 25)   # out of view behind the player
+	await _run(monster, 1.2)
+	assert_false(monster.is_true_form(), "puts a face back on once nobody is looking")
+
+
+func test_hidden_watcher_sighting_slips_out_of_view_sideways() -> void:
+	var monster: Monster = await _staged_sighting(14.0, true)
+	var player: FakePlayer = world.get_node(^"Player")
+	player.is_hidden = true
+	world.bake_navigation()
+	await world.settle_navigation()
+	# Held in view through the hold and the normal walk-off; then it is on its own.
+	var cap := Monster.SIGHTING_MAX_HOLD + Monster.SIGHTING_WALKOFF_MAX + Monster.SIGHTING_HIDDEN_WATCH_MAX
+	var stay := func() -> void:
+		if monster._phase <= 1:
+			monster.global_position = Vector3(0, 0, -14)
+	var ticks: int = await _ticks_until_leaving(monster, Monster.SIGHTING, roundi((cap + 2.0) / STEP), stay)
+	assert_true(ticks > 0 and ticks * STEP < cap, "left the view before the cap (%.1f s)" % (ticks * STEP))
+	assert_eq(monster.state, Monster.DISGUISED_ROAM)
+	assert_false(monster.is_true_form(), "out of view, so the face went back on")
+	assert_false(monster.is_in_player_view())
 
 
 func test_rule2_during_a_disguised_sighting_reveals() -> void:

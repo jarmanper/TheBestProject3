@@ -102,3 +102,20 @@ func test_drives_only_the_emissive_tube_surface_of_a_two_surface_fixture() -> vo
 		assert_near(own.emission_energy_multiplier, 1.5, 0.001, "dimming scales the tube's emission")
 	assert_near(tube.emission_energy_multiplier, 3.0, 0.001, "the shared material is untouched")
 	light.free()
+
+
+func test_lights_point_within_range_only_while_on() -> void:
+	(_light.get_node("Light") as OmniLight3D).omni_range = 5.0
+	_light.global_position = Vector3(0, 3.5, 0)
+	assert_true(_light.lights_point(Vector3(0, 1.0, 0)), "right under it")
+	assert_true(_light.lights_point(Vector3(4.0, 1.0, 0)), "inside the range")
+	assert_false(_light.lights_point(Vector3(6.0, 1.0, 0)), "beyond the range")
+	var dead := StoreLight.new()
+	dead.starts_off = true
+	var omni := OmniLight3D.new()
+	omni.name = "Light"
+	omni.omni_range = 5.0
+	dead.add_child(omni)
+	tree.root.add_child(dead)
+	assert_false(dead.lights_point(dead.global_position + Vector3.DOWN), "a dead or switched-off fixture lights nothing")
+	dead.free()
