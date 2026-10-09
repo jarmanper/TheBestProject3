@@ -67,7 +67,16 @@ jobs:
           chmod +x "$GODOT_BIN"
           echo "GODOT=$GODOT_BIN" >> "$GITHUB_ENV"
 
-      - name: Import project and export Web build
+      - name: Import project
+        run: '"$GODOT" --headless --path . --import'
+
+      # The runner exits 1 when any test fails (or logs an engine error), which fails the job
+      # before anything is exported or deployed.
+      - name: Run tests
+        timeout-minutes: 20
+        run: '"$GODOT" --headless --path . -s res://tests/run_tests.gd'
+
+      - name: Export Web build
         run: tools/build_web.sh
 
       - name: Add .nojekyll
