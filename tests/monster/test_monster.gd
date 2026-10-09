@@ -3,6 +3,7 @@ extends TestCase
 ## is off and the tests call tick() with fixed 60 Hz steps (deterministic).
 
 const AiTestWorld := preload("res://tests/monster/ai_test_world.gd")
+const FakePlayer := preload("res://tests/monster/fake_player.gd")
 const TaskSource := preload("res://systems/monster/sandbox/sandbox_task_source.gd")
 const STEP := 1.0 / 60.0
 
@@ -122,7 +123,7 @@ func test_reveals_after_four_seconds_in_range_with_los() -> void:
 
 
 func test_no_reveal_when_player_hidden() -> void:
-	var player: Player = world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
+	var player: FakePlayer = world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
 	var monster := _spawn_monster(Vector3(0, 0, -4))
 	await world.settle()
 	monster.force_state(Monster.LURE)
@@ -154,7 +155,7 @@ func test_no_reveal_out_of_range() -> void:
 # --- Rule 1: sprint and winded ---------------------------------------------------------
 
 func test_winded_after_thirteen_seconds_of_chase_then_chases_again() -> void:
-	var player: Player = world.add_player(Vector3(0, 0, -10), Vector3(0, 0, -20))
+	var player: FakePlayer = world.add_player(Vector3(0, 0, -10), Vector3(0, 0, -20))
 	var monster := _spawn_monster(Vector3.ZERO)
 	await world.settle()
 	monster.force_state(Monster.CHASE)
@@ -170,7 +171,7 @@ func test_winded_after_thirteen_seconds_of_chase_then_chases_again() -> void:
 
 
 func test_winded_searches_when_player_out_of_sight() -> void:
-	var player: Player = world.add_player(Vector3(0, 0, -10), Vector3(0, 0, -20))
+	var player: FakePlayer = world.add_player(Vector3(0, 0, -10), Vector3(0, 0, -20))
 	var monster := _spawn_monster(Vector3.ZERO)
 	await world.settle()
 	monster.force_state(Monster.WINDED)
@@ -182,7 +183,7 @@ func test_winded_searches_when_player_out_of_sight() -> void:
 # --- Rule 3: staged sighting ----------------------------------------------------------
 
 func test_sighting_staged_at_two_am_when_unsighted() -> void:
-	var player: Player = world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
+	var player: FakePlayer = world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
 	var monster := _spawn_monster(Vector3(0, 0, 25))   # behind the player
 	for at in [Vector3(0, 0, -28), Vector3(15, 0, -15), Vector3(-15, 0, -15), Vector3(0, 0, 20)]:
 		world.add_marker(&"patrol_point", at)
@@ -264,7 +265,7 @@ func test_intercom_ignored_while_chasing() -> void:
 
 
 func test_hears_sprinting_player_within_radius() -> void:
-	var player: Player = world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
+	var player: FakePlayer = world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
 	var monster := _spawn_monster(Vector3(0, 0, 12))
 	world.add_box(Vector3(0.0, 1.5, 6.0), Vector3(8.0, 3.0, 0.3))   # hearing goes through walls
 	await world.settle()
@@ -278,7 +279,7 @@ func test_hears_sprinting_player_within_radius() -> void:
 
 
 func test_does_not_hear_beyond_radius() -> void:
-	var player: Player = world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
+	var player: FakePlayer = world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
 	var monster := _spawn_monster(Vector3(0, 0, 20))
 	await world.settle()
 	player.noise = 1.0
@@ -300,7 +301,7 @@ func _add_spot(at: Vector3, exit: Vector3) -> HidingSpot:
 
 
 func test_witnessed_hiding_spot_is_searched_and_occupant_pulled_out() -> void:
-	var player: Player = world.add_player(Vector3(0, 0, -1), Vector3(0, 0, -10))
+	var player: FakePlayer = world.add_player(Vector3(0, 0, -1), Vector3(0, 0, -10))
 	var spot := _add_spot(Vector3(0, 0, -1.5), Vector3(0, 0, -0.5))
 	var monster := _spawn_monster(Vector3(0, 0, 0.3))
 	await world.settle()
@@ -316,7 +317,7 @@ func test_witnessed_hiding_spot_is_searched_and_occupant_pulled_out() -> void:
 
 
 func test_unwitnessed_hiding_is_not_known() -> void:
-	var player: Player = world.add_player(Vector3(0, 0, -1), Vector3(0, 0, -10))
+	var player: FakePlayer = world.add_player(Vector3(0, 0, -1), Vector3(0, 0, -10))
 	world.add_box(Vector3(0.0, 1.5, 4.0), Vector3(10.0, 3.0, 0.3))
 	var spot := _add_spot(Vector3(0, 0, -1.5), Vector3(0, 0, -0.5))
 	var monster := _spawn_monster(Vector3(0, 0, 8))
@@ -330,7 +331,7 @@ func test_unwitnessed_hiding_is_not_known() -> void:
 # --- Attack and retreat ------------------------------------------------------------------------
 
 func test_attack_damages_player_in_range_then_retreats() -> void:
-	var player: Player = world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
+	var player: FakePlayer = world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
 	var monster := _spawn_monster(Vector3(0, 0, -1.2))
 	await world.settle()
 	monster.force_state(Monster.CHASE)
@@ -340,6 +341,19 @@ func test_attack_damages_player_in_range_then_retreats() -> void:
 	assert_near(player.health, 100.0 - Monster.ATTACK_DAMAGE, 0.01)
 	await _run(monster, Monster.ATTACK_RECOVER)
 	assert_eq(monster.state, Monster.RETREAT)
+
+
+func test_ignores_a_dead_player() -> void:
+	var player: FakePlayer = world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
+	var monster := _spawn_monster(Vector3(0, 0, -1.2))
+	await world.settle()
+	player.health = 0.0
+	monster.force_state(Monster.CHASE)
+	await _run(monster, 3.0)
+	assert_false(Monster.ATTACK in states, "no attacks on a dead player")
+	monster.force_state(Monster.LURE)
+	await _run(monster, 5.0)
+	assert_eq(states.count(Monster.REVEAL), 0, "no reveal at a dead player")
 
 
 func test_retreat_redisguises_out_of_view_and_ends_chase() -> void:

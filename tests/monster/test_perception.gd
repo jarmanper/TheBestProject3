@@ -2,6 +2,7 @@ extends TestCase
 ## Line of sight and camera visibility against real physics.
 
 const AiTestWorld := preload("res://tests/monster/ai_test_world.gd")
+const FakePlayer := preload("res://tests/monster/fake_player.gd")
 
 var world: Node3D
 
@@ -33,7 +34,7 @@ func test_only_world_layer_blocks_sight() -> void:
 
 
 func test_point_visible_in_front_of_camera() -> void:
-	var player: Player = world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
+	var player: FakePlayer = world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
 	await world.settle()
 	var camera := Perception.find_player_camera(player)
 	assert_true(camera != null, "camera found")
@@ -46,7 +47,7 @@ func test_point_visible_in_front_of_camera() -> void:
 
 
 func test_wall_hides_point_from_camera() -> void:
-	var player: Player = world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
+	var player: FakePlayer = world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
 	world.add_box(Vector3(0.0, 1.5, -5.0), Vector3(6.0, 3.0, 0.3))
 	await world.settle()
 	var camera := Perception.find_player_camera(player)
@@ -62,9 +63,9 @@ func test_body_points_cover_feet_to_head() -> void:
 	assert_near(points[2].y, 1.8)
 
 
-func test_finds_camera_on_plain_player_stub() -> void:
-	var player := Player.new()
+func test_finds_camera_when_get_camera_returns_null() -> void:
+	var player := Player.new()   # the foundation stub returns null from get_camera()
 	var camera := Camera3D.new()
 	player.add_child(camera)
-	world.add_child(player)
-	assert_eq(Perception.find_player_camera(player), camera)
+	assert_eq(Perception.find_player_camera(player), camera, "falls back to the Camera3D child")
+	player.free()

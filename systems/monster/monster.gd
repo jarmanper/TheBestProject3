@@ -72,6 +72,7 @@ const TWITCH_INTERVAL := Vector2(1.5, 4.5)
 const WHEEZE_INTERVAL := 3.0
 const LIGHT_PULSE_INTERVAL := 0.25
 const TASK_SPOT_AVOID := 3.0            ## it "works" at least this far from real tasks
+const HUNT_BIAS := 0.35                 ## share of roam stops picked near the player
 const TURN_SPEED := 8.0
 const ARRIVE_DISTANCE := 0.6
 const GRAVITY := 9.8
@@ -104,8 +105,10 @@ var missing_names: Array[String] = []   ## coworkers it has taken
 var investigate_target := Vector3.ZERO
 var witnessed_spot: Node3D              ## hiding spot it watched the player enter
 
-# Perception, refreshed every tick by _sense().
-var _player: Player
+# Perception, refreshed every tick by _sense(). The player is reached through the
+# contract API by name (docs/ARCHITECTURE.md §6), so the real Player, the stub
+# and test doubles all work.
+var _player: Node3D
 var _camera: Camera3D
 var _player_distance := INF
 var _player_hidden := false
@@ -314,9 +317,9 @@ func get_debug_text() -> String:
 
 func _sense(delta: float) -> void:
 	_nav_ok = AiNav.is_ready(_agent.get_navigation_map(), global_position)
-	_player = GameState.player as Player if is_instance_valid(GameState.player) else null
-	if _player != null and not _player.is_inside_tree():
-		_player = null
+	_player = GameState.player if is_instance_valid(GameState.player) else null
+	if _player != null and (not _player.is_inside_tree() or float(_player.get(&"health")) <= 0.0):
+		_player = null   # gone, or dead: nothing left to hunt
 	if _player == null:
 		_camera = null
 		_player_distance = INF
@@ -328,9 +331,9 @@ func _sense(delta: float) -> void:
 	if _camera == null or not is_instance_valid(_camera) or not _camera.is_inside_tree():
 		_camera = Perception.find_player_camera(_player)
 	var my_eye := global_position + Vector3.UP * (_height() * 0.9)
-	var player_eye := _player.get_eye_position()
+	var player_eye: Vector3 = _player.call(&"get_eye_position")
 	_player_distance = _flat_distance(global_position, _player.global_position)
-	_player_hidden = _player.is_hidden
+	_player_hidden = _player.get(&"is_hidden")
 	_has_los = my_eye.distance_to(player_eye) <= SIGHT_RANGE \
 		and Perception.has_line_of_sight(get_world_3d().direct_space_state, my_eye, player_eye)
 	_sees_player = _has_los and not _player_hidden
@@ -348,7 +351,7 @@ func _is_visible_at(base: Vector3, height: float) -> bool:
 
 func _hears_player() -> bool:
 	return _player != null and not _player_hidden and _player_distance <= HEARING_RADIUS \
-		and _player.get_noise_level() >= 1.0
+		and float(_player.call(&"get_noise_level")) >= 1.0
 
 
 func _can_abduct_unseen(coworker: Coworker) -> bool:
@@ -633,11 +636,11 @@ func _tick_attack(_delta: float) -> void:
 
 
 func _resolve_attack() -> void:
-	if _player == null or _player.is_hidden or _player.health <= 0.0:
+	if _player == null or _player.get(&"is_hidden") or float(_player.get(&"health")) <= 0.0:
 		return
 	var distance := _flat_distance(global_position, _player.global_position)
 	if distance <= ATTACK_RANGE and _has_los:
-		_player.take_damage(ATTACK_DAMAGE, global_position)
+		_player.call(&"take_damage", ATTACK_DAMAGE, global_position)
 		Sfx.play_at(&"monster_attack_hit", _player.global_position + Vector3.UP, 0.0, 1.0, 20.0)
 		_attack_hit = true
 
@@ -727,16 +730,20 @@ func _look_around(delta: float) -> void:
 
 
 func _pull_player_out(spot: Node3D) -> bool:
-	if _player == null or not _player.is_hidden or _player.current_hiding_spot != spot:
+	if not _player_hides_in(spot):
 		return false
 	_face_now(spot.global_position)
 	if spot.has_method(&"pull_out_occupant"):
 		spot.pull_out_occupant()
-	if _player.is_hidden and _player.current_hiding_spot == spot:
-		_player.exit_hiding()   # a hiding spot that cannot eject (stub) still loses its occupant
+	if _player_hides_in(spot):
+		_player.call(&"exit_hiding")   # a hiding spot that cannot eject (stub) still loses its occupant
 	witnessed_spot = null
 	_set_state(ATTACK)
 	return true
+
+
+func _player_hides_in(spot: Node3D) -> bool:
+	return _player != null and _player.get(&"is_hidden") and _player.get(&"current_hiding_spot") == spot
 
 
 func _ensure_hunting_form() -> void:
@@ -765,12 +772,12 @@ func _pick_roam_point() -> Vector3:
 	for attempt in 8:
 		var point := global_position + _random_flat_dir() * rng.randf_range(4.0, 10.0)
 		var roll := rng.randf()
-		if _player != null and roll < 0.35:
+		if _player != null and roll < HUNT_BIAS:
 			# It hunts: drift toward wherever the player is working.
 			var zone := StoreZone.find_zone(get_tree(), StoreZone.find_zone_id_at(get_tree(), _player.global_position))
 			point = AiNav.random_point_in_zone(zone, rng) if zone != null \
 				else _player.global_position + _random_flat_dir() * rng.randf_range(5.0, 10.0)
-		elif not patrol.is_empty() and roll < 0.7:
+		elif not patrol.is_empty() and roll < HUNT_BIAS + (1.0 - HUNT_BIAS) * 0.5:
 			point = (patrol[rng.randi() % patrol.size()] as Node3D).global_position
 		elif not zones.is_empty():
 			point = AiNav.random_point_in_zone(zones[rng.randi() % zones.size()], rng)

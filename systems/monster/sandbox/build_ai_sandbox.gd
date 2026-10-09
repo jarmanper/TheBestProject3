@@ -2,7 +2,8 @@ extends SceneTree
 ## Generates systems/monster/sandbox/ai_sandbox.tscn: walls, shelves and counters
 ## (StaticBody3D, world layer) under a NavigationRegion3D whose navmesh is baked
 ## from the static colliders, StoreZones, spawn/patrol markers, stub TaskStations,
-## a HidingSpot, flickering sandbox lights, the Player stub, 3 coworkers, the monster.
+## a HidingSpot, flickering sandbox lights, 3 coworkers and the monster (the player
+## is spawned at runtime by ai_sandbox.gd).
 ##   godot --headless --path . -s res://systems/monster/sandbox/build_ai_sandbox.gd
 ## Layout (x -16..16, z -13..13, +Z = front): sales floor with three shelf rows
 ## (aisles 1-2), checkout at the front, produce to the right, a dairy strip, and a
@@ -267,26 +268,8 @@ func _station(station_name: String, at: Vector3, kind: StringName, zone: StringN
 
 
 func _build_actors() -> void:
-	var player := CharacterBody3D.new()
-	player.set_script(load("res://systems/monster/sandbox/sandbox_player.gd"))
-	player.name = "Player"
-	player.position = Vector3(0, 0, 8)
-	_add(scene, player)
-	var shape := CollisionShape3D.new()
-	shape.name = "CollisionShape3D"
-	var capsule := CapsuleShape3D.new()
-	capsule.radius = 0.35
-	capsule.height = 1.8
-	shape.shape = capsule
-	shape.position.y = 0.9
-	_add(player, shape)
-	var camera := Camera3D.new()
-	camera.name = "Camera3D"
-	camera.fov = 95.0
-	camera.current = true
-	camera.position.y = 1.6
-	_add(player, camera)
-
+	# The player is spawned at PlayerSpawn by ai_sandbox.gd at runtime (the real
+	# Player scene once it exists, else the foundation stub with sandbox controls).
 	var coworker_scene := load(Catalog.SCENES[&"coworker"]) as PackedScene
 	var spawns := [Vector3(4, 0, -8), Vector3(11, 0, -7), Vector3(-2, 0, 4)]
 	for i in Catalog.COWORKERS.size():

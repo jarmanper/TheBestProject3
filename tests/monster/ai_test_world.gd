@@ -61,10 +61,10 @@ func add_marker(group: StringName, at: Vector3) -> Marker3D:
 	return marker
 
 
-## The foundation Player stub (with a controllable noise level) plus a Camera3D
-## at eye height looking at `look_target`.
-func add_player(at: Vector3, look_target: Vector3) -> Player:
-	var player: Player = FakePlayer.new()
+## A player double (Player contract API, settable noise) with a Camera3D at eye
+## height looking at `look_target`.
+func add_player(at: Vector3, look_target: Vector3) -> CharacterBody3D:
+	var player: CharacterBody3D = FakePlayer.new()
 	player.name = "Player"
 	var shape := CollisionShape3D.new()
 	var capsule := CapsuleShape3D.new()
@@ -84,7 +84,7 @@ func add_player(at: Vector3, look_target: Vector3) -> Player:
 	return player
 
 
-func aim_player(player: Player, look_target: Vector3) -> void:
+func aim_player(player: Node3D, look_target: Vector3) -> void:
 	var camera := player.get_node(^"Camera3D") as Camera3D
 	var flat := Vector3(look_target.x, camera.global_position.y, look_target.z)
 	if flat.distance_to(camera.global_position) > 0.01:

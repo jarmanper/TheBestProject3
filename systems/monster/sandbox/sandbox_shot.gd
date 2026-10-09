@@ -28,7 +28,7 @@ func _run() -> void:
 	for i in 5:
 		await physics_frame
 	var player := sandbox.get_node(^"Player") as Node3D
-	var camera := player.get_node(^"Camera3D") as Camera3D
+	var camera := player.find_children("*", "Camera3D", true, false)[0] as Camera3D
 	# Untyped on purpose: Monster/Coworker scripts use autoloads, which a -s script
 	# cannot reference at compile time.
 	var monster := sandbox.get_node(^"Monster") as Node3D
