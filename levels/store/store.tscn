@@ -1,0 +1,2174 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://levels/store/store.gd" id="1_u5u8c"]
+[ext_resource type="NavigationMesh" path="res://levels/store/store_navmesh.res" id="2_le6hp"]
+[ext_resource type="PackedScene" path="res://assets/models/environment/store_interior.glb" id="3_ky6b0"]
+[ext_resource type="PackedScene" path="res://assets/models/props/time_clock.glb" id="4_kwlki"]
+[ext_resource type="PackedScene" path="res://assets/models/props/break_table.glb" id="5_btbsq"]
+[ext_resource type="PackedScene" path="res://assets/models/props/chair.glb" id="6_1agnc"]
+[ext_resource type="PackedScene" path="res://assets/models/props/walkie_talkie.glb" id="7_oobse"]
+[ext_resource type="PackedScene" path="res://assets/models/props/vending_machine.glb" id="8_jfynn"]
+[ext_resource type="PackedScene" path="res://assets/models/props/trash_bin.glb" id="9_rntpi"]
+[ext_resource type="PackedScene" path="res://assets/models/props/manager_desk.glb" id="10_5l7s0"]
+[ext_resource type="PackedScene" path="res://assets/models/props/crt_monitor.glb" id="11_q7mum"]
+[ext_resource type="PackedScene" path="res://assets/models/props/intercom_mic.glb" id="12_6f27x"]
+[ext_resource type="PackedScene" path="res://assets/models/props/office_chair.glb" id="13_k5ja7"]
+[ext_resource type="PackedScene" path="res://assets/models/props/cardboard_box_a.glb" id="14_q1knb"]
+[ext_resource type="PackedScene" path="res://assets/models/props/cardboard_box_c.glb" id="15_i8hg0"]
+[ext_resource type="PackedScene" path="res://assets/models/props/sink.glb" id="16_78syq"]
+[ext_resource type="PackedScene" path="res://assets/models/props/mop_bucket.glb" id="17_dmxms"]
+[ext_resource type="PackedScene" path="res://assets/models/props/trash_bag.glb" id="18_fgga1"]
+[ext_resource type="PackedScene" path="res://assets/models/props/wet_floor_sign.glb" id="19_0otd2"]
+[ext_resource type="PackedScene" path="res://assets/models/props/breaker_panel.glb" id="20_miiun"]
+[ext_resource type="PackedScene" path="res://assets/models/props/baler.glb" id="21_maekc"]
+[ext_resource type="PackedScene" path="res://assets/models/props/shopping_cart.glb" id="22_pjptg"]
+[ext_resource type="PackedScene" path="res://assets/models/props/flattened_boxes.glb" id="23_jkx1u"]
+[ext_resource type="PackedScene" path="res://assets/models/props/cardboard_box_b.glb" id="24_i53od"]
+[ext_resource type="PackedScene" path="res://assets/models/props/newspaper_debris.glb" id="25_63uyr"]
+[ext_resource type="PackedScene" path="res://assets/models/props/pallet_boxes.glb" id="26_iywig"]
+[ext_resource type="PackedScene" path="res://systems/environment/tools/pickup_mop.tscn" id="27_5elds"]
+[ext_resource type="Script" path="res://systems/environment/tool_pickup.gd" id="28_gc510"]
+[ext_resource type="PackedScene" path="res://systems/environment/tools/pickup_price_gun.tscn" id="29_e6scn"]
+[ext_resource type="PackedScene" path="res://systems/environment/tools/pickup_box_cutter.tscn" id="30_cpr7f"]
+[ext_resource type="PackedScene" path="res://systems/environment/tools/pickup_stock_box.tscn" id="31_ysvom"]
+[ext_resource type="PackedScene" path="res://systems/environment/tools/pickup_keys.tscn" id="32_bueu1"]
+[ext_resource type="PackedScene" path="res://systems/environment/hiding/hide_locker.tscn" id="33_xqw2v"]
+[ext_resource type="Script" path="res://systems/environment/hiding_spot.gd" id="34_lo573"]
+[ext_resource type="PackedScene" path="res://systems/environment/hiding/hide_boxes.tscn" id="35_rnqhq"]
+[ext_resource type="PackedScene" path="res://systems/environment/hiding/hide_counter.tscn" id="36_nabra"]
+[ext_resource type="PackedScene" path="res://systems/environment/stations/station_spill.tscn" id="37_eyt32"]
+[ext_resource type="Script" path="res://systems/environment/task_station.gd" id="38_51jo5"]
+[ext_resource type="PackedScene" path="res://systems/environment/stations/station_restock.tscn" id="39_7fxnh"]
+[ext_resource type="PackedScene" path="res://systems/environment/stations/station_face_shelf.tscn" id="40_td5df"]
+[ext_resource type="PackedScene" path="res://systems/environment/stations/station_register.tscn" id="41_2wywd"]
+[ext_resource type="PackedScene" path="res://systems/environment/stations/station_price.tscn" id="42_foxcb"]
+[ext_resource type="PackedScene" path="res://systems/environment/stations/station_freezer_log.tscn" id="43_k20a3"]
+[ext_resource type="PackedScene" path="res://systems/environment/stations/station_boxes.tscn" id="44_ljhi0"]
+[ext_resource type="PackedScene" path="res://systems/environment/stations/station_trash.tscn" id="45_s2pyp"]
+[ext_resource type="PackedScene" path="res://systems/environment/stations/station_breaker.tscn" id="46_rmsme"]
+[ext_resource type="PackedScene" path="res://systems/environment/stations/station_safe.tscn" id="47_gcw8u"]
+[ext_resource type="Script" path="res://systems/environment/store_zone.gd" id="48_2vgj8"]
+[ext_resource type="Script" path="res://systems/environment/store_light.gd" id="49_bwngl"]
+[ext_resource type="Script" path="res://levels/store/ambient_emitter.gd" id="50_4858n"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_x0opm"]
+size = Vector3(1.1800001, 0.85, 0.78000003)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1oiam"]
+size = Vector3(0.39999998, 0.8494759, 0.46438935)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_8pnut"]
+size = Vector3(0.39999998, 0.8494759, 0.46438935)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_obw8n"]
+size = Vector3(0.39999998, 0.8494759, 0.46438935)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1x5mi"]
+size = Vector3(0.39999998, 0.8494759, 0.46438935)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_in776"]
+size = Vector3(0.88, 1.85, 0.81000006)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_enf1o"]
+size = Vector3(0.42900544, 0.74, 0.42900544)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_baeg8"]
+size = Vector3(1.48, 0.76051, 0.73)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tgh0s"]
+size = Vector3(0.59566724, 1.0576133, 0.6210734)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_m3lxq"]
+size = Vector3(0.42900544, 0.74, 0.42900544)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pxoux"]
+size = Vector3(0.48, 0.34, 0.35999998)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qfolf"]
+size = Vector3(0.58000004, 1.15, 0.48)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qvs0h"]
+size = Vector3(0.38, 1.0155885, 0.52750003)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6g7nx"]
+size = Vector3(0.43714145, 0.59999996, 0.3997287)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_e7cnl"]
+size = Vector3(0.28, 0.6630349, 0.29162678)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wp60c"]
+size = Vector3(1.48, 2.3, 1.015)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5i7er"]
+size = Vector3(0.58, 1.017, 1.064)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_rlpit"]
+size = Vector3(0.43714145, 0.59999996, 0.3997287)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_0siih"]
+size = Vector3(0.43714145, 0.59999996, 0.3997287)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bonb1"]
+size = Vector3(1.1989844, 0.3935978, 0.8820132)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_of84j"]
+size = Vector3(0.58, 1.017, 1.064)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_486fo"]
+size = Vector3(0.58, 1.017, 1.064)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4vaca"]
+size = Vector3(0.837275, 0.7118145, 0.61991763)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_gfpgn"]
+size = Vector3(0.48, 0.34, 0.35999998)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_25di7"]
+size = Vector3(1.1989844, 0.3935978, 0.8820132)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jqnk5"]
+size = Vector3(1.1800001, 1.2739999, 0.98)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_q1uh0"]
+size = Vector3(0.43714145, 0.59999996, 0.3997287)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4ac5m"]
+size = Vector3(0.43714145, 0.59999996, 0.3997287)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ig1o0"]
+size = Vector3(0.58, 1.017, 1.064)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wbj8m"]
+size = Vector3(0.58, 1.017, 1.064)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sq8yg"]
+size = Vector3(0.48, 0.34, 0.35999998)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_aqjtx"]
+size = Vector3(0.837275, 0.7118145, 0.61991763)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_abthc"]
+size = Vector3(0.35568804, 0.4395765, 0.28)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ed07p"]
+size = Vector3(0.28, 0.6630349, 0.29162678)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wgflv"]
+size = Vector3(2.8, 4, 10)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_r7xaw"]
+size = Vector3(2.8, 4, 10)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5y5th"]
+size = Vector3(2.8, 4, 10)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_l4pxs"]
+size = Vector3(2.8, 4, 10)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_gf7uv"]
+size = Vector3(22, 4, 3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jnftd"]
+size = Vector3(3.4, 4, 10)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_58udc"]
+size = Vector3(18, 4, 15)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3s1ts"]
+size = Vector3(26, 4, 9)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_aq0mg"]
+size = Vector3(14, 4, 7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dxn2v"]
+size = Vector3(40, 3, 3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lbuuj"]
+size = Vector3(22, 3, 7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_r0vqf"]
+size = Vector3(8, 3, 7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hdf4j"]
+size = Vector3(6, 3, 7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1uew6"]
+size = Vector3(4, 3, 7)
+
+[sub_resource type="Environment" id="Environment_yf7ci"]
+background_mode = 1
+background_color = Color(0.008, 0.01, 0.009, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.36, 0.46, 0.4, 1)
+ambient_light_energy = 0.14
+reflected_light_source = 1
+tonemap_mode = 2
+tonemap_white = 6.0
+glow_enabled = true
+glow_intensity = 0.7
+glow_blend_mode = 2
+glow_hdr_threshold = 1.1
+fog_enabled = true
+fog_light_color = Color(0.03, 0.038, 0.034, 1)
+fog_density = 0.035
+fog_sky_affect = 0.0
+adjustment_enabled = true
+adjustment_contrast = 1.08
+adjustment_saturation = 0.9
+
+[node name="Store" type="Node3D" unique_id=755244982]
+script = ExtResource("1_u5u8c")
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=1857645805]
+navigation_mesh = ExtResource("2_le6hp")
+
+[node name="StoreInterior" type="Node3D" parent="NavigationRegion3D" unique_id=1530898697 instance=ExtResource("3_ky6b0")]
+
+[node name="Props" type="Node3D" parent="NavigationRegion3D" unique_id=366088156]
+
+[node name="TimeClock_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=849766789 instance=ExtResource("4_kwlki")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 7, 1.4, -9.1)
+
+[node name="BreakTable_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=565520106 instance=ExtResource("5_btbsq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.6, 0, -14.6)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/BreakTable_1" unique_id=1960287267]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/BreakTable_1/Body" unique_id=1394629264]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.425, 0)
+shape = SubResource("BoxShape3D_x0opm")
+
+[node name="Chair_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1878419968 instance=ExtResource("6_1agnc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.1, 0, -15.35)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/Chair_1" unique_id=1983798245]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/Chair_1/Body" unique_id=1747793183]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4242354, -0.032194704)
+shape = SubResource("BoxShape3D_1oiam")
+
+[node name="Chair_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=650623010 instance=ExtResource("6_1agnc")]
+transform = Transform3D(0.99026805, 0, -0.1391731, 0, 1, 0, 0.1391731, 0, 0.99026805, 7.1, 0, -15.3)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/Chair_2" unique_id=1142507566]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/Chair_2/Body" unique_id=1384230512]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4242354, -0.032194704)
+shape = SubResource("BoxShape3D_8pnut")
+
+[node name="Chair_3" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1146812604 instance=ExtResource("6_1agnc")]
+transform = Transform3D(-0.99026805, 0, 0.13917318, 0, 1, 0, -0.13917318, 0, -0.99026805, 6.2, 0, -13.85)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/Chair_3" unique_id=1043979379]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/Chair_3/Body" unique_id=31824132]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4242354, -0.032194704)
+shape = SubResource("BoxShape3D_obw8n")
+
+[node name="Chair_4" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1156925815 instance=ExtResource("6_1agnc")]
+transform = Transform3D(-0.9396926, 0, -0.34202015, 0, 1, 0, 0.34202015, 0, -0.9396926, 7.25, 0, -13.7)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/Chair_4" unique_id=887738608]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/Chair_4/Body" unique_id=1824464384]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4242354, -0.032194704)
+shape = SubResource("BoxShape3D_1x5mi")
+
+[node name="WalkieTalkie_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=823385236 instance=ExtResource("7_oobse")]
+transform = Transform3D(0.81915206, 0, 0.57357645, 0, 1, 0, -0.57357645, 0, 0.81915206, 6.35, 0.85, -14.55)
+
+[node name="VendingMachine_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1006844863 instance=ExtResource("8_jfynn")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 9.5, 0, -13.2)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/VendingMachine_1" unique_id=1848298296]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/VendingMachine_1/Body" unique_id=836108145]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.0150000155)
+shape = SubResource("BoxShape3D_in776")
+
+[node name="TrashBin_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1372088979 instance=ExtResource("9_rntpi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.8, 0, -9.45)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/TrashBin_1" unique_id=1592208463]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/TrashBin_1/Body" unique_id=176663378]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.37, 0)
+shape = SubResource("BoxShape3D_enf1o")
+
+[node name="ManagerDesk_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1916200523 instance=ExtResource("10_5l7s0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 0, -13.95)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/ManagerDesk_1" unique_id=2141990065]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/ManagerDesk_1/Body" unique_id=720078815]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.380255, 0)
+shape = SubResource("BoxShape3D_baeg8")
+
+[node name="CrtMonitor_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1003459505 instance=ExtResource("11_q7mum")]
+transform = Transform3D(-0.9396926, 0, 0.3420202, 0, 1, 0, -0.3420202, 0, -0.9396926, 12.5, 0.76, -14)
+
+[node name="IntercomMic_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1975843837 instance=ExtResource("12_6f27x")]
+transform = Transform3D(-0.9659258, 0, -0.25881907, 0, 1, 0, 0.25881907, 0, -0.9659258, 13.5, 0.76, -13.8)
+
+[node name="OfficeChair_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=156253656 instance=ExtResource("13_k5ja7")]
+transform = Transform3D(-0.76604444, 0, -0.64278764, 0, 1, 0, 0.64278764, 0, -0.76604444, 14.45, 0, -14.95)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/OfficeChair_1" unique_id=1535180257]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/OfficeChair_1/Body" unique_id=782035736]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5288066, -0.0658316)
+shape = SubResource("BoxShape3D_tgh0s")
+
+[node name="TrashBin_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=719527509 instance=ExtResource("9_rntpi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.55, 0, -9.55)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/TrashBin_2" unique_id=808187513]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/TrashBin_2/Body" unique_id=1730986209]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.37, 0)
+shape = SubResource("BoxShape3D_m3lxq")
+
+[node name="CardboardBoxA_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1424535352 instance=ExtResource("14_q1knb")]
+transform = Transform3D(0.99026805, 0, 0.1391731, 0, 1, 0, -0.1391731, 0, 0.99026805, 10.5, 0, -15.6)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/CardboardBoxA_1" unique_id=1512883577]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/CardboardBoxA_1/Body" unique_id=455808704]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17, 0)
+shape = SubResource("BoxShape3D_pxoux")
+
+[node name="CardboardBoxC_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=891203140 instance=ExtResource("15_i8hg0")]
+transform = Transform3D(0.9702957, 0, -0.2419219, 0, 1, 0, 0.2419219, 0, 0.9702957, 10.55, 0.34, -15.62)
+
+[node name="Sink_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1276068452 instance=ExtResource("16_78syq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.7, 0, -15.75)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/Sink_1" unique_id=1155876877]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/Sink_1/Body" unique_id=1012537553]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.575, 0)
+shape = SubResource("BoxShape3D_qfolf")
+
+[node name="MopBucket_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1215152432 instance=ExtResource("17_dmxms")]
+transform = Transform3D(0.90630776, 0, 0.42261827, 0, 1, 0, -0.42261827, 0, 0.90630776, 17, 0, -15.35)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/MopBucket_1" unique_id=1843635504]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/MopBucket_1/Body" unique_id=247489799]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.50779426, 0.0037499964)
+shape = SubResource("BoxShape3D_qvs0h")
+
+[node name="TrashBag_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1519852182 instance=ExtResource("18_fgga1")]
+transform = Transform3D(0.76604444, 0, 0.6427876, 0, 1, 0, -0.6427876, 0, 0.76604444, 19.55, 0, -9.6)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/TrashBag_1" unique_id=1785983157]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/TrashBag_1/Body" unique_id=1653749820]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.29999998, 0)
+shape = SubResource("BoxShape3D_6g7nx")
+
+[node name="WetFloorSign_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=403340292 instance=ExtResource("19_0otd2")]
+transform = Transform3D(0.9659258, 0, 0.25881904, 0, 1, 0, -0.25881904, 0, 0.9659258, 16.6, 0, -15.6)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/WetFloorSign_1" unique_id=587424167]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/WetFloorSign_1/Body" unique_id=1315332760]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.33151746, 0)
+shape = SubResource("BoxShape3D_e7cnl")
+
+[node name="BreakerPanel_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1248821549 instance=ExtResource("20_miiun")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -8.9)
+
+[node name="Baler_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1432148079 instance=ExtResource("21_maekc")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -19.33, 0, -7.5)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/Baler_1" unique_id=282262356]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/Baler_1/Body" unique_id=177302307]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0.04249999)
+shape = SubResource("BoxShape3D_wp60c")
+
+[node name="ShoppingCart_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=2072183533 instance=ExtResource("22_pjptg")]
+transform = Transform3D(-0.08715577, 0, 0.9961947, 0, 1, 0, -0.9961947, 0, -0.08715577, -13, 0, -6.55)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/ShoppingCart_1" unique_id=67099565]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/ShoppingCart_1/Body" unique_id=414091799]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5085, -0.035000026)
+shape = SubResource("BoxShape3D_5i7er")
+
+[node name="TrashBag_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1583799743 instance=ExtResource("18_fgga1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.2, 0, -6.42)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/TrashBag_2" unique_id=1259856913]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/TrashBag_2/Body" unique_id=144282426]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.29999998, 0)
+shape = SubResource("BoxShape3D_rlpit")
+
+[node name="TrashBag_3" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1267042573 instance=ExtResource("18_fgga1")]
+transform = Transform3D(0.34202015, 0, 0.9396926, 0, 1, 0, -0.9396926, 0, 0.34202015, -7.65, 0, -6.45)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/TrashBag_3" unique_id=1156763151]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/TrashBag_3/Body" unique_id=798068902]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.29999998, 0)
+shape = SubResource("BoxShape3D_0siih")
+
+[node name="FlattenedBoxes_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=48264149 instance=ExtResource("23_jkx1u")]
+transform = Transform3D(0.99026805, 0, 0.1391731, 0, 1, 0, -0.1391731, 0, 0.99026805, 3.6, 0, -8.35)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/FlattenedBoxes_1" unique_id=1246854370]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/FlattenedBoxes_1/Body" unique_id=916715267]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1967989, 0)
+shape = SubResource("BoxShape3D_bonb1")
+
+[node name="ShoppingCart_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=2010044448 instance=ExtResource("22_pjptg")]
+transform = Transform3D(-0.034899462, 0, 0.99939084, 0, 1, 0, -0.99939084, 0, -0.034899462, -8.9, 0, -12.3)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/ShoppingCart_2" unique_id=1912562866]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/ShoppingCart_2/Body" unique_id=319327384]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5085, -0.035000026)
+shape = SubResource("BoxShape3D_of84j")
+
+[node name="ShoppingCart_3" type="Node3D" parent="NavigationRegion3D/Props" unique_id=2140085163 instance=ExtResource("22_pjptg")]
+transform = Transform3D(0.2419219, 0, 0.9702957, 0, 1, 0, -0.9702957, 0, 0.2419219, -15.4, 0, -12.35)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/ShoppingCart_3" unique_id=1872955287]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/ShoppingCart_3/Body" unique_id=1086753576]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5085, -0.035000026)
+shape = SubResource("BoxShape3D_486fo")
+
+[node name="CardboardBoxB_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1228329231 instance=ExtResource("24_i53od")]
+transform = Transform3D(0.9396926, 0, 0.34202012, 0, 1, 0, -0.34202012, 0, 0.9396926, -13.9, 0, -13.75)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/CardboardBoxB_1" unique_id=302109397]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/CardboardBoxB_1/Body" unique_id=1732892959]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.05606094, 0.35590726, 0.010672271)
+shape = SubResource("BoxShape3D_4vaca")
+
+[node name="CardboardBoxA_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=353929843 instance=ExtResource("14_q1knb")]
+transform = Transform3D(0.9848077, 0, -0.17364818, 0, 1, 0, 0.17364818, 0, 0.9848077, -14.55, 0, -13.8)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/CardboardBoxA_2" unique_id=1869084134]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/CardboardBoxA_2/Body" unique_id=1476562088]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17, 0)
+shape = SubResource("BoxShape3D_gfpgn")
+
+[node name="CardboardBoxA_3" type="Node3D" parent="NavigationRegion3D/Props" unique_id=12157996 instance=ExtResource("14_q1knb")]
+transform = Transform3D(0.90630776, 0, 0.42261827, 0, 1, 0, -0.42261827, 0, 0.90630776, -14.5, 0.34, -13.78)
+
+[node name="NewspaperDebris_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=335172248 instance=ExtResource("25_63uyr")]
+transform = Transform3D(0.8660254, 0, 0.5, 0, 1, 0, -0.5, 0, 0.8660254, -11.6, 0, -13)
+
+[node name="NewspaperDebris_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=476531912 instance=ExtResource("25_63uyr")]
+transform = Transform3D(0.76604444, 0, -0.6427876, 0, 1, 0, 0.6427876, 0, 0.76604444, -7.4, 0, -13.4)
+
+[node name="FlattenedBoxes_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=128566389 instance=ExtResource("23_jkx1u")]
+transform = Transform3D(0.9659258, 0, -0.25881904, 0, 1, 0, 0.25881904, 0, 0.9659258, -16.7, 0, -13.55)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/FlattenedBoxes_2" unique_id=835434980]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/FlattenedBoxes_2/Body" unique_id=71561498]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1967989, 0)
+shape = SubResource("BoxShape3D_25di7")
+
+[node name="PalletBoxes_1" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1441068680 instance=ExtResource("26_iywig")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.42, 0, -15.35)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/PalletBoxes_1" unique_id=1595752063]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/PalletBoxes_1/Body" unique_id=1431072371]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.63699996, 0)
+shape = SubResource("BoxShape3D_jqnk5")
+
+[node name="TrashBag_4" type="Node3D" parent="NavigationRegion3D/Props" unique_id=256480110 instance=ExtResource("18_fgga1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.9, 0, -9.5)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/TrashBag_4" unique_id=82439253]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/TrashBag_4/Body" unique_id=1414779688]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.29999998, 0)
+shape = SubResource("BoxShape3D_q1uh0")
+
+[node name="TrashBag_5" type="Node3D" parent="NavigationRegion3D/Props" unique_id=2054544051 instance=ExtResource("18_fgga1")]
+transform = Transform3D(-0.50000006, 0, 0.8660254, 0, 1, 0, -0.8660254, 0, -0.50000006, 1.4, 0, -9.5)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/TrashBag_5" unique_id=846846261]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/TrashBag_5/Body" unique_id=763673792]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.29999998, 0)
+shape = SubResource("BoxShape3D_4ac5m")
+
+[node name="ShoppingCart_4" type="Node3D" parent="NavigationRegion3D/Props" unique_id=440187219 instance=ExtResource("22_pjptg")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2.75, 0, 15)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/ShoppingCart_4" unique_id=606241606]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/ShoppingCart_4/Body" unique_id=1365291522]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5085, -0.035000026)
+shape = SubResource("BoxShape3D_ig1o0")
+
+[node name="ShoppingCart_5" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1681431502 instance=ExtResource("22_pjptg")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 3.15, 0, 15)
+
+[node name="ShoppingCart_6" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1178301847 instance=ExtResource("22_pjptg")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 3.55, 0, 15)
+
+[node name="ShoppingCart_7" type="Node3D" parent="NavigationRegion3D/Props" unique_id=490837411 instance=ExtResource("22_pjptg")]
+transform = Transform3D(-0.76604444, 0, 0.64278764, 0, 1, 0, -0.64278764, 0, -0.76604444, -17.5, 0, 9)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/ShoppingCart_7" unique_id=857291338]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/ShoppingCart_7/Body" unique_id=1695283776]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5085, -0.035000026)
+shape = SubResource("BoxShape3D_wbj8m")
+
+[node name="CardboardBoxA_4" type="Node3D" parent="NavigationRegion3D/Props" unique_id=125914214 instance=ExtResource("14_q1knb")]
+transform = Transform3D(0.9659258, 0, 0.25881904, 0, 1, 0, -0.25881904, 0, 0.9659258, 1.4, 0, 7.9)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/CardboardBoxA_4" unique_id=1558028275]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/CardboardBoxA_4/Body" unique_id=1476361157]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17, 0)
+shape = SubResource("BoxShape3D_sq8yg")
+
+[node name="CardboardBoxB_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1469845095 instance=ExtResource("24_i53od")]
+transform = Transform3D(0.8660254, 0, -0.5, 0, 1, 0, 0.5, 0, 0.8660254, -17.9, 0, 7.6)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/CardboardBoxB_2" unique_id=940973797]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/CardboardBoxB_2/Body" unique_id=650846841]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.05606094, 0.35590726, 0.010672271)
+shape = SubResource("BoxShape3D_aqjtx")
+
+[node name="CardboardBoxC_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=1826444807 instance=ExtResource("15_i8hg0")]
+transform = Transform3D(0.9961947, 0, 0.08715574, 0, 1, 0, -0.08715574, 0, 0.9961947, 5.4, 0, -4.9)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/CardboardBoxC_2" unique_id=549419137]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/CardboardBoxC_2/Body" unique_id=1452777641]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.007844001, 0.21978825, -1.4901161e-08)
+shape = SubResource("BoxShape3D_abthc")
+
+[node name="WetFloorSign_2" type="Node3D" parent="NavigationRegion3D/Props" unique_id=187205898 instance=ExtResource("19_0otd2")]
+transform = Transform3D(0.8660254, 0, 0.5, 0, 1, 0, -0.5, 0, 0.8660254, -9.9, 0, 7.7)
+
+[node name="Body" type="StaticBody3D" parent="NavigationRegion3D/Props/WetFloorSign_2" unique_id=408383856]
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="NavigationRegion3D/Props/WetFloorSign_2/Body" unique_id=2080456518]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.33151746, 0)
+shape = SubResource("BoxShape3D_ed07p")
+
+[node name="NewspaperDebris_3" type="Node3D" parent="NavigationRegion3D/Props" unique_id=716451005 instance=ExtResource("25_63uyr")]
+transform = Transform3D(0.25881907, 0, 0.9659258, 0, 1, 0, -0.9659258, 0, 0.25881907, -2.2, 0, -2.2)
+
+[node name="Tools" type="Node3D" parent="NavigationRegion3D" unique_id=1751062193]
+
+[node name="Rack_mop" type="Area3D" parent="NavigationRegion3D/Tools" unique_id=1902243501 instance=ExtResource("27_5elds")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 19.98, 1.35, -12.6)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("28_gc510")
+tool_id = &"mop"
+
+[node name="Rack_price_gun" type="Area3D" parent="NavigationRegion3D/Tools" unique_id=2117885827 instance=ExtResource("29_e6scn")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 13.2, 1.05, 12.42)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("28_gc510")
+tool_id = &"price_gun"
+
+[node name="Rack_box_cutter" type="Area3D" parent="NavigationRegion3D/Tools" unique_id=1895461462 instance=ExtResource("30_cpr7f")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 1.9, 1.25, -12.7)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("28_gc510")
+tool_id = &"box_cutter"
+
+[node name="Rack_stock_box" type="Area3D" parent="NavigationRegion3D/Tools" unique_id=804241117 instance=ExtResource("31_ysvom")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 1.666, 0, -10.55)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("28_gc510")
+tool_id = &"stock_box"
+
+[node name="Rack_keys" type="Area3D" parent="NavigationRegion3D/Tools" unique_id=844050464 instance=ExtResource("32_bueu1")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10.1, 1.45, -11.2)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("28_gc510")
+tool_id = &"keys"
+
+[node name="HidingSpots" type="Node3D" parent="NavigationRegion3D" unique_id=709497079]
+
+[node name="Hide_locker_1" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=418086621 instance=ExtResource("33_xqw2v")]
+editor_description = "Origin at the locker's floor centre, door toward +Z. The locker.glb model carries the hinged Door the spot swings open."
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2.37, 0, -10.35)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("34_lo573")
+
+[node name="Hide_locker_2" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=1029522213 instance=ExtResource("33_xqw2v")]
+editor_description = "Origin at the locker's floor centre, door toward +Z. The locker.glb model carries the hinged Door the spot swings open."
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2.37, 0, -10.88)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("34_lo573")
+
+[node name="Hide_locker_3" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=1212380636 instance=ExtResource("33_xqw2v")]
+editor_description = "Origin at the locker's floor centre, door toward +Z. The locker.glb model carries the hinged Door the spot swings open."
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2.37, 0, -11.41)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("34_lo573")
+
+[node name="Hide_boxes_1" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=1688010302 instance=ExtResource("35_rnqhq")]
+editor_description = "Origin at the floor centre of the pile; the crouch nook (x -0.42..0.42, z -0.40..0.38, 0.96 m high) opens toward +Z."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.4, 0, -14.55)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("34_lo573")
+spot_kind = &"boxes"
+
+[node name="Hide_boxes_2" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=1770019370 instance=ExtResource("35_rnqhq")]
+editor_description = "Origin at the floor centre of the pile; the crouch nook (x -0.42..0.42, z -0.40..0.38, 0.96 m high) opens toward +Z."
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.2, 0, -10.2)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("34_lo573")
+spot_kind = &"boxes"
+
+[node name="Hide_counter_1" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=1308363533 instance=ExtResource("36_nabra")]
+editor_description = "A crouch spot inside an existing counter: put the origin at the floor centre of the cavity with +Z pointing out of its opening. The counter itself belongs to the level art."
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -11.95, 0, 11.8)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("34_lo573")
+spot_kind = &"counter"
+
+[node name="Hide_counter_2" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=2036938326 instance=ExtResource("36_nabra")]
+editor_description = "A crouch spot inside an existing counter: put the origin at the floor centre of the cavity with +Z pointing out of its opening. The counter itself belongs to the level art."
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -6.95, 0, 11.8)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("34_lo573")
+spot_kind = &"counter"
+
+[node name="Hide_counter_3" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=688715184 instance=ExtResource("36_nabra")]
+editor_description = "A crouch spot inside an existing counter: put the origin at the floor centre of the cavity with +Z pointing out of its opening. The counter itself belongs to the level art."
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.95, 0, 11.8)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("34_lo573")
+spot_kind = &"counter"
+
+[node name="Hide_counter_4" type="Area3D" parent="NavigationRegion3D/HidingSpots" unique_id=1240236414 instance=ExtResource("36_nabra")]
+editor_description = "A crouch spot inside an existing counter: put the origin at the floor centre of the cavity with +Z pointing out of its opening. The counter itself belongs to the level art."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.6, 0, 12.5)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("34_lo573")
+spot_kind = &"counter"
+
+[node name="Stations" type="Node3D" parent="NavigationRegion3D" unique_id=2115081124]
+
+[node name="Station_mop_spill_aisle_3" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=1485910797 instance=ExtResource("37_eyt32")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 1)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("38_51jo5")
+task_kind = &"mop_spill"
+zone = &"aisle_3"
+title = "Mop the spill in Aisle 3"
+required_tool = &"mop"
+manager_line = "Clean up on aisle three, someone's going to slip."
+hold_time = 4.0
+
+[node name="Station_mop_spill_produce" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=2132606593 instance=ExtResource("37_eyt32")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 0)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("38_51jo5")
+task_kind = &"mop_spill"
+zone = &"produce"
+title = "Mop the spill in Produce"
+required_tool = &"mop"
+manager_line = "There's a spill out by produce, grab the mop."
+hold_time = 4.0
+
+[node name="Station_restock_aisle_2" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=1483047573 instance=ExtResource("39_7fxnh")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -11.3, 0, 4)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("38_51jo5")
+task_kind = &"restock"
+zone = &"aisle_2"
+title = "Restock the shelves in Aisle 2"
+required_tool = &"stock_box"
+manager_line = "Aisle two is looking bare, bring out a box."
+hold_time = 3.5
+
+[node name="Station_restock_aisle_4" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=660654613 instance=ExtResource("39_7fxnh")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -0.7, 0, 0.5)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("38_51jo5")
+task_kind = &"restock"
+zone = &"aisle_4"
+title = "Restock the shelves in Aisle 4"
+required_tool = &"stock_box"
+manager_line = "Aisle four needs restocking when you get a chance."
+hold_time = 3.5
+
+[node name="Station_face_shelf_aisle_1" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=831106239 instance=ExtResource("40_td5df")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -15.3, 0, 2)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("38_51jo5")
+task_kind = &"face_shelf"
+zone = &"aisle_1"
+title = "Face the shelves in Aisle 1"
+manager_line = "Aisle one's a mess, square it away."
+hold_time = 3.0
+
+[node name="Station_register_checkout" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=153144148 instance=ExtResource("41_2wywd")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -11.55, 0, 12.8)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("38_51jo5")
+task_kind = &"register"
+zone = &"checkout"
+title = "Count Register 1"
+manager_line = "Register one needs to be counted out."
+hold_time = 4.0
+
+[node name="@Area3D@3" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=393323044 instance=ExtResource("41_2wywd")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -6.55, 0, 12.8)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("38_51jo5")
+task_kind = &"register"
+zone = &"checkout"
+title = "Count Register 2"
+manager_line = "Register two still needs counting."
+hold_time = 4.0
+
+[node name="Station_price_update_dairy" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=1357822935 instance=ExtResource("42_foxcb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, -5.05)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("38_51jo5")
+task_kind = &"price_update"
+zone = &"dairy"
+title = "Update price labels in Dairy"
+required_tool = &"price_gun"
+manager_line = "Dairy prices changed, re-tag the shelf labels."
+hold_time = 3.0
+
+[node name="Station_freezer_log_frozen" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=2030877900 instance=ExtResource("43_k20a3")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -19.2, 0, 2)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("38_51jo5")
+task_kind = &"freezer_log"
+zone = &"frozen"
+title = "Log the freezer temperature"
+manager_line = "Don't forget the freezer temperature log."
+hold_time = 3.0
+
+[node name="Station_boxes_storage" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=1488692382 instance=ExtResource("44_ljhi0")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -2.6, 0, -12)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("38_51jo5")
+task_kind = &"boxes"
+zone = &"storage"
+title = "Break down boxes in Storage"
+required_tool = &"box_cutter"
+manager_line = "Storage room's piling up, break those boxes down."
+hold_time = 4.0
+
+[node name="Station_trash_break_room" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=187134470 instance=ExtResource("45_s2pyp")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 9.4, 0, -9.6)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("38_51jo5")
+task_kind = &"trash"
+zone = &"break_room"
+title = "Empty the break room trash"
+manager_line = "Break room trash is overflowing again."
+hold_time = 3.0
+
+[node name="Station_breaker_hallway" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=2031867206 instance=ExtResource("46_rmsme")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -8.9)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("38_51jo5")
+task_kind = &"breaker"
+zone = &"hallway"
+title = "Reset the breaker"
+required_tool = &"keys"
+basic_task = false
+manager_line = "The breaker tripped, go reset it before we lose the lights."
+hold_time = 5.0
+
+[node name="Station_safe_service_desk" type="Area3D" parent="NavigationRegion3D/Stations" unique_id=1455954871 instance=ExtResource("47_gcw8u")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 13.4, 0, 15.1)
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("38_51jo5")
+task_kind = &"safe"
+zone = &"service_desk"
+title = "Lock the safe"
+required_tool = &"keys"
+basic_task = false
+manager_line = "Lock up the safe at the service desk before it's too late."
+hold_time = 5.0
+
+[node name="Zones" type="Node3D" parent="." unique_id=620320977]
+
+[node name="Zone_aisle_1" type="Area3D" parent="Zones" unique_id=414700940]
+script = ExtResource("48_2vgj8")
+zone_id = &"aisle_1"
+display_name = "Aisle 1"
+
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_aisle_1" unique_id=654006625]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 2, 2)
+shape = SubResource("BoxShape3D_wgflv")
+
+[node name="Zone_aisle_2" type="Area3D" parent="Zones" unique_id=1281194186]
+script = ExtResource("48_2vgj8")
+zone_id = &"aisle_2"
+display_name = "Aisle 2"
+
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_aisle_2" unique_id=1955147882]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 2, 2)
+shape = SubResource("BoxShape3D_r7xaw")
+
+[node name="Zone_aisle_3" type="Area3D" parent="Zones" unique_id=2115173926]
+script = ExtResource("48_2vgj8")
+zone_id = &"aisle_3"
+display_name = "Aisle 3"
+
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_aisle_3" unique_id=1571291335]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 2, 2)
+shape = SubResource("BoxShape3D_5y5th")
+
+[node name="Zone_aisle_4" type="Area3D" parent="Zones" unique_id=1669375811]
+script = ExtResource("48_2vgj8")
+zone_id = &"aisle_4"
+display_name = "Aisle 4"
+
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_aisle_4" unique_id=1231084043]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 2)
+shape = SubResource("BoxShape3D_l4pxs")
+
+[node name="Zone_dairy" type="Area3D" parent="Zones" unique_id=311537466]
+script = ExtResource("48_2vgj8")
+zone_id = &"dairy"
+display_name = "Dairy"
+
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_dairy" unique_id=145359309]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 2, -4.5)
+shape = SubResource("BoxShape3D_gf7uv")
+
+[node name="Zone_frozen" type="Area3D" parent="Zones" unique_id=613153671]
+script = ExtResource("48_2vgj8")
+zone_id = &"frozen"
+display_name = "Frozen Foods"
+
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_frozen" unique_id=1706878405]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.3, 2, 2)
+shape = SubResource("BoxShape3D_jnftd")
+
+[node name="Zone_produce" type="Area3D" parent="Zones" unique_id=838925320]
+script = ExtResource("48_2vgj8")
+zone_id = &"produce"
+display_name = "Produce"
+
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_produce" unique_id=1127308580]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 2, 1.5)
+shape = SubResource("BoxShape3D_58udc")
+
+[node name="Zone_checkout" type="Area3D" parent="Zones" unique_id=1402322267]
+script = ExtResource("48_2vgj8")
+zone_id = &"checkout"
+display_name = "Checkout"
+
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_checkout" unique_id=117927429]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 2, 11.5)
+shape = SubResource("BoxShape3D_3s1ts")
+
+[node name="Zone_service_desk" type="Area3D" parent="Zones" unique_id=781641239]
+script = ExtResource("48_2vgj8")
+zone_id = &"service_desk"
+display_name = "Customer Service"
+
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_service_desk" unique_id=1310840044]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 2, 12.5)
+shape = SubResource("BoxShape3D_aq0mg")
+
+[node name="Zone_hallway" type="Area3D" parent="Zones" unique_id=844794332]
+script = ExtResource("48_2vgj8")
+zone_id = &"hallway"
+display_name = "Back Hallway"
+
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_hallway" unique_id=312685336]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -7.5)
+shape = SubResource("BoxShape3D_dxn2v")
+
+[node name="Zone_storage" type="Area3D" parent="Zones" unique_id=1721357337]
+script = ExtResource("48_2vgj8")
+zone_id = &"storage"
+display_name = "Storage Room"
+
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_storage" unique_id=1943212069]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 1.5, -12.5)
+shape = SubResource("BoxShape3D_lbuuj")
+
+[node name="Zone_break_room" type="Area3D" parent="Zones" unique_id=1941512920]
+script = ExtResource("48_2vgj8")
+zone_id = &"break_room"
+display_name = "Break Room"
+
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_break_room" unique_id=1958767995]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 1.5, -12.5)
+shape = SubResource("BoxShape3D_r0vqf")
+
+[node name="Zone_office" type="Area3D" parent="Zones" unique_id=1493025913]
+script = ExtResource("48_2vgj8")
+zone_id = &"office"
+display_name = "Manager's Office"
+
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_office" unique_id=109734053]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 1.5, -12.5)
+shape = SubResource("BoxShape3D_hdf4j")
+
+[node name="Zone_janitor" type="Area3D" parent="Zones" unique_id=1952209476]
+script = ExtResource("48_2vgj8")
+zone_id = &"janitor"
+display_name = "Janitor Closet"
+
+[node name="Box" type="CollisionShape3D" parent="Zones/Zone_janitor" unique_id=143307540]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 1.5, -12.5)
+shape = SubResource("BoxShape3D_1uew6")
+
+[node name="Markers" type="Node3D" parent="." unique_id=175292238]
+
+[node name="PlayerSpawn" type="Marker3D" parent="Markers" unique_id=1338777685 groups=["player_spawn"]]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 6, 0, -12.5)
+
+[node name="CoworkerSpawn1" type="Marker3D" parent="Markers" unique_id=1261990218 groups=["coworker_spawn"]]
+transform = Transform3D(0.8660254, 0, 0.5, 0, 1, 0, -0.5, 0, 0.8660254, 4, 0, -14.4)
+
+[node name="CoworkerSpawn2" type="Marker3D" parent="Markers" unique_id=327664426 groups=["coworker_spawn"]]
+transform = Transform3D(0.49999997, 0, -0.86602545, 0, 1, 0, 0.86602545, 0, 0.49999997, 8.2, 0, -11.2)
+
+[node name="CoworkerSpawn3" type="Marker3D" parent="Markers" unique_id=257460922 groups=["coworker_spawn"]]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.5, 0, -7.4)
+
+[node name="MonsterSpawn" type="Marker3D" parent="Markers" unique_id=1720011515 groups=["monster_spawn"]]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -18, 0, -15)
+
+[node name="ManagerSpot" type="Marker3D" parent="Markers" unique_id=1754116852 groups=["manager_spot"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 0, -15.15)
+
+[node name="Patrol01" type="Marker3D" parent="Markers" unique_id=930991024 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0, 0.5)
+
+[node name="Patrol02" type="Marker3D" parent="Markers" unique_id=1607868520 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 5.5)
+
+[node name="Patrol03" type="Marker3D" parent="Markers" unique_id=1824524338 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -1.5)
+
+[node name="Patrol04" type="Marker3D" parent="Markers" unique_id=1005576639 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 4.5)
+
+[node name="Patrol05" type="Marker3D" parent="Markers" unique_id=1581363164 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 0, -4)
+
+[node name="Patrol06" type="Marker3D" parent="Markers" unique_id=858327439 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -4)
+
+[node name="Patrol07" type="Marker3D" parent="Markers" unique_id=990479789 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 0, 5.5)
+
+[node name="Patrol08" type="Marker3D" parent="Markers" unique_id=524471166 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 4)
+
+[node name="Patrol09" type="Marker3D" parent="Markers" unique_id=1128292882 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, -0.5)
+
+[node name="Patrol10" type="Marker3D" parent="Markers" unique_id=1923277485 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 8.2)
+
+[node name="Patrol11" type="Marker3D" parent="Markers" unique_id=50047231 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.5, 0, 8.5)
+
+[node name="Patrol12" type="Marker3D" parent="Markers" unique_id=349811371 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0, 14.5)
+
+[node name="Patrol13" type="Marker3D" parent="Markers" unique_id=207595938 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 0, 11.5)
+
+[node name="Patrol14" type="Marker3D" parent="Markers" unique_id=123779446 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.5, 0, 11)
+
+[node name="Patrol15" type="Marker3D" parent="Markers" unique_id=1271572741 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 10)
+
+[node name="Patrol16" type="Marker3D" parent="Markers" unique_id=1446465253 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, -7.5)
+
+[node name="Patrol17" type="Marker3D" parent="Markers" unique_id=1840468048 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, -7.5)
+
+[node name="Patrol18" type="Marker3D" parent="Markers" unique_id=2097024681 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, -7.5)
+
+[node name="Patrol19" type="Marker3D" parent="Markers" unique_id=2035658308 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, -13)
+
+[node name="Patrol20" type="Marker3D" parent="Markers" unique_id=1357234601 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.6, 0, -13)
+
+[node name="Patrol21" type="Marker3D" parent="Markers" unique_id=1490744240 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5, 0, -11.5)
+
+[node name="Patrol22" type="Marker3D" parent="Markers" unique_id=377424032 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, 0, -10.4)
+
+[node name="Patrol23" type="Marker3D" parent="Markers" unique_id=1276503462 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.3, 0, -10.3)
+
+[node name="Patrol24" type="Marker3D" parent="Markers" unique_id=278897730 groups=["patrol_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.3, 0, -11)
+
+[node name="Lights" type="Node3D" parent="." unique_id=1450674668]
+
+[node name="CoolerLight_01" type="OmniLight3D" parent="Lights" unique_id=318455554]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 1.3, -4.6)
+light_color = Color(0.81, 0.89, 0.94, 1)
+light_energy = 0.6
+light_specular = 0.4
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 3.5
+omni_attenuation = 1.6
+
+[node name="CoolerLight_02" type="OmniLight3D" parent="Lights" unique_id=251969104]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 1.3, -4.6)
+light_color = Color(0.81, 0.89, 0.94, 1)
+light_energy = 0.6
+light_specular = 0.4
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 3.5
+omni_attenuation = 1.6
+
+[node name="CoolerLight_03" type="OmniLight3D" parent="Lights" unique_id=1020682244]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.3, -4.6)
+light_color = Color(0.81, 0.89, 0.94, 1)
+light_energy = 0.6
+light_specular = 0.4
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 3.5
+omni_attenuation = 1.6
+
+[node name="CoolerLight_04" type="OmniLight3D" parent="Lights" unique_id=693386702]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.7, 1.3, 2)
+light_color = Color(0.81, 0.89, 0.94, 1)
+light_energy = 0.6
+light_specular = 0.4
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 3.5
+omni_attenuation = 1.6
+
+[node name="EmergencyLight_01" type="OmniLight3D" parent="Lights" unique_id=321860859]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.35, -8.6)
+light_color = Color(0.95, 0.16, 0.12, 1)
+light_energy = 1.4
+light_specular = 0.4
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 4.5
+omni_attenuation = 1.2
+
+[node name="EmergencyLight_02" type="OmniLight3D" parent="Lights" unique_id=1693845569]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 2.35, -8.6)
+light_color = Color(0.95, 0.16, 0.12, 1)
+light_energy = 1.4
+light_specular = 0.4
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 4.5
+omni_attenuation = 1.2
+
+[node name="EmergencyLight_03" type="OmniLight3D" parent="Lights" unique_id=320276831]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2.35, -8.6)
+light_color = Color(0.95, 0.16, 0.12, 1)
+light_energy = 1.4
+light_specular = 0.4
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 4.5
+omni_attenuation = 1.2
+
+[node name="EmergencyLight_04" type="OmniLight3D" parent="Lights" unique_id=682942114]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 2.35, -8.6)
+light_color = Color(0.95, 0.16, 0.12, 1)
+light_energy = 1.4
+light_specular = 0.4
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 4.5
+omni_attenuation = 1.2
+
+[node name="EmergencyLight_05" type="OmniLight3D" parent="Lights" unique_id=900308566]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.7, 2.3, -10.4)
+light_color = Color(0.95, 0.16, 0.12, 1)
+light_energy = 1.4
+light_specular = 0.4
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 4.5
+omni_attenuation = 1.2
+
+[node name="EmergencyLight_06" type="OmniLight3D" parent="Lights" unique_id=424455012]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.3, -15.7)
+light_color = Color(0.95, 0.16, 0.12, 1)
+light_energy = 1.4
+light_specular = 0.4
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 4.5
+omni_attenuation = 1.2
+
+[node name="EmergencyLight_07" type="OmniLight3D" parent="Lights" unique_id=1252686124]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, 2.3, -15)
+light_color = Color(0.95, 0.16, 0.12, 1)
+light_energy = 1.4
+light_specular = 0.4
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 4.5
+omni_attenuation = 1.2
+
+[node name="ExitLight" type="OmniLight3D" parent="Lights" unique_id=1789529942]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.65, 2.3, -13)
+light_color = Color(0.2, 1, 0.42, 1)
+light_energy = 1.2
+light_specular = 0.4
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 4.0
+omni_attenuation = 1.4
+
+[node name="StoreLight_001" type="Node3D" parent="Lights" unique_id=716196565]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 3.4, 5.9)
+script = ExtResource("49_bwngl")
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_001")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_001" unique_id=579200525]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_002" type="Node3D" parent="Lights" unique_id=341617190]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 3.4, 2.9)
+script = ExtResource("49_bwngl")
+starts_off = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_002")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_002" unique_id=874021259]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_003" type="Node3D" parent="Lights" unique_id=1677005410]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 3.4, -0.1)
+script = ExtResource("49_bwngl")
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_003")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_003" unique_id=2008086350]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_004" type="Node3D" parent="Lights" unique_id=973469991]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 3.4, 5.9)
+script = ExtResource("49_bwngl")
+starts_off = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_004")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_004" unique_id=914307679]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_005" type="Node3D" parent="Lights" unique_id=180644650]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 3.4, 2.9)
+script = ExtResource("49_bwngl")
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_005")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_005" unique_id=1511502713]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_006" type="Node3D" parent="Lights" unique_id=891955365]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 3.24, -0.1)
+script = ExtResource("49_bwngl")
+starts_off = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_006_broken")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_006" unique_id=434438053]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_007" type="Node3D" parent="Lights" unique_id=1348512589]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 3.4, 5.9)
+script = ExtResource("49_bwngl")
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_007")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_007" unique_id=1017614441]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_008" type="Node3D" parent="Lights" unique_id=2142889592]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 3.4, 2.9)
+script = ExtResource("49_bwngl")
+starts_off = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_008")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_008" unique_id=1149212387]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_009" type="Node3D" parent="Lights" unique_id=1645534550]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 3.4, -0.1)
+script = ExtResource("49_bwngl")
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_009")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_009" unique_id=1023976597]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_010" type="Node3D" parent="Lights" unique_id=773011545]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 3.4, 5.9)
+script = ExtResource("49_bwngl")
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_010")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_010" unique_id=537814636]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_011" type="Node3D" parent="Lights" unique_id=28556976]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 3.24, 2.9)
+script = ExtResource("49_bwngl")
+always_flicker = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_011_broken")
+buzzes = true
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_011" unique_id=219897508]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_012" type="Node3D" parent="Lights" unique_id=1160627943]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 3.4, -0.1)
+script = ExtResource("49_bwngl")
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_012")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_012" unique_id=1882247343]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_013" type="Node3D" parent="Lights" unique_id=1059049197]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.9, 3.24, 5.9)
+script = ExtResource("49_bwngl")
+always_flicker = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_013_broken")
+buzzes = true
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_013" unique_id=570741137]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_014" type="Node3D" parent="Lights" unique_id=410588217]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.9, 3.4, 2.9)
+script = ExtResource("49_bwngl")
+starts_off = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_014")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_014" unique_id=899902123]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_015" type="Node3D" parent="Lights" unique_id=395963635]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.9, 3.4, -0.1)
+script = ExtResource("49_bwngl")
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_015")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_015" unique_id=911492393]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_016" type="Node3D" parent="Lights" unique_id=2107806406]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 3.4, -4.3)
+script = ExtResource("49_bwngl")
+starts_off = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_016")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_016" unique_id=921585076]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_017" type="Node3D" parent="Lights" unique_id=2063212780]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 3.4, -4.3)
+script = ExtResource("49_bwngl")
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_017")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_017" unique_id=1033205027]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_018" type="Node3D" parent="Lights" unique_id=2056070028]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 3.24, -4.3)
+script = ExtResource("49_bwngl")
+starts_off = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_018_broken")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_018" unique_id=303286718]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_019" type="Node3D" parent="Lights" unique_id=1238081371]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 3.4, -4.3)
+script = ExtResource("49_bwngl")
+starts_off = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_019")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_019" unique_id=1913736868]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_020" type="Node3D" parent="Lights" unique_id=433877645]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 3.4, -4.3)
+script = ExtResource("49_bwngl")
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_020")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_020" unique_id=1056816752]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_021" type="Node3D" parent="Lights" unique_id=1872488369]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 3.4, 8.5)
+script = ExtResource("49_bwngl")
+starts_off = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_021")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_021" unique_id=819948957]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_022" type="Node3D" parent="Lights" unique_id=306728337]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 3.4, 8.5)
+script = ExtResource("49_bwngl")
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_022")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_022" unique_id=1148920159]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_023" type="Node3D" parent="Lights" unique_id=561453311]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 3.4, 8.5)
+script = ExtResource("49_bwngl")
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_023")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_023" unique_id=1328005732]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_024" type="Node3D" parent="Lights" unique_id=1296228908]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 3.4, 8.5)
+script = ExtResource("49_bwngl")
+starts_off = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_024")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_024" unique_id=86994545]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_025" type="Node3D" parent="Lights" unique_id=428938368]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.05, 3.4, 11.5)
+script = ExtResource("49_bwngl")
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_025")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_025" unique_id=1997705341]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_026" type="Node3D" parent="Lights" unique_id=1185663683]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.05, 3.4, 11.5)
+script = ExtResource("49_bwngl")
+starts_off = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_026")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_026" unique_id=1180561940]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_027" type="Node3D" parent="Lights" unique_id=380214288]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.05, 3.4, 11.5)
+script = ExtResource("49_bwngl")
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_027")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_027" unique_id=260264693]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_028" type="Node3D" parent="Lights" unique_id=988866577]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 3.24, 14.6)
+script = ExtResource("49_bwngl")
+starts_off = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_028_broken")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_028" unique_id=1292183168]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_029" type="Node3D" parent="Lights" unique_id=1966043591]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.5, 3.4, 14.6)
+script = ExtResource("49_bwngl")
+starts_off = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_029")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_029" unique_id=773480174]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_030" type="Node3D" parent="Lights" unique_id=2040307985]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 3.4, 14.6)
+script = ExtResource("49_bwngl")
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_030")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_030" unique_id=350585042]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_031" type="Node3D" parent="Lights" unique_id=2092188660]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 3.4, 13.6)
+script = ExtResource("49_bwngl")
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_031")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_031" unique_id=1659536790]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_032" type="Node3D" parent="Lights" unique_id=1045797563]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.5, 3.4, 11.2)
+script = ExtResource("49_bwngl")
+starts_off = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_032")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_032" unique_id=1027801904]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_033" type="Node3D" parent="Lights" unique_id=1705997776]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 3.4, -3)
+script = ExtResource("49_bwngl")
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_033")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_033" unique_id=1305314015]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_034" type="Node3D" parent="Lights" unique_id=1624207572]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 3.4, 1.5)
+script = ExtResource("49_bwngl")
+starts_off = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_034")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_034" unique_id=1942338380]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_035" type="Node3D" parent="Lights" unique_id=759543507]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 3.4, 6)
+script = ExtResource("49_bwngl")
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_035")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_035" unique_id=1198040904]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_036" type="Node3D" parent="Lights" unique_id=1343246968]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 3.4, -3)
+script = ExtResource("49_bwngl")
+starts_off = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_036")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_036" unique_id=53112938]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_037" type="Node3D" parent="Lights" unique_id=1801774602]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 3.4, 1.5)
+script = ExtResource("49_bwngl")
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_037")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_037" unique_id=840200590]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_038" type="Node3D" parent="Lights" unique_id=2072748021]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 3.4, 6)
+script = ExtResource("49_bwngl")
+starts_off = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_038")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_038" unique_id=2092679736]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_039" type="Node3D" parent="Lights" unique_id=1442557518]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.5, 3.4, -3)
+script = ExtResource("49_bwngl")
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_039")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_039" unique_id=187846847]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_040" type="Node3D" parent="Lights" unique_id=227916170]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.5, 3.4, 1.5)
+script = ExtResource("49_bwngl")
+starts_off = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_040")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_040" unique_id=351713777]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_041" type="Node3D" parent="Lights" unique_id=1735081364]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.5, 3.24, 6)
+script = ExtResource("49_bwngl")
+always_flicker = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_041_broken")
+buzzes = true
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_041" unique_id=220394648]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_042" type="Node3D" parent="Lights" unique_id=184607666]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 2.62, -7.5)
+script = ExtResource("49_bwngl")
+base_energy = 0.55
+starts_off = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_042")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_042" unique_id=178600801]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_energy = 0.55
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_043" type="Node3D" parent="Lights" unique_id=1938703632]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 2.62, -7.5)
+script = ExtResource("49_bwngl")
+base_energy = 0.55
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_043")
+buzzes = true
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_043" unique_id=1422721421]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_energy = 0.55
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_044" type="Node3D" parent="Lights" unique_id=1796115243]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 2.62, -7.5)
+script = ExtResource("49_bwngl")
+base_energy = 0.55
+starts_off = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_044")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_044" unique_id=1490541070]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_energy = 0.55
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_045" type="Node3D" parent="Lights" unique_id=325233959]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 2.46, -7.5)
+script = ExtResource("49_bwngl")
+base_energy = 0.55
+always_flicker = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_045_broken")
+buzzes = true
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_045" unique_id=1560165416]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_energy = 0.55
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_046" type="Node3D" parent="Lights" unique_id=399059787]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 2.62, -7.5)
+script = ExtResource("49_bwngl")
+base_energy = 0.55
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_046")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_046" unique_id=438989487]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_energy = 0.55
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_047" type="Node3D" parent="Lights" unique_id=1235330673]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.5, 2.46, -13)
+script = ExtResource("49_bwngl")
+base_energy = 0.7
+starts_off = true
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_047_broken")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_047" unique_id=746077175]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_energy = 0.7
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_048" type="Node3D" parent="Lights" unique_id=1246111606]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 2.62, -13)
+script = ExtResource("49_bwngl")
+base_energy = 0.7
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_048")
+buzzes = true
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_048" unique_id=2076084248]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_energy = 0.7
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_049" type="Node3D" parent="Lights" unique_id=1019049620]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 2.62, -12.5)
+script = ExtResource("49_bwngl")
+base_energy = 0.7
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_049")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_049" unique_id=160883779]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_energy = 0.7
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_050" type="Node3D" parent="Lights" unique_id=158115111]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2.62, -12.5)
+script = ExtResource("49_bwngl")
+base_energy = 0.85
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_050")
+buzzes = true
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_050" unique_id=1440785832]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_energy = 0.85
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_051" type="Node3D" parent="Lights" unique_id=570289008]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 2.62, -12.5)
+script = ExtResource("49_bwngl")
+base_energy = 0.75
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_051")
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_051" unique_id=1961198159]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.95, 0.88, 0.72, 1)
+light_energy = 0.75
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="StoreLight_052" type="Node3D" parent="Lights" unique_id=609507332]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 2.62, -12.5)
+script = ExtResource("49_bwngl")
+base_energy = 0.6
+fixture_path = NodePath("../../NavigationRegion3D/StoreInterior/Fixtures/Fixture_052")
+buzzes = true
+
+[node name="Light" type="OmniLight3D" parent="Lights/StoreLight_052" unique_id=88563531]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.12, 0)
+light_color = Color(0.86, 0.9, 0.8, 1)
+light_energy = 0.6
+light_specular = 0.6
+distance_fade_enabled = true
+distance_fade_begin = 24.0
+distance_fade_length = 6.0
+omni_range = 5.5
+omni_attenuation = 1.5
+
+[node name="Audio" type="Node3D" parent="." unique_id=1478828522]
+
+[node name="IntercomSpeaker1" type="AudioStreamPlayer3D" parent="Audio" unique_id=43454172 groups=["intercom_speaker"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 3.9, 2)
+unit_size = 8.0
+max_distance = 60.0
+bus = &"Voice"
+
+[node name="IntercomSpeaker2" type="AudioStreamPlayer3D" parent="Audio" unique_id=848181451 groups=["intercom_speaker"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 3.9, 2)
+unit_size = 8.0
+max_distance = 60.0
+bus = &"Voice"
+
+[node name="IntercomSpeaker3" type="AudioStreamPlayer3D" parent="Audio" unique_id=1731162134 groups=["intercom_speaker"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 3.9, 12)
+unit_size = 8.0
+max_distance = 60.0
+bus = &"Voice"
+
+[node name="IntercomSpeaker4" type="AudioStreamPlayer3D" parent="Audio" unique_id=1487150407 groups=["intercom_speaker"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.9, -7.5)
+unit_size = 8.0
+max_distance = 60.0
+bus = &"Voice"
+
+[node name="IntercomSpeaker5" type="AudioStreamPlayer3D" parent="Audio" unique_id=361041528 groups=["intercom_speaker"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.9, -12.5)
+unit_size = 8.0
+max_distance = 60.0
+bus = &"Voice"
+
+[node name="IntercomSpeaker6" type="AudioStreamPlayer3D" parent="Audio" unique_id=193509276 groups=["intercom_speaker"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2.9, -11)
+unit_size = 8.0
+max_distance = 60.0
+bus = &"Voice"
+
+[node name="Ambience1_freezer_hum" type="AudioStreamPlayer3D" parent="Audio" unique_id=1547404197]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 1.2, -5.2)
+volume_db = -10.0
+unit_size = 3.0
+max_distance = 12.0
+bus = &"Ambience"
+script = ExtResource("50_4858n")
+sound_id = &"amb_freezer_hum"
+
+[node name="Ambience2_freezer_hum" type="AudioStreamPlayer3D" parent="Audio" unique_id=730905758]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 1.2, -5.2)
+volume_db = -10.0
+unit_size = 3.0
+max_distance = 12.0
+bus = &"Ambience"
+script = ExtResource("50_4858n")
+sound_id = &"amb_freezer_hum"
+
+[node name="Ambience3_freezer_hum" type="AudioStreamPlayer3D" parent="Audio" unique_id=1815055023]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 1.2, 2)
+volume_db = -10.0
+unit_size = 3.0
+max_distance = 12.0
+bus = &"Ambience"
+script = ExtResource("50_4858n")
+sound_id = &"amb_freezer_hum"
+
+[node name="Ambience4_backroom" type="AudioStreamPlayer3D" parent="Audio" unique_id=681058199]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 2, -7.5)
+volume_db = -12.0
+unit_size = 3.0
+max_distance = 16.0
+bus = &"Ambience"
+script = ExtResource("50_4858n")
+
+[node name="Ambience5_backroom" type="AudioStreamPlayer3D" parent="Audio" unique_id=1453046499]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2, -7.5)
+volume_db = -12.0
+unit_size = 3.0
+max_distance = 16.0
+bus = &"Ambience"
+script = ExtResource("50_4858n")
+
+[node name="Ambience6_backroom" type="AudioStreamPlayer3D" parent="Audio" unique_id=1979611630]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2, -12.8)
+volume_db = -10.0
+unit_size = 3.0
+max_distance = 16.0
+bus = &"Ambience"
+script = ExtResource("50_4858n")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1531887083]
+environment = SubResource("Environment_yf7ci")
