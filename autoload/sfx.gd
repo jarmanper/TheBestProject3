@@ -65,8 +65,28 @@ const LOOPING := [
 	&"music_dread", &"music_chase",
 ]
 
+## How long to let the audio thread run at shutdown (see _exit_tree).
+const SHUTDOWN_DRAIN_MS := 80
+
 var _cache := {}        # base path -> AudioStream (or null when missing)
 var _warned := {}
+
+
+## Shutdown only (autoloads leave the tree when the engine quits, after the scene).
+## Leaving the tree only *pauses* a player's playback; the engine stops it when the node is
+## deleted, which happens after every _exit_tree and right before AudioServer.finish(), so the
+## audio thread never gets to free it and the playbacks (with the looping streams they hold)
+## are reported as "ObjectDB instances leaked" / "resources still in use at exit". Stop every
+## player now and give the audio thread a few mix steps (about 12 ms each) to free them.
+func _exit_tree() -> void:
+	_cache.clear()
+	var tree := get_tree()
+	if tree and tree.root:
+		for node in tree.root.find_children("*", "", true, false):
+			if node is AudioStreamPlayer or node is AudioStreamPlayer3D or node is AudioStreamPlayer2D:
+				node.stop()
+	# Also covers players freed during the last frame (already stopping, not yet freed).
+	OS.delay_msec(SHUTDOWN_DRAIN_MS)
 
 
 ## Returns a stream for `id` (random variant). Looping ids come back looping.
