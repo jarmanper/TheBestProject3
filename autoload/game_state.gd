@@ -5,6 +5,7 @@ extends Node
 const SECONDS_PER_HOUR := 90.0
 const END_HOUR := 6
 const SETTINGS_PATH := "user://settings.cfg"
+const BRIGHTNESS_MIN := 0.4
 
 var night_running := false
 var night_time := 0.0                 ## seconds since 12:00 AM
@@ -18,6 +19,9 @@ var world_root: Node3D                ## 3D root inside the game viewport
 var mouse_sensitivity := 0.0025       ## radians per pixel
 var master_volume := 0.8              ## 0..1
 var crt_enabled := true
+var brightness: float = 1.0:          ## 0.4..1.0 -- horror game: can only be turned DOWN
+	set(value):
+		brightness = clampf(value, BRIGHTNESS_MIN, 1.0)
 
 var _last_hour := -1
 
@@ -112,6 +116,7 @@ func load_settings() -> void:
 		mouse_sensitivity = config.get_value("input", "mouse_sensitivity", mouse_sensitivity)
 		master_volume = config.get_value("audio", "master_volume", master_volume)
 		crt_enabled = config.get_value("video", "crt_enabled", crt_enabled)
+		brightness = config.get_value("video", "brightness", brightness)
 	set_master_volume(master_volume)
 
 
@@ -120,4 +125,5 @@ func save_settings() -> void:
 	config.set_value("input", "mouse_sensitivity", mouse_sensitivity)
 	config.set_value("audio", "master_volume", master_volume)
 	config.set_value("video", "crt_enabled", crt_enabled)
+	config.set_value("video", "brightness", brightness)
 	config.save(SETTINGS_PATH)
