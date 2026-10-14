@@ -27,8 +27,11 @@ signal task_failed(task: TaskData)
 signal tasks_changed                           ## checklist should refresh
 
 # --- Store Manager -----------------------------------------------------------
-## Store-wide PA. Everyone hears it, including the monster (GDD seam 1).
+## Store-wide PA presentation for the HUD and audio systems.
 signal intercom_announced(message: String, zone: StringName)
+## An actionable manager task broadcast. `origins` are the PA speakers that
+## carried the call; AI listeners must check their distance before acting on it.
+signal manager_task_intercom_broadcast(zone: StringName, origins: Array, hearing_radius: float)
 ## Private radio to the player. `is_mimic` is the hidden truth: never show it in UI.
 signal walkie_message(speaker: String, message: String, origin: Vector3, is_mimic: bool)
 

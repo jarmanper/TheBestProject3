@@ -10,6 +10,9 @@ extends Node3D
 ## PA voice plays from this many intercom speakers nearest the player (more = phasing echo).
 const PA_SPEAKER_COUNT := 2
 const PA_VOICE_DB := 2.0
+## Matches the positional PA voice's maximum distance. Consumers receive this
+## value with each task call rather than assuming every intercom is audible.
+const PA_HEARING_RADIUS := 40.0
 
 ## `RANDOM` is the live-game default. The explicit channels make a scripted
 ## manager beat or a regression test choose its audience without duplicating
@@ -81,6 +84,7 @@ func issue_bonus_task(channel: AnnouncementChannel = AnnouncementChannel.RANDOM)
 		selected_channel = AnnouncementChannel.INTERCOM if _rng.randf() < 0.5 else AnnouncementChannel.WALKIE
 	if selected_channel == AnnouncementChannel.INTERCOM:
 		_announce(line, station.zone)
+		_emit_manager_task_intercom_broadcast(station.zone)
 	else:
 		_walkie(line)
 	return true
@@ -208,6 +212,17 @@ func _announce(message: String, zone: StringName = &"") -> void:
 		_play_pa_clip(clip, at)
 
 
+## Publishes the gameplay meaning of an intercom task separately from its
+## subtitle/audio event. The monster uses the speaker positions and radius to
+## decide whether it actually heard the call before waiting at the task zone.
+func _emit_manager_task_intercom_broadcast(zone: StringName) -> void:
+	var origins: Array[Vector3] = []
+	for speaker in _nearest_intercom_speakers(PA_SPEAKER_COUNT):
+		origins.append(speaker.global_position)
+	if not origins.is_empty():
+		Events.manager_task_intercom_broadcast.emit(zone, origins, PA_HEARING_RADIUS)
+
+
 func _nearest_intercom_speakers(count: int) -> Array[Node3D]:
 	var speakers: Array[Node3D] = []
 	for node in get_tree().get_nodes_in_group(&"intercom_speaker"):
@@ -230,7 +245,7 @@ func _play_pa_clip(clip: AudioStream, at: Vector3) -> void:
 	player.bus = &"Voice"
 	player.volume_db = PA_VOICE_DB
 	player.unit_size = 6.0
-	player.max_distance = 40.0
+	player.max_distance = PA_HEARING_RADIUS
 	parent.add_child(player)
 	player.global_position = at
 	player.finished.connect(player.queue_free)

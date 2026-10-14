@@ -422,26 +422,45 @@ func test_rule2_during_a_true_form_sighting_charges_without_transforming() -> vo
 
 # --- Seam 1, hearing ---------------------------------------------------------------------
 
-func test_intercom_sends_it_to_investigate_that_zone() -> void:
+func test_nearby_manager_task_intercom_sends_it_to_investigate_that_zone() -> void:
 	world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
 	var zone: StoreZone = world.add_zone(&"storage", Vector3(15, 1.5, 15), Vector3(8, 3, 8))
 	world.add_zone(&"produce", Vector3(-15, 1.5, -15), Vector3(8, 3, 8))
 	var monster := _spawn_monster(Vector3(0, 0, -20))
 	world.bake_navigation()
 	await world.settle_navigation()
-	Events.intercom_announced.emit("Clean-up in the storage room.", &"storage")
+	Events.manager_task_intercom_broadcast.emit(&"storage", [Vector3(0, 0, -15)], 10.0)
 	assert_eq(monster.state, Monster.INVESTIGATE)
 	assert_true(zone.contains_point(monster.investigate_target), "target %s inside the storage zone" % monster.investigate_target)
 	assert_false(monster.is_true_form(), "goes disguised")
 
 
-func test_intercom_ignored_while_chasing() -> void:
+func test_manager_task_intercom_beyond_earshot_is_ignored() -> void:
+	world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
+	world.add_zone(&"storage", Vector3(15, 1.5, 15), Vector3(8, 3, 8))
+	var monster := _spawn_monster(Vector3(0, 0, -20))
+	await world.settle()
+	Events.manager_task_intercom_broadcast.emit(&"storage", [Vector3(0, 0, 0)], 10.0)
+	assert_eq(monster.state, Monster.DISGUISED_ROAM, "a task call outside earshot gives no destination")
+	assert_eq(monster.investigate_target, Vector3.ZERO)
+
+
+func test_plain_intercom_does_not_give_the_monster_task_intelligence() -> void:
+	world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
+	world.add_zone(&"storage", Vector3(15, 1.5, 15), Vector3(8, 3, 8))
+	var monster := _spawn_monster(Vector3(0, 0, -20))
+	await world.settle()
+	Events.intercom_announced.emit("The store closes in three hours.", &"storage")
+	assert_eq(monster.state, Monster.DISGUISED_ROAM, "only manager task broadcasts create an opportunity")
+
+
+func test_manager_task_intercom_ignored_while_chasing() -> void:
 	world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
 	world.add_zone(&"storage", Vector3(15, 1.5, 15), Vector3(8, 3, 8))
 	var monster := _spawn_monster(Vector3(0, 0, -20))
 	await world.settle()
 	monster.force_state(Monster.CHASE)
-	Events.intercom_announced.emit("Clean-up in the storage room.", &"storage")
+	Events.manager_task_intercom_broadcast.emit(&"storage", [Vector3(0, 0, -15)], 10.0)
 	assert_eq(monster.state, Monster.CHASE)
 
 

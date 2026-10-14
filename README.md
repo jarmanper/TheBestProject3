@@ -110,6 +110,6 @@ The project includes a Web export preset and [GitHub Pages workflow](.github/wor
 
 - A low-poly, dark supermarket with narrow aisles, flickering fluorescent lights, red emergency lighting, storage, checkout, tools, three hiding spots, and built-in ambient/footstep/intercom/mimic audio.
 - A closing-task checklist: lock the register, restock an aisle, clean a spill with a mop, then finish the manager's intercom priority task with a utility key.
-- A manager intercom event that promotes the rear-breaker task and immediately redirects the mimic to that work location.
+- A manager task intercom event that gives a nearby mimic a reason to investigate the announced work location.
 - An unkillable mimic that initially passes as an employee, guarantees a sighting, uses collision-aware routes around shelves, loses sight through aisle obstructions, attacks after sustained close range, and can sprint for only 13 seconds before it slows down.
 - No weapons, monster health, multiplayer, or in-game voice chat; those are intentionally outside this first single-player slice.

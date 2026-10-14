@@ -44,8 +44,10 @@ the night's tasks or another system's actor state.
 - **Inputs:** night/hour lifecycle, coworker-missing and manager-task outcome
   signals, inactive `TaskStation`s, and the manager's spawn/intercom groups.
 - **Outputs:** one request through `Tasks.add_manager_task()`, an
-  `Events.intercom_announced(message, zone)` broadcast, or an
-  `Events.walkie_message(...)` radio message.
+  `Events.intercom_announced(message, zone)` presentation broadcast, a
+  `Events.manager_task_intercom_broadcast(zone, origins, hearing_radius)`
+  task-intelligence event for nearby AI listeners, or an `Events.walkie_message(...)`
+  radio message.
 - **Not owned here:** task activation, deadlines, priority ordering, claims,
   tools, checklist rendering, coworker routing, monster investigation, or HUD
   audio/subtitles. Those systems consume the manager's request or event through
@@ -53,9 +55,11 @@ the night's tasks or another system's actor state.
 
 ### Seams (GDD §3)
 
-1. **Intercom → Monster.** `StoreManager` writes `Events.intercom_announced(message, zone)`.
-   Everyone hears it, *including the monster*, which reads it and heads to that zone to wait
-   for whoever answers. Walkie messages are private: the monster does **not** hear them.
+1. **Manager task intercom → Monster.** When a bonus task is announced over the PA,
+   `StoreManager` writes `Events.manager_task_intercom_broadcast(zone, origins, hearing_radius)`.
+   The monster reads the task zone only if it is within the supplied hearing radius of a PA
+   speaker, then heads there to wait for whoever answers. Ordinary PA lines and walkie messages
+   do **not** provide task intelligence to the monster.
 2. **Manager → Tasks → Workers.** `StoreManager` adds a task with `Tasks.add_manager_task()`.
    `Tasks` sorts manager tasks above basic tasks (priority); coworkers always claim open
    manager tasks first; the HUD checklist lists them first.

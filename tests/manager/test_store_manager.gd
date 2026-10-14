@@ -2,12 +2,14 @@ extends TestCase
 
 var _manager: StoreManager
 var _stations: Array[TaskStation] = []
+var _speakers: Array[Node3D] = []
 
 
 func before_each() -> void:
 	Tasks.reset()
 	GameState.night_running = false
 	_stations.clear()
+	_speakers.clear()
 	_manager = StoreManager.new()
 
 
@@ -20,6 +22,10 @@ func after_each() -> void:
 		if is_instance_valid(station):
 			station.free()
 	_stations.clear()
+	for speaker in _speakers:
+		if is_instance_valid(speaker):
+			speaker.free()
+	_speakers.clear()
 
 
 func _make_inactive_station(i: int, is_basic := false) -> TaskStation:
@@ -32,6 +38,15 @@ func _make_inactive_station(i: int, is_basic := false) -> TaskStation:
 	tree.root.add_child(station)
 	_stations.append(station)
 	return station
+
+
+func _make_intercom_speaker(at := Vector3.ZERO) -> Marker3D:
+	var speaker := Marker3D.new()
+	speaker.add_to_group(&"intercom_speaker")
+	tree.root.add_child(speaker)
+	speaker.global_position = at
+	_speakers.append(speaker)
+	return speaker
 
 
 func test_issue_bonus_task_adds_a_manager_task_at_an_inactive_station() -> void:
@@ -76,7 +91,23 @@ func test_issue_bonus_task_announces_on_intercom_with_the_stations_zone() -> voi
 	Events.intercom_announced.connect(record)
 	assert_true(_manager.issue_bonus_task(StoreManager.AnnouncementChannel.INTERCOM))
 	Events.intercom_announced.disconnect(record)
-	assert_eq(heard, [station.zone], "intercom publishes the task zone for the monster")
+	assert_eq(heard, [station.zone], "intercom presentation carries the task zone")
+
+
+func test_intercom_task_broadcast_gives_ai_the_speaker_positions_and_range() -> void:
+	tree.root.add_child(_manager)
+	var station := _make_inactive_station(0)
+	var speaker := _make_intercom_speaker(Vector3(3, 2, -4))
+	var broadcasts: Array = []
+	var record := func(zone: StringName, origins: Array, hearing_radius: float) -> void:
+		broadcasts.append([zone, origins, hearing_radius])
+	Events.manager_task_intercom_broadcast.connect(record)
+	assert_true(_manager.issue_bonus_task(StoreManager.AnnouncementChannel.INTERCOM))
+	Events.manager_task_intercom_broadcast.disconnect(record)
+	assert_eq(broadcasts.size(), 1, "one task-intelligence event")
+	assert_eq(broadcasts[0][0], station.zone)
+	assert_eq(broadcasts[0][1], [speaker.global_position], "the AI receives the PA source")
+	assert_eq(broadcasts[0][2], StoreManager.PA_HEARING_RADIUS)
 
 
 func test_issue_bonus_task_sends_walkie_without_an_intercom_broadcast() -> void:
@@ -84,16 +115,22 @@ func test_issue_bonus_task_sends_walkie_without_an_intercom_broadcast() -> void:
 	var station := _make_inactive_station(0)
 	station.manager_line = "Lock up the safe at the service desk before it's too late."
 	var intercoms: Array = []
+	var task_broadcasts: Array = []
 	var walkies: Array = []
 	var on_intercom := func(_message: String, _zone: StringName) -> void: intercoms.append(true)
+	var on_task_broadcast := func(_zone: StringName, _origins: Array, _hearing_radius: float) -> void:
+		task_broadcasts.append(true)
 	var on_walkie := func(speaker: String, message: String, _origin: Vector3, is_mimic: bool) -> void:
 		walkies.append([speaker, message, is_mimic])
 	Events.intercom_announced.connect(on_intercom)
+	Events.manager_task_intercom_broadcast.connect(on_task_broadcast)
 	Events.walkie_message.connect(on_walkie)
 	assert_true(_manager.issue_bonus_task(StoreManager.AnnouncementChannel.WALKIE))
 	Events.intercom_announced.disconnect(on_intercom)
+	Events.manager_task_intercom_broadcast.disconnect(on_task_broadcast)
 	Events.walkie_message.disconnect(on_walkie)
 	assert_true(intercoms.is_empty(), "walkie assignments do not broadcast a monster-visible zone")
+	assert_true(task_broadcasts.is_empty(), "walkie assignments do not give the monster task intelligence")
 	assert_eq(walkies.size(), 1)
 	assert_eq(walkies[0], ["MANAGER", station.manager_line, false])
 
