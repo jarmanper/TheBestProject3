@@ -22,13 +22,13 @@ func after_each() -> void:
 	_stations.clear()
 
 
-func _make_inactive_station(i: int) -> TaskStation:
+func _make_inactive_station(i: int, is_basic := false) -> TaskStation:
 	var station := TaskStation.new()
 	station.task_kind = &"safe"
 	station.zone = StringName("zone_%d" % i)
 	station.title = "Station %d" % i
 	station.required_tool = &"keys"
-	station.basic_task = false
+	station.basic_task = is_basic
 	tree.root.add_child(station)
 	_stations.append(station)
 	return station
@@ -46,6 +46,25 @@ func test_issue_bonus_task_adds_a_manager_task_at_an_inactive_station() -> void:
 func test_issue_bonus_task_returns_false_with_no_inactive_stations() -> void:
 	tree.root.add_child(_manager)
 	assert_false(_manager.issue_bonus_task())
+
+
+func test_bonus_task_uses_the_configured_deadline_and_precedes_basic_work() -> void:
+	tree.root.add_child(_manager)
+	_manager.manager_task_time_limit = 47.0
+	for i in 6:
+		_make_inactive_station(i, true)
+	var manager_station := _make_inactive_station(6)
+	manager_station.manager_line = "Lock up the safe at the service desk before it's too late."
+	Tasks.begin_night()
+	assert_true(_manager.issue_bonus_task())
+	var open_tasks := Tasks.get_open_tasks()
+	assert_eq(open_tasks.size(), 7)
+	var bonus := open_tasks[0]
+	assert_true(bonus.is_manager_task, "manager work is prioritized before basic work")
+	assert_true(bonus.station == manager_station, "only inactive station receives the bonus task")
+	assert_near(bonus.time_limit, 47.0)
+	assert_near(bonus.time_left, 47.0)
+	assert_false(open_tasks[1].is_manager_task, "basic work remains after the priority task")
 
 
 func test_issue_bonus_task_announces_on_intercom_with_the_stations_zone() -> void:
