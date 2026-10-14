@@ -32,6 +32,12 @@ const TASK_COMPLETED := [
 	"Good, keep that pace up.",
 ]
 
+## One per bonus task once its countdown reaches StoreManager's configured
+## warning fraction. The task remains open; this is pressure, not a failure.
+const TASK_DUE_SOON := [
+	"That was supposed to be handled already.",
+]
+
 const TASK_FAILED := [
 	"Well, that didn't get done in time. I'll make a note of it.",
 	"Someone's getting a write-up for that one.",

@@ -23,6 +23,9 @@ enum AnnouncementChannel { RANDOM, INTERCOM, WALKIE }
 @export var max_bonus_interval := 110.0
 @export var max_open_manager_tasks := 2
 @export var manager_task_time_limit := 120.0
+## Fraction of a manager task's countdown at which it gets one agitated radio reminder.
+## Zero disables reminders; the manager never changes the task or its deadline.
+@export_range(0.0, 1.0, 0.05) var manager_task_warning_fraction := 0.5
 @export var pa_flavour_min_interval := 90.0
 @export var pa_flavour_max_interval := 150.0
 
@@ -32,6 +35,7 @@ var _elapsed := 0.0
 var _welcome_sent := false
 var _next_bonus_at := 0.0
 var _next_pa_flavour_at := 0.0
+var _warned_manager_tasks: Dictionary[StringName, bool] = {}
 var _rng := RandomNumberGenerator.new()
 
 
@@ -58,6 +62,7 @@ func tick(delta: float) -> void:
 	_maybe_send_welcome()
 	_maybe_send_pa_flavour()
 	_maybe_issue_bonus_task()
+	_maybe_warn_manager_tasks()
 
 
 ## Picks an inactive station and assigns it as a manager task. Live gameplay
@@ -84,6 +89,7 @@ func issue_bonus_task(channel: AnnouncementChannel = AnnouncementChannel.RANDOM)
 func _on_night_started() -> void:
 	_elapsed = 0.0
 	_welcome_sent = false
+	_warned_manager_tasks.clear()
 	_next_bonus_at = _rng.randf_range(min_first_bonus_delay, max_first_bonus_delay)
 	_next_pa_flavour_at = _elapsed + _rng.randf_range(pa_flavour_min_interval, pa_flavour_max_interval)
 
@@ -107,11 +113,13 @@ func _on_coworker_missing(coworker_name: String) -> void:
 
 func _on_task_completed(task: TaskData, _by: Node) -> void:
 	if task.is_manager_task:
+		_warned_manager_tasks.erase(task.id)
 		_walkie(ManagerLines.TASK_COMPLETED.pick_random())
 
 
 func _on_task_failed(task: TaskData) -> void:
 	if task.is_manager_task:
+		_warned_manager_tasks.erase(task.id)
 		_walkie(ManagerLines.TASK_FAILED.pick_random())
 
 
@@ -138,6 +146,21 @@ func _maybe_issue_bonus_task() -> void:
 		_next_bonus_at = _elapsed + _rng.randf_range(min_bonus_interval, max_bonus_interval)
 	else:
 		_next_bonus_at = _elapsed + 5.0  ## nothing free right now; retry soon
+
+
+## Observes manager-task countdowns owned by Tasks and gives each task at most
+## one warning. This intentionally does not alter task state, priority or time.
+func _maybe_warn_manager_tasks() -> void:
+	if manager_task_warning_fraction <= 0.0:
+		return
+	for task in Tasks.get_open_tasks():
+		if not task.is_manager_task or task.time_limit <= 0.0 or task.time_left <= 0.0:
+			continue
+		if _warned_manager_tasks.has(task.id):
+			continue
+		if task.time_left <= task.time_limit * manager_task_warning_fraction:
+			_warned_manager_tasks[task.id] = true
+			_walkie(ManagerLines.TASK_DUE_SOON.pick_random())
 
 
 func _open_manager_task_count() -> int:

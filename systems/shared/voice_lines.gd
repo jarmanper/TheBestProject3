@@ -107,6 +107,8 @@ static func enumerate_all() -> Array[Dictionary]:
 			_add(out, seen, "MANAGER", template % coworker_name, false, WALKIE)
 	for line: String in ManagerLines.TASK_COMPLETED:
 		_add(out, seen, "MANAGER", line, false, WALKIE)
+	for line: String in ManagerLines.TASK_DUE_SOON:
+		_add(out, seen, "MANAGER", line, false, WALKIE)
 	for line: String in ManagerLines.TASK_FAILED:
 		_add(out, seen, "MANAGER", line, false, WALKIE)
 

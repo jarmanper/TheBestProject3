@@ -13,6 +13,7 @@ func test_every_manager_dialogue_category_has_copy() -> void:
 	assert_false(ManagerLines.PA_FLAVOUR.is_empty(), "PA flavour lines")
 	assert_false(ManagerLines.COWORKER_MISSING.is_empty(), "missing-coworker lines")
 	assert_false(ManagerLines.TASK_COMPLETED.is_empty(), "completion lines")
+	assert_false(ManagerLines.TASK_DUE_SOON.is_empty(), "due-soon lines")
 	assert_false(ManagerLines.TASK_FAILED.is_empty(), "failure lines")
 	assert_false(ManagerLines.TALK.is_empty(), "face-to-face talk lines")
 
@@ -39,6 +40,8 @@ func test_every_manager_walkie_line_has_a_generated_clip() -> void:
 		for template: String in ManagerLines.COWORKER_MISSING:
 			lines.append(template % String(coworker["name"]))
 	for line: String in ManagerLines.TASK_COMPLETED:
+		lines.append(line)
+	for line: String in ManagerLines.TASK_DUE_SOON:
 		lines.append(line)
 	for line: String in ManagerLines.TASK_FAILED:
 		lines.append(line)

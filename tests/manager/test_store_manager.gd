@@ -208,6 +208,34 @@ func test_manager_reacts_on_walkie_when_a_manager_task_fails() -> void:
 	assert_false(heard[0][2])
 
 
+func test_manager_warns_once_when_a_bonus_task_reaches_its_deadline_fraction() -> void:
+	_manager.welcome_delay = 999.0
+	_manager.min_first_bonus_delay = 999.0
+	_manager.max_first_bonus_delay = 999.0
+	_manager.pa_flavour_min_interval = 999.0
+	_manager.pa_flavour_max_interval = 999.0
+	_manager.manager_task_warning_fraction = 0.5
+	tree.root.add_child(_manager)
+	Events.night_started.emit()
+	var station := _make_inactive_station(0)
+	var task := Tasks.add_manager_task(station, 10.0)
+	var heard: Array = []
+	var record := func(speaker: String, message: String, _origin: Vector3, _is_mimic: bool) -> void:
+		heard.append([speaker, message])
+	Events.walkie_message.connect(record)
+	task.time_left = 5.1
+	_manager.tick(0.0)
+	assert_true(heard.is_empty(), "no warning before the configured deadline fraction")
+	task.time_left = 5.0
+	_manager.tick(0.0)
+	_manager.tick(1.0)
+	Events.walkie_message.disconnect(record)
+	assert_eq(heard.size(), 1, "each manager task receives one due-soon warning")
+	assert_eq(heard[0][0], "MANAGER")
+	assert_true(heard[0][1] in ManagerLines.TASK_DUE_SOON)
+	assert_false(task.failed, "a warning leaves the task state to Tasks")
+
+
 func _intercom_lines_for_hour(hour: int) -> Array:
 	var heard: Array = []
 	var record := func(message: String, _zone: StringName) -> void: heard.append(message)
