@@ -79,6 +79,49 @@ func test_tick_sends_the_welcome_line_once_after_its_delay() -> void:
 	assert_true(heard[0] in ManagerLines.WELCOME)
 
 
+func test_night_start_resets_the_welcome_schedule() -> void:
+	_manager.welcome_delay = 1.0
+	_manager.min_first_bonus_delay = 999.0
+	_manager.max_first_bonus_delay = 999.0
+	_manager.pa_flavour_min_interval = 999.0
+	_manager.pa_flavour_max_interval = 999.0
+	tree.root.add_child(_manager)
+	var heard: Array = []
+	var record := func(message: String, _zone: StringName) -> void: heard.append(message)
+	Events.intercom_announced.connect(record)
+	Events.night_started.emit()
+	_manager.tick(1.0)
+	Events.night_started.emit()
+	_manager.tick(0.5)
+	assert_eq(heard.size(), 1, "new night restarts the welcome delay")
+	_manager.tick(0.5)
+	Events.intercom_announced.disconnect(record)
+	assert_eq(heard.size(), 2, "each night gets one welcome")
+	assert_true(heard.all(func(line: String) -> bool: return line in ManagerLines.WELCOME))
+
+
+func test_pa_flavour_uses_its_tunable_interval_and_repeats() -> void:
+	_manager.welcome_delay = 999.0
+	_manager.min_first_bonus_delay = 999.0
+	_manager.max_first_bonus_delay = 999.0
+	_manager.pa_flavour_min_interval = 2.0
+	_manager.pa_flavour_max_interval = 2.0
+	tree.root.add_child(_manager)
+	var heard: Array = []
+	var record := func(message: String, _zone: StringName) -> void: heard.append(message)
+	Events.intercom_announced.connect(record)
+	Events.night_started.emit()
+	_manager.tick(1.9)
+	assert_true(heard.is_empty(), "PA flavour waits for its configured interval")
+	_manager.tick(0.1)
+	_manager.tick(1.9)
+	assert_eq(heard.size(), 1, "one PA flavour line at two seconds")
+	_manager.tick(0.1)
+	Events.intercom_announced.disconnect(record)
+	assert_eq(heard.size(), 2, "PA flavour reschedules at the same tunable interval")
+	assert_true(heard.all(func(line: String) -> bool: return line in ManagerLines.PA_FLAVOUR))
+
+
 func test_tick_issues_the_first_bonus_task_within_its_configured_window() -> void:
 	tree.root.add_child(_manager)
 	_manager.min_first_bonus_delay = 1.0
