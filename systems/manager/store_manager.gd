@@ -11,6 +11,11 @@ extends Node3D
 const PA_SPEAKER_COUNT := 2
 const PA_VOICE_DB := 2.0
 
+## `RANDOM` is the live-game default. The explicit channels make a scripted
+## manager beat or a regression test choose its audience without duplicating
+## task-assignment logic.
+enum AnnouncementChannel { RANDOM, INTERCOM, WALKIE }
+
 @export var welcome_delay := 6.0
 @export var min_first_bonus_delay := 50.0
 @export var max_first_bonus_delay := 70.0
@@ -55,9 +60,10 @@ func tick(delta: float) -> void:
 	_maybe_issue_bonus_task()
 
 
-## Picks an inactive station and assigns it as a manager task, 50/50 over the
-## intercom or the walkie. Returns false when there is nothing to assign.
-func issue_bonus_task() -> bool:
+## Picks an inactive station and assigns it as a manager task. Live gameplay
+## uses the 50/50 RANDOM channel; explicit channels are for scripted beats.
+## Returns false when there is nothing to assign.
+func issue_bonus_task(channel: AnnouncementChannel = AnnouncementChannel.RANDOM) -> bool:
 	var station := _pick_inactive_station()
 	if station == null:
 		return false
@@ -65,7 +71,10 @@ func issue_bonus_task() -> bool:
 	if task == null:
 		return false
 	var line: String = station.manager_line if not station.manager_line.is_empty() else ("Attention: " + station.title)
-	if _rng.randf() < 0.5:
+	var selected_channel := channel
+	if selected_channel == AnnouncementChannel.RANDOM:
+		selected_channel = AnnouncementChannel.INTERCOM if _rng.randf() < 0.5 else AnnouncementChannel.WALKIE
+	if selected_channel == AnnouncementChannel.INTERCOM:
 		_announce(line, station.zone)
 	else:
 		_walkie(line)

@@ -69,17 +69,33 @@ func test_bonus_task_uses_the_configured_deadline_and_precedes_basic_work() -> v
 
 func test_issue_bonus_task_announces_on_intercom_with_the_stations_zone() -> void:
 	tree.root.add_child(_manager)
-	var heard: Array = []
+	var station := _make_inactive_station(0)
+	station.manager_line = "Lock up the safe at the service desk before it's too late."
+	var heard: Array[StringName] = []
 	var record := func(_message: String, zone: StringName) -> void: heard.append(zone)
 	Events.intercom_announced.connect(record)
-	for i in 20:
-		_make_inactive_station(i)
-		_manager.issue_bonus_task()
-		if not heard.is_empty():
-			break
+	assert_true(_manager.issue_bonus_task(StoreManager.AnnouncementChannel.INTERCOM))
 	Events.intercom_announced.disconnect(record)
-	assert_false(heard.is_empty(), "expected at least one bonus task to go out over the intercom in 20 tries")
-	assert_true(String(heard[0]).begins_with("zone_"))
+	assert_eq(heard, [station.zone], "intercom publishes the task zone for the monster")
+
+
+func test_issue_bonus_task_sends_walkie_without_an_intercom_broadcast() -> void:
+	tree.root.add_child(_manager)
+	var station := _make_inactive_station(0)
+	station.manager_line = "Lock up the safe at the service desk before it's too late."
+	var intercoms: Array = []
+	var walkies: Array = []
+	var on_intercom := func(_message: String, _zone: StringName) -> void: intercoms.append(true)
+	var on_walkie := func(speaker: String, message: String, _origin: Vector3, is_mimic: bool) -> void:
+		walkies.append([speaker, message, is_mimic])
+	Events.intercom_announced.connect(on_intercom)
+	Events.walkie_message.connect(on_walkie)
+	assert_true(_manager.issue_bonus_task(StoreManager.AnnouncementChannel.WALKIE))
+	Events.intercom_announced.disconnect(on_intercom)
+	Events.walkie_message.disconnect(on_walkie)
+	assert_true(intercoms.is_empty(), "walkie assignments do not broadcast a monster-visible zone")
+	assert_eq(walkies.size(), 1)
+	assert_eq(walkies[0], ["MANAGER", station.manager_line, false])
 
 
 func test_tick_sends_the_welcome_line_once_after_its_delay() -> void:
