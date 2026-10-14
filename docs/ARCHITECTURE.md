@@ -16,6 +16,9 @@ monster that mimics them hunts them down.
   Walkie voices are shared radio-babble variants (`walkie_voice_*`), not one voice per
   coworker; the mimic's set (`walkie_voice_mimic_*`: a touch lower, more distorted, reversed
   syllables) is a subtle audio tell **by design** — the subtitle never gives it away.
+- **Multiplayer foundation.** The Web export can create and join WebRTC lobbies through a
+  separate WSS signaling service with STUN/TURN fallback. The current shift remains
+  single-player until player, task, monster, and end-state replication is integrated.
 - **Night:** 12:00 AM to 6:00 AM, `GameState.SECONDS_PER_HOUR` = 90 real seconds per hour (9 minutes total).
 - **Win:** reach 6:00 AM alive with every basic task done ("SHIFT COMPLETE").
 - **Fired:** reach 6:00 AM alive with basic tasks left ("YOU'RE FIRED").
@@ -119,8 +122,10 @@ systems/player/      Player (+ viewmodel)
 systems/environment/ Tasks (autoload), TaskData, TaskStation, ToolPickup, HidingSpot, StoreZone, StoreLight
 systems/manager/     StoreManager + manager NPC
 systems/monster/     Monster + Perception helpers
+systems/network/     WebRTC lobby configuration + session bootstrap
 systems/coworkers/   Coworker
 ui/                  HUD, menus, post-processing (CRT)
+services/multiplayer/ Deployable WSS signaling + Caddy/coturn stack
 levels/greybox/      CSG blockout of the layout below (for testing)
 levels/store/        Final store level (art + gameplay nodes)
 scenes/              main_menu.tscn, game.tscn

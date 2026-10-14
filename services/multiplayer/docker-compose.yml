@@ -1,0 +1,52 @@
+services:
+  signaling:
+    build: ./signaling
+    restart: unless-stopped
+    environment:
+      PORT: "8080"
+      MAX_PLAYERS: ${MAX_PLAYERS:-4}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:?Set this to the HTTPS GitHub Pages origin}
+    expose:
+      - "8080"
+
+  caddy:
+    image: caddy:2.8-alpine
+    restart: unless-stopped
+    depends_on:
+      - signaling
+    environment:
+      SIGNALING_DOMAIN: ${SIGNALING_DOMAIN:?Set the signaling DNS name}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+  turn:
+    image: coturn/coturn:4.6.3
+    restart: unless-stopped
+    command:
+      - -n
+      - --log-file=stdout
+      - --fingerprint
+      - --lt-cred-mech
+      - --realm=${TURN_REALM:?Set the TURN realm/domain}
+      - --user=${TURN_USERNAME:?Set a TURN username}:${TURN_PASSWORD:?Set a TURN password}
+      - --cert=/certs/fullchain.pem
+      - --pkey=/certs/privkey.pem
+      - --min-port=49160
+      - --max-port=49200
+    ports:
+      - "3478:3478/tcp"
+      - "3478:3478/udp"
+      - "5349:5349/tcp"
+      - "5349:5349/udp"
+      - "49160-49200:49160-49200/udp"
+    volumes:
+      - ${TURN_CERT_DIRECTORY:?Mount a directory containing fullchain.pem and privkey.pem}:/certs:ro
+
+volumes:
+  caddy_data:
+  caddy_config:

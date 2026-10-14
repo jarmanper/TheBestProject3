@@ -21,6 +21,7 @@ Events="*res://autoload/events.gd"
 GameState="*res://autoload/game_state.gd"
 Sfx="*res://autoload/sfx.gd"
 Tasks="*res://systems/environment/task_manager.gd"
+MultiplayerSession="*res://systems/network/multiplayer_session.gd"
 
 [display]
 

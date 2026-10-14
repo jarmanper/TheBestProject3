@@ -60,6 +60,13 @@ tools/serve_web.py          # serves build/web/ at http://127.0.0.1:8060/
 export automatically on every push to `main` (or via Actions → Run workflow). One-time repo
 setting required before the first deploy: **Settings → Pages → Source: GitHub Actions**.
 
+## Online lobby / WebRTC
+
+The browser client supports a WebRTC pre-game lobby, but GitHub Pages only
+hosts the static game export. Deploy the separate WSS signaling and STUN/TURN
+stack, then add its values as GitHub Actions secrets before publishing an
+online-enabled build. See [the multiplayer deployment guide](docs/MULTIPLAYER.md).
+
 ## Working on your system
 
 Each system lives in its own folder (owners from the GDD; full contract in
@@ -112,4 +119,4 @@ The project includes a Web export preset and [GitHub Pages workflow](.github/wor
 - A closing-task checklist: lock the register, restock an aisle, clean a spill with a mop, then finish the manager's intercom priority task with a utility key.
 - A manager task intercom event that gives a nearby mimic a reason to investigate the announced work location.
 - An unkillable mimic that initially passes as an employee, guarantees a sighting, uses collision-aware routes around shelves, loses sight through aisle obstructions, attacks after sustained close range, and can sprint for only 13 seconds before it slows down.
-- No weapons, monster health, multiplayer, or in-game voice chat; those are intentionally outside this first single-player slice.
+- No weapons, monster health, or in-game voice chat; those are intentionally outside this first gameplay slice. The WebRTC lobby is in place, while synchronized co-op gameplay is the next integration step.
