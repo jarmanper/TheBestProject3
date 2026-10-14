@@ -1,7 +1,9 @@
 class_name ManagerLines
 extends RefCounted
 ## All of the store manager's flavour text in one place, so lines can be
-## tuned without touching StoreManager's logic.
+## tuned without touching StoreManager's logic. Broadcast and walkie lines
+## are enumerated by VoiceLines for generated clips; TALK is face-to-face
+## subtitle copy from ManagerNpc and intentionally has no radio/PA clip.
 
 const WELCOME := [
 	"Attention staff: the overnight shift has begun. Let's get those tasks done before sunrise.",
