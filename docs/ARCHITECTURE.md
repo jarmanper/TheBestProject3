@@ -34,6 +34,23 @@ monster that mimics them hunts them down.
 | Coworkers — AI employees | team | `systems/coworkers/` |
 | Player — first-person controller | team | `systems/player/` |
 
+### Store Manager ownership boundary
+
+`StoreManager` owns the manager NPC's spawn and presentation, the timing and
+selection of bonus-task requests, and all manager dialogue. Its state is the
+manager's schedule, random seed, and announcement cooldowns -- never a copy of
+the night's tasks or another system's actor state.
+
+- **Inputs:** night/hour lifecycle, coworker-missing and manager-task outcome
+  signals, inactive `TaskStation`s, and the manager's spawn/intercom groups.
+- **Outputs:** one request through `Tasks.add_manager_task()`, an
+  `Events.intercom_announced(message, zone)` broadcast, or an
+  `Events.walkie_message(...)` radio message.
+- **Not owned here:** task activation, deadlines, priority ordering, claims,
+  tools, checklist rendering, coworker routing, monster investigation, or HUD
+  audio/subtitles. Those systems consume the manager's request or event through
+  their public contracts.
+
 ### Seams (GDD §3)
 
 1. **Intercom → Monster.** `StoreManager` writes `Events.intercom_announced(message, zone)`.
