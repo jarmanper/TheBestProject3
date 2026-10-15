@@ -80,7 +80,7 @@ const ABDUCT_INTERVAL := Vector2(120.0, 200.0)
 const ABDUCT_RETRY := 5.0
 const ABDUCT_MIN_PLAYER_DISTANCE := 15.0
 const MISSING_IDENTITY_CHANCE := 0.75   ## prefers wearing a missing coworker's face
-const INTERCOM_MEMORY := 60.0           ## acts on an announcement heard this recently
+const INTERCOM_MEMORY := 60.0           ## acts on a manager task call heard this recently
 const WORK_PAUSE := Vector2(4.0, 10.0)  ## roam: pretends to work this long at each stop
 const TWITCH_INTERVAL := Vector2(1.5, 4.5)
 const WHEEZE_INTERVAL := 3.0
@@ -156,8 +156,8 @@ var _hop_wait := 0.0                    ## search: idle time before the next hop
 var _wheeze_left := 0.0                 ## winded: next wheeze in
 var _attack_hit := false
 var _sighting_failures := 0
-var _pending_intercom: StringName = &""
-var _pending_intercom_age := 0.0
+var _pending_manager_task_zone: StringName = &""
+var _pending_manager_task_age := 0.0
 var _chase_active := false
 
 # Presence: forms, animation, tells.
@@ -197,7 +197,7 @@ func _ready() -> void:
 	_target = global_position
 	_burst_cooldown = _roll(BURST_INTERVAL)
 	_twitch_left = _roll(TWITCH_INTERVAL)
-	Events.intercom_announced.connect(_on_intercom_announced)
+	Events.manager_task_intercom_broadcast.connect(_on_manager_task_intercom_broadcast)
 	Events.player_hid.connect(_on_player_hid)
 	Events.player_unhid.connect(_on_player_unhid)
 	Events.coworker_missing.connect(_on_coworker_missing)
@@ -416,7 +416,7 @@ func _tick_rules(delta: float) -> void:
 		GameState.add_stat("monster_sightings")
 	var hour := GameState.get_hour()
 	rules.tick_schedules(delta, hour)
-	_pending_intercom_age += delta
+	_pending_manager_task_age += delta
 	# Rule 2: a player lingering near the disguise makes it turn.
 	var lingering := state in RULE2_STATES \
 		and MonsterRules.is_reveal_condition(_player_distance, _has_los, _player_hidden)
@@ -498,10 +498,10 @@ func _enter_disguised_roam() -> void:
 
 
 func _tick_disguised_roam(delta: float) -> void:
-	if not _pending_intercom.is_empty():
-		var zone := _pending_intercom
-		_pending_intercom = &""
-		if _pending_intercom_age <= INTERCOM_MEMORY and investigate_zone(zone):
+	if not _pending_manager_task_zone.is_empty():
+		var zone := _pending_manager_task_zone
+		_pending_manager_task_zone = &""
+		if _pending_manager_task_age <= INTERCOM_MEMORY and investigate_zone(zone):
 			return
 	if _stare_if_lingered():
 		return
@@ -1342,15 +1342,28 @@ func _update_animation() -> void:
 
 # --- Signals -------------------------------------------------------------------------
 
-## GDD seam 1: everyone hears the intercom, including the monster.
-func _on_intercom_announced(_message: String, zone: StringName) -> void:
+## Manager task calls give the monster an opportunity only when one of the PA
+## speakers is close enough to hear. Walls do not block this store-wide sound,
+## matching the monster's existing player-noise hearing rule.
+func _on_manager_task_intercom_broadcast(zone: StringName, origins: Array, hearing_radius: float) -> void:
 	if not is_inside_tree():
+		return
+	if zone.is_empty() or not _is_in_earshot(origins, hearing_radius):
 		return
 	if state in CALM_STATES:
 		investigate_zone(zone)
 	elif state == SIGHTING or state == RETREAT:
-		_pending_intercom = zone
-		_pending_intercom_age = 0.0
+		_pending_manager_task_zone = zone
+		_pending_manager_task_age = 0.0
+
+
+func _is_in_earshot(origins: Array, hearing_radius: float) -> bool:
+	if hearing_radius <= 0.0:
+		return false
+	for origin: Variant in origins:
+		if origin is Vector3 and global_position.distance_to(origin) <= hearing_radius:
+			return true
+	return false
 
 
 ## It only knows where the player hid if it was watching at that moment.

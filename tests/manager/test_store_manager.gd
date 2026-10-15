@@ -2,12 +2,14 @@ extends TestCase
 
 var _manager: StoreManager
 var _stations: Array[TaskStation] = []
+var _speakers: Array[Node3D] = []
 
 
 func before_each() -> void:
 	Tasks.reset()
 	GameState.night_running = false
 	_stations.clear()
+	_speakers.clear()
 	_manager = StoreManager.new()
 
 
@@ -20,18 +22,31 @@ func after_each() -> void:
 		if is_instance_valid(station):
 			station.free()
 	_stations.clear()
+	for speaker in _speakers:
+		if is_instance_valid(speaker):
+			speaker.free()
+	_speakers.clear()
 
 
-func _make_inactive_station(i: int) -> TaskStation:
+func _make_inactive_station(i: int, is_basic := false) -> TaskStation:
 	var station := TaskStation.new()
 	station.task_kind = &"safe"
 	station.zone = StringName("zone_%d" % i)
 	station.title = "Station %d" % i
 	station.required_tool = &"keys"
-	station.basic_task = false
+	station.basic_task = is_basic
 	tree.root.add_child(station)
 	_stations.append(station)
 	return station
+
+
+func _make_intercom_speaker(at := Vector3.ZERO) -> Marker3D:
+	var speaker := Marker3D.new()
+	speaker.add_to_group(&"intercom_speaker")
+	tree.root.add_child(speaker)
+	speaker.global_position = at
+	_speakers.append(speaker)
+	return speaker
 
 
 func test_issue_bonus_task_adds_a_manager_task_at_an_inactive_station() -> void:
@@ -48,19 +63,76 @@ func test_issue_bonus_task_returns_false_with_no_inactive_stations() -> void:
 	assert_false(_manager.issue_bonus_task())
 
 
+func test_bonus_task_uses_the_configured_deadline_and_precedes_basic_work() -> void:
+	tree.root.add_child(_manager)
+	_manager.manager_task_time_limit = 47.0
+	for i in 6:
+		_make_inactive_station(i, true)
+	var manager_station := _make_inactive_station(6)
+	manager_station.manager_line = "Lock up the safe at the service desk before it's too late."
+	Tasks.begin_night()
+	assert_true(_manager.issue_bonus_task())
+	var open_tasks := Tasks.get_open_tasks()
+	assert_eq(open_tasks.size(), 7)
+	var bonus := open_tasks[0]
+	assert_true(bonus.is_manager_task, "manager work is prioritized before basic work")
+	assert_true(bonus.station == manager_station, "only inactive station receives the bonus task")
+	assert_near(bonus.time_limit, 47.0)
+	assert_near(bonus.time_left, 47.0)
+	assert_false(open_tasks[1].is_manager_task, "basic work remains after the priority task")
+
+
 func test_issue_bonus_task_announces_on_intercom_with_the_stations_zone() -> void:
 	tree.root.add_child(_manager)
-	var heard: Array = []
+	var station := _make_inactive_station(0)
+	station.manager_line = "Lock up the safe at the service desk before it's too late."
+	var heard: Array[StringName] = []
 	var record := func(_message: String, zone: StringName) -> void: heard.append(zone)
 	Events.intercom_announced.connect(record)
-	for i in 20:
-		_make_inactive_station(i)
-		_manager.issue_bonus_task()
-		if not heard.is_empty():
-			break
+	assert_true(_manager.issue_bonus_task(StoreManager.AnnouncementChannel.INTERCOM))
 	Events.intercom_announced.disconnect(record)
-	assert_false(heard.is_empty(), "expected at least one bonus task to go out over the intercom in 20 tries")
-	assert_true(String(heard[0]).begins_with("zone_"))
+	assert_eq(heard, [station.zone], "intercom presentation carries the task zone")
+
+
+func test_intercom_task_broadcast_gives_ai_the_speaker_positions_and_range() -> void:
+	tree.root.add_child(_manager)
+	var station := _make_inactive_station(0)
+	var speaker := _make_intercom_speaker(Vector3(3, 2, -4))
+	var broadcasts: Array = []
+	var record := func(zone: StringName, origins: Array, hearing_radius: float) -> void:
+		broadcasts.append([zone, origins, hearing_radius])
+	Events.manager_task_intercom_broadcast.connect(record)
+	assert_true(_manager.issue_bonus_task(StoreManager.AnnouncementChannel.INTERCOM))
+	Events.manager_task_intercom_broadcast.disconnect(record)
+	assert_eq(broadcasts.size(), 1, "one task-intelligence event")
+	assert_eq(broadcasts[0][0], station.zone)
+	assert_eq(broadcasts[0][1], [speaker.global_position], "the AI receives the PA source")
+	assert_eq(broadcasts[0][2], StoreManager.PA_HEARING_RADIUS)
+
+
+func test_issue_bonus_task_sends_walkie_without_an_intercom_broadcast() -> void:
+	tree.root.add_child(_manager)
+	var station := _make_inactive_station(0)
+	station.manager_line = "Lock up the safe at the service desk before it's too late."
+	var intercoms: Array = []
+	var task_broadcasts: Array = []
+	var walkies: Array = []
+	var on_intercom := func(_message: String, _zone: StringName) -> void: intercoms.append(true)
+	var on_task_broadcast := func(_zone: StringName, _origins: Array, _hearing_radius: float) -> void:
+		task_broadcasts.append(true)
+	var on_walkie := func(speaker: String, message: String, _origin: Vector3, is_mimic: bool) -> void:
+		walkies.append([speaker, message, is_mimic])
+	Events.intercom_announced.connect(on_intercom)
+	Events.manager_task_intercom_broadcast.connect(on_task_broadcast)
+	Events.walkie_message.connect(on_walkie)
+	assert_true(_manager.issue_bonus_task(StoreManager.AnnouncementChannel.WALKIE))
+	Events.intercom_announced.disconnect(on_intercom)
+	Events.manager_task_intercom_broadcast.disconnect(on_task_broadcast)
+	Events.walkie_message.disconnect(on_walkie)
+	assert_true(intercoms.is_empty(), "walkie assignments do not broadcast a monster-visible zone")
+	assert_true(task_broadcasts.is_empty(), "walkie assignments do not give the monster task intelligence")
+	assert_eq(walkies.size(), 1)
+	assert_eq(walkies[0], ["MANAGER", station.manager_line, false])
 
 
 func test_tick_sends_the_welcome_line_once_after_its_delay() -> void:
@@ -77,6 +149,49 @@ func test_tick_sends_the_welcome_line_once_after_its_delay() -> void:
 	Events.intercom_announced.disconnect(record)
 	assert_eq(heard.size(), 1)
 	assert_true(heard[0] in ManagerLines.WELCOME)
+
+
+func test_night_start_resets_the_welcome_schedule() -> void:
+	_manager.welcome_delay = 1.0
+	_manager.min_first_bonus_delay = 999.0
+	_manager.max_first_bonus_delay = 999.0
+	_manager.pa_flavour_min_interval = 999.0
+	_manager.pa_flavour_max_interval = 999.0
+	tree.root.add_child(_manager)
+	var heard: Array = []
+	var record := func(message: String, _zone: StringName) -> void: heard.append(message)
+	Events.intercom_announced.connect(record)
+	Events.night_started.emit()
+	_manager.tick(1.0)
+	Events.night_started.emit()
+	_manager.tick(0.5)
+	assert_eq(heard.size(), 1, "new night restarts the welcome delay")
+	_manager.tick(0.5)
+	Events.intercom_announced.disconnect(record)
+	assert_eq(heard.size(), 2, "each night gets one welcome")
+	assert_true(heard.all(func(line: String) -> bool: return line in ManagerLines.WELCOME))
+
+
+func test_pa_flavour_uses_its_tunable_interval_and_repeats() -> void:
+	_manager.welcome_delay = 999.0
+	_manager.min_first_bonus_delay = 999.0
+	_manager.max_first_bonus_delay = 999.0
+	_manager.pa_flavour_min_interval = 2.0
+	_manager.pa_flavour_max_interval = 2.0
+	tree.root.add_child(_manager)
+	var heard: Array = []
+	var record := func(message: String, _zone: StringName) -> void: heard.append(message)
+	Events.intercom_announced.connect(record)
+	Events.night_started.emit()
+	_manager.tick(1.9)
+	assert_true(heard.is_empty(), "PA flavour waits for its configured interval")
+	_manager.tick(0.1)
+	_manager.tick(1.9)
+	assert_eq(heard.size(), 1, "one PA flavour line at two seconds")
+	_manager.tick(0.1)
+	Events.intercom_announced.disconnect(record)
+	assert_eq(heard.size(), 2, "PA flavour reschedules at the same tunable interval")
+	assert_true(heard.all(func(line: String) -> bool: return line in ManagerLines.PA_FLAVOUR))
 
 
 func test_tick_issues_the_first_bonus_task_within_its_configured_window() -> void:
@@ -128,6 +243,34 @@ func test_manager_reacts_on_walkie_when_a_manager_task_fails() -> void:
 	assert_eq(heard.size(), 1)
 	assert_eq(heard[0][0], "MANAGER")
 	assert_false(heard[0][2])
+
+
+func test_manager_warns_once_when_a_bonus_task_reaches_its_deadline_fraction() -> void:
+	_manager.welcome_delay = 999.0
+	_manager.min_first_bonus_delay = 999.0
+	_manager.max_first_bonus_delay = 999.0
+	_manager.pa_flavour_min_interval = 999.0
+	_manager.pa_flavour_max_interval = 999.0
+	_manager.manager_task_warning_fraction = 0.5
+	tree.root.add_child(_manager)
+	Events.night_started.emit()
+	var station := _make_inactive_station(0)
+	var task := Tasks.add_manager_task(station, 10.0)
+	var heard: Array = []
+	var record := func(speaker: String, message: String, _origin: Vector3, _is_mimic: bool) -> void:
+		heard.append([speaker, message])
+	Events.walkie_message.connect(record)
+	task.time_left = 5.1
+	_manager.tick(0.0)
+	assert_true(heard.is_empty(), "no warning before the configured deadline fraction")
+	task.time_left = 5.0
+	_manager.tick(0.0)
+	_manager.tick(1.0)
+	Events.walkie_message.disconnect(record)
+	assert_eq(heard.size(), 1, "each manager task receives one due-soon warning")
+	assert_eq(heard[0][0], "MANAGER")
+	assert_true(heard[0][1] in ManagerLines.TASK_DUE_SOON)
+	assert_false(task.failed, "a warning leaves the task state to Tasks")
 
 
 func _intercom_lines_for_hour(hour: int) -> Array:

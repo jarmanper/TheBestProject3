@@ -10,6 +10,14 @@ extends Node3D
 ## PA voice plays from this many intercom speakers nearest the player (more = phasing echo).
 const PA_SPEAKER_COUNT := 2
 const PA_VOICE_DB := 2.0
+## Matches the positional PA voice's maximum distance. Consumers receive this
+## value with each task call rather than assuming every intercom is audible.
+const PA_HEARING_RADIUS := 40.0
+
+## `RANDOM` is the live-game default. The explicit channels make a scripted
+## manager beat or a regression test choose its audience without duplicating
+## task-assignment logic.
+enum AnnouncementChannel { RANDOM, INTERCOM, WALKIE }
 
 @export var welcome_delay := 6.0
 @export var min_first_bonus_delay := 50.0
@@ -18,6 +26,9 @@ const PA_VOICE_DB := 2.0
 @export var max_bonus_interval := 110.0
 @export var max_open_manager_tasks := 2
 @export var manager_task_time_limit := 120.0
+## Fraction of a manager task's countdown at which it gets one agitated radio reminder.
+## Zero disables reminders; the manager never changes the task or its deadline.
+@export_range(0.0, 1.0, 0.05) var manager_task_warning_fraction := 0.5
 @export var pa_flavour_min_interval := 90.0
 @export var pa_flavour_max_interval := 150.0
 
@@ -27,6 +38,7 @@ var _elapsed := 0.0
 var _welcome_sent := false
 var _next_bonus_at := 0.0
 var _next_pa_flavour_at := 0.0
+var _warned_manager_tasks: Dictionary[StringName, bool] = {}
 var _rng := RandomNumberGenerator.new()
 
 
@@ -53,11 +65,13 @@ func tick(delta: float) -> void:
 	_maybe_send_welcome()
 	_maybe_send_pa_flavour()
 	_maybe_issue_bonus_task()
+	_maybe_warn_manager_tasks()
 
 
-## Picks an inactive station and assigns it as a manager task, 50/50 over the
-## intercom or the walkie. Returns false when there is nothing to assign.
-func issue_bonus_task() -> bool:
+## Picks an inactive station and assigns it as a manager task. Live gameplay
+## uses the 50/50 RANDOM channel; explicit channels are for scripted beats.
+## Returns false when there is nothing to assign.
+func issue_bonus_task(channel: AnnouncementChannel = AnnouncementChannel.RANDOM) -> bool:
 	var station := _pick_inactive_station()
 	if station == null:
 		return false
@@ -65,8 +79,12 @@ func issue_bonus_task() -> bool:
 	if task == null:
 		return false
 	var line: String = station.manager_line if not station.manager_line.is_empty() else ("Attention: " + station.title)
-	if _rng.randf() < 0.5:
+	var selected_channel := channel
+	if selected_channel == AnnouncementChannel.RANDOM:
+		selected_channel = AnnouncementChannel.INTERCOM if _rng.randf() < 0.5 else AnnouncementChannel.WALKIE
+	if selected_channel == AnnouncementChannel.INTERCOM:
 		_announce(line, station.zone)
+		_emit_manager_task_intercom_broadcast(station.zone)
 	else:
 		_walkie(line)
 	return true
@@ -75,6 +93,7 @@ func issue_bonus_task() -> bool:
 func _on_night_started() -> void:
 	_elapsed = 0.0
 	_welcome_sent = false
+	_warned_manager_tasks.clear()
 	_next_bonus_at = _rng.randf_range(min_first_bonus_delay, max_first_bonus_delay)
 	_next_pa_flavour_at = _elapsed + _rng.randf_range(pa_flavour_min_interval, pa_flavour_max_interval)
 
@@ -98,11 +117,13 @@ func _on_coworker_missing(coworker_name: String) -> void:
 
 func _on_task_completed(task: TaskData, _by: Node) -> void:
 	if task.is_manager_task:
+		_warned_manager_tasks.erase(task.id)
 		_walkie(ManagerLines.TASK_COMPLETED.pick_random())
 
 
 func _on_task_failed(task: TaskData) -> void:
 	if task.is_manager_task:
+		_warned_manager_tasks.erase(task.id)
 		_walkie(ManagerLines.TASK_FAILED.pick_random())
 
 
@@ -129,6 +150,21 @@ func _maybe_issue_bonus_task() -> void:
 		_next_bonus_at = _elapsed + _rng.randf_range(min_bonus_interval, max_bonus_interval)
 	else:
 		_next_bonus_at = _elapsed + 5.0  ## nothing free right now; retry soon
+
+
+## Observes manager-task countdowns owned by Tasks and gives each task at most
+## one warning. This intentionally does not alter task state, priority or time.
+func _maybe_warn_manager_tasks() -> void:
+	if manager_task_warning_fraction <= 0.0:
+		return
+	for task in Tasks.get_open_tasks():
+		if not task.is_manager_task or task.time_limit <= 0.0 or task.time_left <= 0.0:
+			continue
+		if _warned_manager_tasks.has(task.id):
+			continue
+		if task.time_left <= task.time_limit * manager_task_warning_fraction:
+			_warned_manager_tasks[task.id] = true
+			_walkie(ManagerLines.TASK_DUE_SOON.pick_random())
 
 
 func _open_manager_task_count() -> int:
@@ -176,6 +212,17 @@ func _announce(message: String, zone: StringName = &"") -> void:
 		_play_pa_clip(clip, at)
 
 
+## Publishes the gameplay meaning of an intercom task separately from its
+## subtitle/audio event. The monster uses the speaker positions and radius to
+## decide whether it actually heard the call before waiting at the task zone.
+func _emit_manager_task_intercom_broadcast(zone: StringName) -> void:
+	var origins: Array[Vector3] = []
+	for speaker in _nearest_intercom_speakers(PA_SPEAKER_COUNT):
+		origins.append(speaker.global_position)
+	if not origins.is_empty():
+		Events.manager_task_intercom_broadcast.emit(zone, origins, PA_HEARING_RADIUS)
+
+
 func _nearest_intercom_speakers(count: int) -> Array[Node3D]:
 	var speakers: Array[Node3D] = []
 	for node in get_tree().get_nodes_in_group(&"intercom_speaker"):
@@ -198,7 +245,7 @@ func _play_pa_clip(clip: AudioStream, at: Vector3) -> void:
 	player.bus = &"Voice"
 	player.volume_db = PA_VOICE_DB
 	player.unit_size = 6.0
-	player.max_distance = 40.0
+	player.max_distance = PA_HEARING_RADIUS
 	parent.add_child(player)
 	player.global_position = at
 	player.finished.connect(player.queue_free)

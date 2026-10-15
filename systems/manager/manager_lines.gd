@@ -1,7 +1,9 @@
 class_name ManagerLines
 extends RefCounted
 ## All of the store manager's flavour text in one place, so lines can be
-## tuned without touching StoreManager's logic.
+## tuned without touching StoreManager's logic. Broadcast and walkie lines
+## are enumerated by VoiceLines for generated clips; TALK is face-to-face
+## subtitle copy from ManagerNpc and intentionally has no radio/PA clip.
 
 const WELCOME := [
 	"Attention staff: the overnight shift has begun. Let's get those tasks done before sunrise.",
@@ -28,6 +30,12 @@ const TASK_COMPLETED := [
 	"Nice work, that's one off the list.",
 	"Appreciate it. One less thing to worry about.",
 	"Good, keep that pace up.",
+]
+
+## One per bonus task once its countdown reaches StoreManager's configured
+## warning fraction. The task remains open; this is pressure, not a failure.
+const TASK_DUE_SOON := [
+	"That was supposed to be handled already.",
 ]
 
 const TASK_FAILED := [
