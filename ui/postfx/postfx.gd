@@ -16,6 +16,13 @@ const CRT_STRENGTH_DEFAULTS := {
 	&"shadow_lift": 0.65,
 	&"flicker_strength": 0.012,
 }
+## The title screen's rolling band and flicker dips, for gameplay (tv_interference).
+const TV_INTERFERENCE_DEFAULTS := {
+	&"band_strength": 0.035,
+	&"dip_strength": 0.35,
+}
+
+@export var tv_interference := false
 
 @onready var _screen: ColorRect = $Screen
 var _material: ShaderMaterial
@@ -46,4 +53,6 @@ func _apply() -> void:
 	_crt_on = GameState.crt_enabled
 	for key in CRT_STRENGTH_DEFAULTS:
 		_material.set_shader_parameter(key, CRT_STRENGTH_DEFAULTS[key] if _crt_on else 0.0)
+	for key in TV_INTERFERENCE_DEFAULTS:
+		_material.set_shader_parameter(key, TV_INTERFERENCE_DEFAULTS[key] if _crt_on and tv_interference else 0.0)
 	_material.set_shader_parameter(&"brightness", GameState.brightness)
