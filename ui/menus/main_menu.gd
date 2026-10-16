@@ -18,7 +18,7 @@ const CONTROLS := [
 	["ESC / P", "PAUSE"],
 ]
 const HINTS := [
-	"Finish your tasks before 6:00 AM.",
+	"Three AI coworkers. Finish before 6 AM.",
 	"Hide in lockers, under counters, behind boxes.",
 	"A coworker who stops working and just stares is not your coworker.",
 	"It can only sprint for 13 seconds.",

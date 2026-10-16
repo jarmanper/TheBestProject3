@@ -207,17 +207,20 @@ static func sort_for_checklist(tasks: Array) -> Array[TaskData]:
 
 
 static func format_task(task: TaskData) -> String:
+	var title := task.title
+	if task.assigned_to != &"":
+		title += "  [%s]" % task.assigned_to
 	if task.failed:
-		return "%s %s" % [MARK_FAILED, task.title]
+		return "%s %s" % [MARK_FAILED, title]
 	if task.completed:
-		return "%s %s" % [MARK_DONE, task.title]
+		return "%s %s" % [MARK_DONE, title]
 	if task.is_manager_task:
-		var text := "%s %s" % [MARK_MANAGER, task.title]
+		var text := "%s %s" % [MARK_MANAGER, title]
 		if task.time_limit > 0.0:
 			var seconds := int(ceilf(maxf(task.time_left, 0.0)))
 			text += "  %d:%02d" % [floori(seconds / 60.0), seconds % 60]
 		return text
-	return "%s %s" % [MARK_OPEN, task.title]
+	return "%s %s" % [MARK_OPEN, title]
 
 
 ## "  (Mop: Janitor Closet)" when `task` needs a tool the player isn't holding, so the

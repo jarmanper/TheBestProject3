@@ -85,6 +85,7 @@ func _ready() -> void:
 
 func _exit_tree() -> void:
 	_drop_task()
+	_release_assignments()
 
 
 func _physics_process(delta: float) -> void:
@@ -122,6 +123,8 @@ func choose_task() -> TaskData:
 	for task: TaskData in _source().get_open_tasks():
 		if task == null or not task.is_open() or not is_instance_valid(task.station):
 			continue
+		if not task.can_be_worked_by(self):
+			continue
 		if task.claimed_by != null and task.claimed_by != self and is_instance_valid(task.claimed_by):
 			continue
 		if _skip_until.get(task, 0.0) > _clock:
@@ -149,6 +152,7 @@ func say_where_i_am() -> void:
 ## The monster took this worker: release any claim and vanish.
 func abduct() -> void:
 	_drop_task()
+	_release_assignments()
 	set_physics_process(false)
 	queue_free()
 
@@ -274,13 +278,19 @@ func _source() -> Object:
 
 func _still_mine(task: TaskData) -> bool:
 	return task != null and task.is_open() and is_instance_valid(task.station) \
-		and (task.claimed_by == null or task.claimed_by == self)
+		and task.can_be_worked_by(self) \
+		and (not is_instance_valid(task.claimed_by) or task.claimed_by == self)
 
 
 func _drop_task() -> void:
 	if current_task != null and (current_task.claimed_by == self or current_task.claimed_by == null):
 		_source().release_task(current_task, self)
 	current_task = null
+
+
+func _release_assignments() -> void:
+	if _source().has_method(&"release_worker_assignments"):
+		_source().release_worker_assignments(self)
 
 
 func _work_position(task: TaskData) -> Vector3:

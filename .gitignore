@@ -6,3 +6,9 @@
 build/
 .superpowers/
 /build/
+
+# Deployment-only WebRTC endpoint and TURN values; every Web export exposes
+# its bundled config, so never commit production credentials here.
+/config/multiplayer.json
+/services/multiplayer/.env
+/services/multiplayer/signaling/node_modules/

@@ -10,8 +10,11 @@ Anthony's here too
 - **Checklist:** Tab
 - **Pause:** Escape or P
 
-Work the overnight shift, finish every basic task before 6:00 AM, and stay out of sight of
-whichever coworker is actually the monster in disguise.
+Work the overnight shift with three AI coworkers: **Dale, Rita and Marcus**. Each has a
+personal task, travels to its station, works, and answers manager requests. The six basic
+tasks are split between the crew: three for you and one for each coworker. Tab shows each
+assignment, and you can help with any task. If a coworker disappears, their unfinished work
+passes to you. Finish every basic task before 6:00 AM and survive the monster in disguise.
 
 ## Run locally
 
@@ -59,6 +62,13 @@ tools/serve_web.py          # serves build/web/ at http://127.0.0.1:8060/
 **Deploy to GitHub Pages:** `.github/workflows/deploy-pages.yml` builds and deploys the Web
 export automatically on every push to `main` (or via Actions → Run workflow). One-time repo
 setting required before the first deploy: **Settings → Pages → Source: GitHub Actions**.
+
+## AI night crew
+
+**CLOCK IN** starts a local shift with all three coworkers automatically. No lobby, server,
+connection, or multiplayer secrets are needed, including on GitHub Pages. Coworkers reserve
+their own tasks so they do not duplicate work, prioritize shared manager requests, check in
+over the radio, and flee the monster. See [the coworker guide](docs/COWORKERS.md).
 
 ## Working on your system
 
@@ -112,4 +122,4 @@ The project includes a Web export preset and [GitHub Pages workflow](.github/wor
 - A closing-task checklist: lock the register, restock an aisle, clean a spill with a mop, then finish the manager's intercom priority task with a utility key.
 - A manager task intercom event that gives a nearby mimic a reason to investigate the announced work location.
 - An unkillable mimic that initially passes as an employee, guarantees a sighting, uses collision-aware routes around shelves, loses sight through aisle obstructions, attacks after sustained close range, and can sprint for only 13 seconds before it slows down.
-- No weapons, monster health, multiplayer, or in-game voice chat; those are intentionally outside this first single-player slice.
+- No weapons, monster health, or in-game voice chat; those are intentionally outside this first gameplay slice. The full game uses three AI coworkers in place of online players.

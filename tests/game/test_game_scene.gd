@@ -62,6 +62,40 @@ func test_player_at_spawn_facing_the_door() -> void:
 	assert_eq(player.get_viewport(), game.get_node("WorldView/SubViewport"), "player renders in the SubViewport")
 
 
+func test_shift_spawns_three_coworkers_with_personal_assignments() -> void:
+	var coworkers := tree.get_nodes_in_group(&"coworker")
+	assert_eq(coworkers.size(), 3)
+	for info: Dictionary in Catalog.COWORKERS:
+		var workers := coworkers.filter(func(worker: Coworker) -> bool: return worker.employee_name == info.name)
+		assert_eq(workers.size(), 1, "one %s in the crew" % info.name)
+		var assignments := Tasks.get_open_tasks().filter(func(task: TaskData) -> bool: return task.assigned_to == StringName(info.name))
+		assert_eq(assignments.size(), Tasks.BASIC_TASKS_PER_COWORKER)
+	assert_true(tree.root.get_node_or_null(^"MultiplayerSession") == null, "shift runs without an online session")
+
+
+func test_all_three_coworkers_navigate_and_finish_their_assignments() -> void:
+	var coworkers := tree.get_nodes_in_group(&"coworker")
+	for worker: Coworker in coworkers:
+		worker.set_physics_process(false)
+	GameState.monster.process_mode = Node.PROCESS_MODE_DISABLED
+	var assignments: Array[TaskData] = []
+	for worker: Coworker in coworkers:
+		for task in Tasks.get_open_tasks():
+			if task.assigned_to == StringName(worker.employee_name):
+				assignments.append(task)
+	await tree.physics_frame
+	for i in 12000: # 200 simulated seconds of real movement through the store.
+		for worker: Coworker in coworkers:
+			worker.tick(1.0 / 60.0)
+		if assignments.all(func(task: TaskData) -> bool: return task.completed):
+			break
+	assert_eq(assignments.size(), 3)
+	for task in assignments:
+		assert_true(task.completed, "%s reached and completed %s" % [task.assigned_to, task.title])
+	assert_eq(Tasks.get_coworker_basic_completions(), 3)
+	assert_eq(Tasks.get_required_remaining(), 3, "the player's tasks remain")
+
+
 func _motion(relative: Vector2) -> InputEventMouseMotion:
 	var motion := InputEventMouseMotion.new()
 	motion.position = Vector2(640, 360)

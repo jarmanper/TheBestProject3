@@ -70,6 +70,7 @@ func test_main_menu_buttons() -> void:
 	await wait_frames(1)
 	var texts := menu.get_button_texts()
 	assert_true(texts.has("CLOCK IN"))
+	assert_false(texts.has("ONLINE LOBBY"))
 	assert_true(texts.has("SETTINGS"))
 	assert_eq(texts.has("QUIT"), not OS.has_feature("web"), "QUIT hidden only on web")
 	assert_eq(menu.get_title_text(), Catalog.GAME_TITLE)
