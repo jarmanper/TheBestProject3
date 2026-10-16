@@ -1,8 +1,6 @@
-[gd_resource type="Theme" load_steps=11 format=3]
+[gd_resource type="Theme" load_steps=11 format=3 uid="uid://cl5ce3kgrb2cq"]
 
-[ext_resource type="FontFile" path="res://assets/fonts/VT323-Regular.ttf" id="1_font"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_none"]
+[ext_resource type="FontFile" uid="uid://csrccxmi1mn0x" path="res://assets/fonts/VT323-Regular.ttf" id="1_font"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_normal"]
 content_margin_left = 16.0
@@ -29,6 +27,27 @@ bg_color = Color(0.91, 0.475, 0.196, 0.25)
 border_width_left = 4
 border_color = Color(0.91, 0.475, 0.196, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_focus"]
+bg_color = Color(0, 0, 0, 0)
+draw_center = false
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.91, 0.475, 0.196, 0.6)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_none"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_grabber_area"]
+content_margin_top = 3.0
+content_margin_bottom = 3.0
+bg_color = Color(0.91, 0.475, 0.196, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slider"]
+content_margin_top = 3.0
+content_margin_bottom = 3.0
+bg_color = Color(0.847, 0.827, 0.659, 0.25)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 content_margin_left = 24.0
 content_margin_top = 18.0
@@ -40,25 +59,6 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0.847, 0.827, 0.659, 0.35)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slider"]
-content_margin_top = 3.0
-content_margin_bottom = 3.0
-bg_color = Color(0.847, 0.827, 0.659, 0.25)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_grabber_area"]
-content_margin_top = 3.0
-content_margin_bottom = 3.0
-bg_color = Color(0.91, 0.475, 0.196, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_focus"]
-bg_color = Color(0, 0, 0, 0)
-draw_center = false
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.91, 0.475, 0.196, 0.6)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_subtitle"]
 content_margin_left = 12.0

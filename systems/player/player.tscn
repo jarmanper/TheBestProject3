@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3 uid="uid://bucs7w3mobysk"]
 
 [ext_resource type="Script" path="res://systems/player/player.gd" id="1_player"]
 [ext_resource type="Script" path="res://systems/player/viewmodel.gd" id="2_viewmodel"]
+[ext_resource type="Script" path="res://systems/monster/voice_recorder.gd" id="3_vx4ts"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.35
@@ -23,7 +24,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 [node name="Camera3D" type="Camera3D" parent="Head"]
 current = true
 fov = 95.0
-near = 0.05
 far = 120.0
 
 [node name="Flashlight" type="SpotLight3D" parent="Head/Camera3D"]
@@ -40,3 +40,6 @@ spot_angle_attenuation = 0.7
 
 [node name="Viewmodel" type="Node3D" parent="Head/Camera3D"]
 script = ExtResource("2_viewmodel")
+
+[node name="VoiceRecorder" type="Node" parent="."]
+script = ExtResource("3_vx4ts")

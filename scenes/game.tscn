@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3 uid="uid://bqm4noacg2als"]
 
 [ext_resource type="Script" path="res://scenes/game.gd" id="1_game"]
 [ext_resource type="PackedScene" path="res://ui/postfx/postfx.tscn" id="2_postfx"]
 [ext_resource type="PackedScene" path="res://ui/hud/hud.tscn" id="3_hud"]
 [ext_resource type="PackedScene" path="res://ui/menus/pause_menu.tscn" id="4_pause"]
 [ext_resource type="PackedScene" path="res://ui/menus/end_screen.tscn" id="5_end"]
+[ext_resource type="Script" path="res://systems/monster/mimic_manager.gd" id="6_eyffo"]
 
 [node name="Game" type="Node"]
 process_mode = 3
@@ -43,3 +44,6 @@ layer = 3
 [node name="PauseMenu" parent="Menus" instance=ExtResource("4_pause")]
 
 [node name="EndScreen" parent="Menus" instance=ExtResource("5_end")]
+
+[node name="MimicManager" type="Node" parent="."]
+script = ExtResource("6_eyffo")

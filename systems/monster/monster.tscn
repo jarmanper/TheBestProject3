@@ -1,4 +1,4 @@
-[gd_scene format=3]
+[gd_scene load_steps=3 format=3 uid="uid://bce7mc7kfq6to"]
 
 [ext_resource type="Script" path="res://systems/monster/monster.gd" id="1_monster"]
 
@@ -8,7 +8,6 @@ height = 1.8
 
 [node name="Monster" type="CharacterBody3D"]
 collision_layer = 4
-collision_mask = 1
 script = ExtResource("1_monster")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
@@ -24,11 +23,13 @@ visible = false
 path_desired_distance = 0.6
 target_desired_distance = 0.5
 path_max_distance = 3.0
-radius = 0.4
 height = 1.8
+radius = 0.4
 
 [node name="Breath" type="AudioStreamPlayer3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 0)
 unit_size = 3.0
 max_distance = 25.0
 bus = &"SFX"
+
+[node name="MimicComponent" type="Node" parent="."]
