@@ -14,6 +14,7 @@ var _coworker_basic_completions := 0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_PAUSABLE
+	_ready_caleb_seam()
 
 
 ## Manager deadlines count down only while the night runs (not on the menu after quitting).
@@ -263,3 +264,36 @@ func _pick_preferring_new_zone(chosen: Array[TaskStation], pool: Array[TaskStati
 func _make_id() -> StringName:
 	_next_id += 1
 	return StringName("task_%d" % _next_id)
+
+# Connect to the manager intercom announcement event if available
+func _ready_caleb_seam() -> void:
+	if Events and Events.has_signal("manager_task_announced"):
+		Events.connect("manager_task_announced", Callable(self, "_on_manager_task_announced"))
+
+# Seam 3.b: Prioritizes manager-assigned tasks over generic closing/opening tasks
+func _on_manager_task_announced(manager_task: TaskData) -> void:
+	add_manager_priority_task(manager_task)
+
+func add_manager_priority_task(task: TaskData) -> void:
+	task.priority = TaskData.TaskPriority.MANAGER_BONUS
+	task.category = TaskData.TaskCategory.MANAGER_ASSIGNED
+	if not active_tasks.has(task):
+		active_tasks.push_front(task)
+	_sort_tasks_by_priority()
+	if has_signal("task_added"):
+		task_added.emit(task)
+	if has_signal("active_tasks_updated"):
+		active_tasks_updated.emit(active_tasks)
+
+func _sort_tasks_by_priority() -> void:
+	active_tasks.sort_custom(func(a: TaskData, b: TaskData) -> bool:
+		var prio_a = a.priority if "priority" in a else 0
+		var prio_b = b.priority if "priority" in b else 0
+		return int(prio_a) > int(prio_b)
+	)
+
+# Seam 3.b: Validates whether worker/player possesses required tool before completing
+func can_worker_complete_task(task: TaskData, held_tool_id: String) -> bool:
+	if "required_tool" in task and not task.required_tool.is_empty():
+		return task.required_tool == held_tool_id
+	return true
