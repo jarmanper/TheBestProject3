@@ -76,7 +76,7 @@ the night's tasks or another system's actor state.
 1. **13-second sprint.** It can sprint for at most `SPRINT_MAX_TIME = 13.0` s, then it is
    *winded* (`WINDED_TIME = 6.0` s, slow, loud wheezing). Players learn: survive 13 s and it gasps.
 2. **Turns after lingering in range.** While disguised, if the player stays within
-   `REVEAL_RANGE = 7.0` m in line of sight for `REVEAL_TIME = 4.0` s, it transforms to its true
+   `REVEAL_RANGE = 7.0` m in line of sight for `REVEAL_TIME = 2.0` s, it transforms to its true
    form and attacks. Players learn: a coworker who stops working and just watches you is wrong.
 3. **Appears to everyone at least once.** If the player has not seen it (true or disguised) by
    `SIGHTING_DEADLINE_HOUR = 2` (2:00 AM), the monster stages a sighting: it appears inside the
