@@ -76,16 +76,6 @@ jobs:
         timeout-minutes: 20
         run: '"$GODOT" --headless --path . -s res://tests/run_tests.gd'
 
-      - name: Write multiplayer export configuration
-        env:
-          MULTIPLAYER_SIGNALING_URL: ${{ secrets.MULTIPLAYER_SIGNALING_URL }}
-          MULTIPLAYER_STUN_URL: ${{ secrets.MULTIPLAYER_STUN_URL }}
-          MULTIPLAYER_TURN_URL: ${{ secrets.MULTIPLAYER_TURN_URL }}
-          MULTIPLAYER_TURN_USERNAME: ${{ secrets.MULTIPLAYER_TURN_USERNAME }}
-          MULTIPLAYER_TURN_CREDENTIAL: ${{ secrets.MULTIPLAYER_TURN_CREDENTIAL }}
-          MULTIPLAYER_MAX_PLAYERS: ${{ secrets.MULTIPLAYER_MAX_PLAYERS }}
-        run: python3 tools/write_multiplayer_config.py
-
       - name: Export Web build
         run: tools/build_web.sh
 

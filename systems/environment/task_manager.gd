@@ -3,10 +3,8 @@ extends Node
 
 const BASIC_TASKS_PER_NIGHT := 6
 const MIN_TOOL_TASKS := 3
-## Balance: all coworkers together may take at most this many *basic* tasks per night
-## (completed + currently claimed), so the player still has to do most of the checklist.
-## Manager tasks are never capped (GDD seam 2: coworkers prioritise them).
-const MAX_COWORKER_BASIC_COMPLETIONS := 2
+## Each of the three AI employees gets a personal task; the rest belong to the player.
+const BASIC_TASKS_PER_COWORKER := 1
 
 var _basic_tasks: Array[TaskData] = []
 var _manager_tasks: Array[TaskData] = []
@@ -71,6 +69,7 @@ func begin_night() -> void:
 
 	for station in chosen:
 		_activate_basic_task(station)
+	_assign_basic_tasks()
 	Events.tasks_changed.emit()
 
 
@@ -100,6 +99,7 @@ func complete_task(task: TaskData, by: Node) -> void:
 	if task == null or not task.is_open():
 		return
 	task.completed = true
+	task.claimed_by = null
 	if not task.is_manager_task and is_instance_valid(by) and not _is_player(by):
 		_coworker_basic_completions += 1
 	GameState.add_stat("tasks_completed")
@@ -112,18 +112,13 @@ func complete_task(task: TaskData, by: Node) -> void:
 	_return_consumed_tool(task, by)
 
 
-## A coworker reserves a task so two workers do not walk to the same one.
-## Refuses a basic task to a non-player worker once coworkers have used up
-## MAX_COWORKER_BASIC_COMPLETIONS (completions plus open claims).
+## A worker reserves an eligible task so two coworkers do not walk to the same one.
 func claim_task(task: TaskData, worker: Node) -> bool:
-	if task == null or not task.is_open():
+	if task == null or not task.is_open() or not task.can_be_worked_by(worker):
 		return false
 	if task.claimed_by == worker:
 		return true
-	if task.claimed_by != null:
-		return false
-	if not task.is_manager_task and not _is_player(worker) \
-			and _coworker_basic_completions + _coworker_basic_claims() >= MAX_COWORKER_BASIC_COMPLETIONS:
+	if is_instance_valid(task.claimed_by):
 		return false
 	task.claimed_by = worker
 	return true
@@ -176,12 +171,32 @@ func get_coworker_basic_completions() -> int:
 	return _coworker_basic_completions
 
 
-func _coworker_basic_claims() -> int:
-	var count := 0
+## A missing worker's unfinished assignments become the player's responsibility.
+func release_worker_assignments(worker: Coworker) -> void:
+	var changed := false
 	for task in _basic_tasks:
-		if task.is_open() and is_instance_valid(task.claimed_by) and not _is_player(task.claimed_by):
-			count += 1
-	return count
+		if task.is_open() and task.assigned_to == StringName(worker.employee_name):
+			task.assigned_to = &"YOU"
+			release_task(task, worker)
+			changed = true
+	if changed:
+		# A worker can leave while the game scene (including its HUD) is exiting.
+		# Refresh after that teardown so subscribers are still inside the tree.
+		Events.tasks_changed.emit.call_deferred()
+
+
+func _assign_basic_tasks() -> void:
+	var coworkers := get_tree().get_nodes_in_group(&"coworker")
+	for task in _basic_tasks:
+		task.assigned_to = &"YOU"
+	var next_task := _basic_tasks.size() - 1
+	for worker: Coworker in coworkers:
+		for i in BASIC_TASKS_PER_COWORKER:
+			# Always leave at least one task for the human, even in small test levels.
+			if next_task <= 0:
+				return
+			_basic_tasks[next_task].assigned_to = StringName(worker.employee_name)
+			next_task -= 1
 
 
 static func _is_player(worker: Node) -> bool:

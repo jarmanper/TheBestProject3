@@ -61,6 +61,18 @@ func test_format_tool_hint_includes_zone_when_known() -> void:
 	assert_eq(GameHud.format_tool_hint("Mop", ""), "  (Mop)")
 
 
+func test_checklist_shows_personal_assignments_and_missing_worker_handoff() -> void:
+	var mine := _task("Count register")
+	mine.assigned_to = &"YOU"
+	var theirs := _task("Face shelves")
+	theirs.assigned_to = &"DALE"
+	hud.render_checklist([mine, theirs])
+	assert_eq(_texts(), ["[ ] Count register  [YOU]", "[ ] Face shelves  [DALE]"] as Array[String])
+	theirs.assigned_to = &"YOU"
+	hud.render_checklist([mine, theirs])
+	assert_eq(_texts()[1], "[ ] Face shelves  [YOU]")
+
+
 func test_checklist_hint_shows_the_racks_zone_until_the_tool_is_held() -> void:
 	Tasks.reset()
 	var station := TaskStation.new()

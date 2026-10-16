@@ -13,8 +13,18 @@ var time_left := 0.0
 var completed := false
 var failed := false
 var station: Node3D                  ## the TaskStation that completes it
+var assigned_to: StringName = &""    ## employee name, &"YOU", or empty for shared work
 var claimed_by: Node                 ## coworker currently walking to / doing it
 
 
 func is_open() -> bool:
 	return not completed and not failed
+
+
+## The player can help anyone; AI workers stick to their own basic assignments.
+func can_be_worked_by(worker: Node) -> bool:
+	if not is_instance_valid(worker):
+		return false
+	if worker.is_in_group(&"player") or assigned_to == &"":
+		return true
+	return worker is Coworker and assigned_to == StringName(worker.employee_name)

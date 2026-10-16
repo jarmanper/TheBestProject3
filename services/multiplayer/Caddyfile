@@ -1,4 +1,0 @@
-{$SIGNALING_DOMAIN} {
-	encode zstd gzip
-	reverse_proxy signaling:8080
-}

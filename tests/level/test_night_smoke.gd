@@ -169,9 +169,10 @@ func test_a_whole_night_runs_clean() -> void:
 	assert_true(&"sighting" in _states, "rule 3: the monster staged a sighting")
 	assert_true(_counts.get("monster_sighted", 0) >= 1, "the player saw the monster")
 	assert_true(_counts.get("staged_sighting_seen", 0) >= 1, "rule 3: the staged sighting was close, central and lit enough to count")
-	assert_true(Tasks.get_coworker_basic_completions() <= Tasks.MAX_COWORKER_BASIC_COMPLETIONS, "coworkers stay under the cap")
-	assert_true(basic_left >= Tasks.BASIC_TASKS_PER_NIGHT - Tasks.MAX_COWORKER_BASIC_COMPLETIONS,
-		"the player still has most basic tasks to do (%d left)" % basic_left)
+	assert_true(Tasks.get_coworker_basic_completions() <= Catalog.COWORKERS.size() * Tasks.BASIC_TASKS_PER_COWORKER,
+		"coworkers only complete their own basic assignments")
+	assert_true(basic_left >= Tasks.BASIC_TASKS_PER_NIGHT - Catalog.COWORKERS.size() * Tasks.BASIC_TASKS_PER_COWORKER,
+		"the player's personal assignments remain (%d left)" % basic_left)
 
 	for hook: Array in _hooks:
 		(hook[0] as Signal).disconnect(hook[1])

@@ -16,9 +16,9 @@ monster that mimics them hunts them down.
   Walkie voices are shared radio-babble variants (`walkie_voice_*`), not one voice per
   coworker; the mimic's set (`walkie_voice_mimic_*`: a touch lower, more distorted, reversed
   syllables) is a subtle audio tell **by design** — the subtitle never gives it away.
-- **Multiplayer foundation.** The Web export can create and join WebRTC lobbies through a
-  separate WSS signaling service with STUN/TURN fallback. The current shift remains
-  single-player until player, task, monster, and end-state replication is integrated.
+- **Local crew.** CLOCK IN starts one human player and exactly three AI coworkers
+  (Dale, Rita and Marcus), with no networking or external services. Each coworker gets
+  a personal basic task, leaving three basic tasks for the player; manager tasks are shared.
 - **Night:** 12:00 AM to 6:00 AM, `GameState.SECONDS_PER_HOUR` = 90 real seconds per hour (9 minutes total).
 - **Win:** reach 6:00 AM alive with every basic task done ("SHIFT COMPLETE").
 - **Fired:** reach 6:00 AM alive with basic tasks left ("YOU'RE FIRED").
@@ -122,10 +122,8 @@ systems/player/      Player (+ viewmodel)
 systems/environment/ Tasks (autoload), TaskData, TaskStation, ToolPickup, HidingSpot, StoreZone, StoreLight
 systems/manager/     StoreManager + manager NPC
 systems/monster/     Monster + Perception helpers
-systems/network/     WebRTC lobby configuration + session bootstrap
 systems/coworkers/   Coworker
 ui/                  HUD, menus, post-processing (CRT)
-services/multiplayer/ Deployable WSS signaling + Caddy/coturn stack
 levels/greybox/      CSG blockout of the layout below (for testing)
 levels/store/        Final store level (art + gameplay nodes)
 scenes/              main_menu.tscn, game.tscn
@@ -198,11 +196,15 @@ See the file's public methods; summary:
 `complete_task(task, by)`, `claim_task(task, worker) -> bool`, `release_task(task, worker)`,
 `get_open_tasks() -> Array[TaskData]` (manager tasks first), `get_tasks_for_checklist()`,
 `get_required_remaining() -> int`, `all_required_done() -> bool`,
-`get_coworker_basic_completions() -> int`. Manager-task deadlines count down only while
+`get_coworker_basic_completions() -> int`, `release_worker_assignments(worker)`.
+Manager-task deadlines count down only while
 `GameState.night_running`.
-**Balance:** coworkers together may take at most `Tasks.MAX_COWORKER_BASIC_COMPLETIONS = 2`
-basic tasks per night: `claim_task` refuses a basic task to a non-player worker once coworker
-basic completions + open coworker claims reach the cap. Manager tasks are never capped.
+**Assignments:** `begin_night()` assigns `Tasks.BASIC_TASKS_PER_COWORKER = 1` basic task
+to each live coworker and marks the remaining tasks `YOU`. `TaskData.assigned_to` is an
+employee name, `YOU`, or empty for shared tasks (including manager tasks).
+`TaskData.can_be_worked_by(worker)` and `claim_task` prevent AI from taking someone else's
+work. The player may help anyone. Missing coworkers release their claims and transfer their
+unfinished assignments to `YOU`. The checklist displays the owner of every assigned task.
 
 ## 6. Scene contracts
 

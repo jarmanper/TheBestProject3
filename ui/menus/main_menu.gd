@@ -8,7 +8,6 @@ const THEME := preload("res://ui/theme/game_theme.tres")
 const BACKGROUND_SHADER := preload("res://ui/menus/menu_background.gdshader")
 const POSTFX_SCENE := preload("res://ui/postfx/postfx.tscn")
 const SETTINGS_SCENE := preload("res://ui/menus/settings_panel.tscn")
-const LOBBY_PANEL := preload("res://ui/menus/lobby_panel.gd")
 
 const CONTROLS := [
 	["WASD / ARROWS", "MOVE"],
@@ -19,7 +18,7 @@ const CONTROLS := [
 	["ESC / P", "PAUSE"],
 ]
 const HINTS := [
-	"Finish your tasks before 6:00 AM.",
+	"Three AI coworkers. Finish before 6 AM.",
 	"Hide in lockers, under counters, behind boxes.",
 	"A coworker who stops working and just stares is not your coworker.",
 	"It can only sprint for 13 seconds.",
@@ -28,7 +27,6 @@ const HINTS := [
 var _title: Label
 var _buttons: VBoxContainer
 var _settings: SettingsPanel
-var _lobby: Node
 var _music: AudioStreamPlayer
 var _flicker := 0.0
 
@@ -125,9 +123,6 @@ func _build() -> void:
 	_buttons.add_theme_constant_override(&"separation", 4)
 	column.add_child(_buttons)
 	_button("CLOCK IN", _clock_in)
-	_button("ONLINE LOBBY", func() -> void:
-		_buttons.visible = false
-		_lobby.call(&"open"))
 	_button("SETTINGS", func() -> void:
 		_buttons.visible = false
 		_settings.open())
@@ -188,11 +183,6 @@ func _build() -> void:
 	_settings = SETTINGS_SCENE.instantiate()
 	add_child(_settings)
 	_settings.closed.connect(func() -> void:
-		_buttons.visible = true
-		(_buttons.get_child(0) as Button).grab_focus())
-	_lobby = LOBBY_PANEL.new()
-	add_child(_lobby)
-	_lobby.connect(&"closed", func() -> void:
 		_buttons.visible = true
 		(_buttons.get_child(0) as Button).grab_focus())
 
