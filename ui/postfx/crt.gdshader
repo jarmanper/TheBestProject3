@@ -19,6 +19,10 @@ uniform float shadow_lift : hint_range(0.0, 1.0) = 0.65;
 uniform float desaturation : hint_range(0.0, 1.0) = 0.2;
 uniform vec4 bezel_color : source_color = vec4(0.028, 0.032, 0.03, 1.0);
 uniform float flicker_strength : hint_range(0.0, 0.1) = 0.012;
+// Title-screen TV interference (menu_background.gdshader) for gameplay: a slow rolling
+// band and an occasional hard flicker dip. Off unless CrtPostFx.tv_interference is set.
+uniform float band_strength : hint_range(0.0, 0.2) = 0.0;
+uniform float dip_strength : hint_range(0.0, 0.6) = 0.0;
 // Horror brightness setting (GameState.brightness): 0.4..1.0, applied to the 3D view
 // regardless of the CRT toggle above.
 uniform float brightness : hint_range(0.4, 1.0) = 1.0;
@@ -56,6 +60,9 @@ void fragment() {
 
 	float vignette = 1.0 - vignette_strength * pow(clamp(length(c * vec2(0.82, 1.0)) / 1.3, 0.0, 1.0), 2.4);
 	float flicker = 1.0 + flicker_strength * (hash(vec2(floor(TIME * 24.0), 3.7)) - 0.5);
+	float band = smoothstep(0.08, 0.0, abs(fract(uv.y - TIME * 0.045) - 0.5));
+	col += vec3(0.847, 0.827, 0.659) * band * band_strength;
+	flicker *= 1.0 - dip_strength * step(0.965, hash(vec2(floor(TIME * 12.0), 5.1)));
 	col *= vignette * flicker * brightness;
 
 	// Bezel: dark plastic with a faint inner glow near the glass edge.

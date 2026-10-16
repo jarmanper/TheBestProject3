@@ -104,17 +104,17 @@ func _set_hour(hour: float) -> void:
 
 # --- Rule 2: reveal ----------------------------------------------------------------
 
-func test_reveals_after_four_seconds_in_range_with_los() -> void:
+func test_reveals_after_two_seconds_in_range_with_los() -> void:
 	world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
 	var monster := _spawn_monster(Vector3(0, 0, -3.5))
 	await world.settle()
 	assert_eq(monster.state, Monster.DISGUISED_ROAM)
 	assert_false(monster.is_true_form())
-	await _run(monster, 3.9)
-	assert_eq(monster.state, Monster.DISGUISED_ROAM, "not yet at 3.9 s")
+	await _run(monster, 1.9)
+	assert_eq(monster.state, Monster.DISGUISED_ROAM, "not yet at 1.9 s")
 	assert_true(monster._staring, "stops and stares at the player before turning")
 	await _run(monster, 0.15)
-	assert_eq(monster.state, Monster.REVEAL, "turns at 4 s")
+	assert_eq(monster.state, Monster.REVEAL, "turns at 2 s")
 	assert_true(monster.is_true_form())
 	assert_eq(events.count("chase_started"), 1)
 	await _run(monster, 1.6)
@@ -586,7 +586,7 @@ func test_attack_damages_player_in_range_then_retreats() -> void:
 	await _run(monster, STEP)
 	assert_eq(monster.state, Monster.ATTACK, "in range: attacks")
 	await _run(monster, Monster.ATTACK_WINDUP + 0.05)
-	assert_near(player.health, 100.0 - Monster.ATTACK_DAMAGE, 0.01)
+	assert_near(player.health, maxf(100.0 - Monster.ATTACK_DAMAGE, 0.0), 0.01)
 	await _run(monster, Monster.ATTACK_RECOVER)
 	assert_eq(monster.state, Monster.RETREAT)
 
@@ -744,8 +744,30 @@ func test_abduction_and_mimic_never_happen_in_the_same_tick() -> void:
 	assert_true(walkies.is_empty(), "no lure call in the same tick")
 	assert_eq(monster.state, Monster.DISGUISED_ROAM)
 	await _run(monster, STEP)
-	assert_eq(walkies.size(), 1, "the lure follows on a later tick")
+	assert_true(walkies.is_empty(), "no lure while it stalks the player")
+	monster.stalk_left = 0.0
+	await _run(monster, STEP)
+	assert_eq(walkies.size(), 1, "the lure follows once it stops stalking")
 	assert_true(walkies[0]["is_mimic"])
+
+
+func test_after_an_abduction_it_comes_for_the_player_and_turns() -> void:
+	world.add_player(Vector3.ZERO, Vector3(0, 0, -10))
+	var rita: Coworker = world.add_coworker("RITA", Vector3(3, 0, 25))   # behind the player, far
+	rita.set_physics_process(false)
+	var monster := _spawn_monster(Vector3(-10, 0, 10))
+	world.bake_navigation()
+	await world.settle_navigation()
+	await _run(monster, STEP)
+	assert_true(monster.try_abduction())
+	assert_near(monster.stalk_left, Monster.STALK_TIME, 0.001, "starts stalking")
+	var start_distance := monster.global_position.distance_to(Vector3.ZERO)
+	await _run(monster, 3.0)
+	assert_eq(monster.disguise_name, "RITA", "still wearing her face")
+	assert_true(monster.global_position.distance_to(Vector3.ZERO) < start_distance - 5.0, "walks at the player")
+	await _run(monster, 10.0)
+	assert_true(Monster.REVEAL in states, "rule 2 turns it once it reaches the player: %s" % [states])
+	assert_eq(monster.stalk_left, 0.0, "hunting ends the stalk")
 
 
 func test_no_abduction_in_view_or_near_player() -> void:

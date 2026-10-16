@@ -36,7 +36,7 @@ var abductions := 0
 
 func _init() -> void:
 	next_mimic_in = _roll(Monster.MIMIC_INTERVAL)
-	next_abduction_in = _roll(Monster.ABDUCT_INTERVAL)
+	next_abduction_in = _roll(Monster.FIRST_ABDUCT_DELAY)
 
 
 # --- Rule 1 ------------------------------------------------------------------

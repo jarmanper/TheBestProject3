@@ -15,10 +15,10 @@ func test_rule_constants_match_contract() -> void:
 	assert_eq(Monster.SPRINT_MAX_TIME, 13.0)
 	assert_eq(Monster.WINDED_TIME, 6.0)
 	assert_eq(Monster.REVEAL_RANGE, 7.0)
-	assert_eq(Monster.REVEAL_TIME, 4.0)
+	assert_eq(Monster.REVEAL_TIME, 2.0)
 	assert_eq(Monster.SIGHTING_DEADLINE_HOUR, 2)
 	assert_eq(Monster.MAX_ABDUCTIONS, 2)
-	assert_eq(Monster.ABDUCT_EARLIEST_HOUR, 1)
+	assert_eq(Monster.ABDUCT_EARLIEST_HOUR, 0)
 
 
 # --- Rule 1: 13-second sprint, then winded for 6 s ---------------------------
@@ -72,10 +72,10 @@ func test_reveal_condition_needs_range_los_and_unhidden_player() -> void:
 	assert_false(MonsterRules.is_reveal_condition(3.0, true, true), "player hidden")
 
 
-func test_reveal_after_four_seconds_in_range() -> void:
-	for i in 39:
+func test_reveal_after_two_seconds_in_range() -> void:
+	for i in 19:
 		assert_false(rules.tick_reveal(0.1, true), "no reveal at %.1f s" % ((i + 1) * 0.1))
-	assert_true(rules.tick_reveal(0.1, true), "reveal at 4.0 s")
+	assert_true(rules.tick_reveal(0.1, true), "reveal at 2.0 s")
 	assert_near(rules.reveal_progress, 0.0, 0.0001, "progress resets after triggering")
 
 
@@ -86,9 +86,9 @@ func test_no_reveal_when_condition_false() -> void:
 
 
 func test_reveal_progress_decays_at_half_speed() -> void:
-	rules.tick_reveal(3.0, true)
+	rules.tick_reveal(1.5, true)
 	rules.tick_reveal(2.0, false)
-	assert_near(rules.reveal_progress, 2.0, 0.0001, "2 s out of range removes 1 s")
+	assert_near(rules.reveal_progress, 0.5, 0.0001, "2 s out of range removes 1 s")
 	rules.tick_reveal(10.0, false)
 	assert_near(rules.reveal_progress, 0.0, 0.0001)
 
@@ -172,10 +172,18 @@ func test_failed_staging_waits_before_retrying() -> void:
 
 # --- Mimicry and abduction schedules -----------------------------------------
 
-func test_schedules_wait_until_one_am() -> void:
+func test_mimic_waits_until_one_am() -> void:
 	rules.tick_schedules(1000.0, 0)
 	assert_false(rules.mimic_due())
+
+
+func test_first_abduction_comes_early_in_the_night() -> void:
+	rules.tick_schedules(Monster.FIRST_ABDUCT_DELAY.x - 1.0, 0)
 	assert_false(rules.abduction_due())
+	rules.tick_schedules(Monster.FIRST_ABDUCT_DELAY.y - Monster.FIRST_ABDUCT_DELAY.x + 2.0, 0)
+	assert_true(rules.abduction_due(), "first abduction within FIRST_ABDUCT_DELAY at 12 AM")
+	rules.abduction_done()
+	assert_true(rules.next_abduction_in >= Monster.ABDUCT_INTERVAL.x, "later ones keep the normal interval")
 
 
 func test_mimic_due_within_interval_after_one_am() -> void:

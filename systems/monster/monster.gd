@@ -17,7 +17,7 @@ extends CharacterBody3D
 const SPRINT_MAX_TIME := 13.0           ## rule 1: seconds of sprinting before it is winded
 const WINDED_TIME := 6.0                ## rule 1: seconds slow and wheezing
 const REVEAL_RANGE := 7.0               ## rule 2: metres
-const REVEAL_TIME := 4.0                ## rule 2: seconds of lingering before it turns
+const REVEAL_TIME := 2.0                ## rule 2: seconds of lingering before it turns
 const SIGHTING_DEADLINE_HOUR := 2       ## rule 3: 2:00 AM
 ## Rule 3 counts a sighting only when the player can really make it out ("it will be in your
 ## LOS"): a fogged shape at 26 m, a frame at the edge of the screen or a figure in the dark is
@@ -28,7 +28,7 @@ const PERCEIVE_TIME := 0.75             ## rule 3: seconds of unbroken view
 
 # --- Hunting ------------------------------------------------------------------
 const ATTACK_RANGE := 1.7
-const ATTACK_DAMAGE := 45.0
+const ATTACK_DAMAGE := 110.0
 const CHASE_SPEED := 5.2                ## the player sprints 5.6, walks 3.0
 const DISGUISED_SPEED := 2.0            ## same as a coworker's walk
 const WINDED_SPEED := 1.2
@@ -36,7 +36,10 @@ const LOSE_TRACK_TIME := 4.0            ## chase without sight this long -> sear
 const REVEAL_COOLDOWN := 25.0           ## after a chase ends, no reveal for this long
 const HEARING_RADIUS := 14.0            ## hears a sprinting player (noise >= 1) this far
 const MAX_ABDUCTIONS := 2
-const ABDUCT_EARLIEST_HOUR := 1
+const ABDUCT_EARLIEST_HOUR := 0
+const FIRST_ABDUCT_DELAY := Vector2(30.0, 45.0)  ## the first coworker goes missing this soon into the night
+const STALK_SPEED := 2.8               ## after an abduction it walks at the player, a bit too briskly
+const STALK_TIME := 60.0               ## gives up stalking after this long (e.g. the player stays hidden)
 const FLICKER_RADIUS := 12.0            ## store lights within this flicker
 
 # --- Tuning -------------------------------------------------------------------
@@ -118,6 +121,7 @@ var rng := RandomNumberGenerator.new()
 var disguise_name := ""                 ## whose face and voice it is wearing
 var missing_names: Array[String] = []   ## coworkers it has taken
 var investigate_target := Vector3.ZERO
+var stalk_left := 0.0                   ## > 0: just took a coworker, now walking at the player in their face
 var witnessed_spot: Node3D              ## hiding spot it watched the player enter
 
 # Perception, refreshed every tick by _sense(). The player is reached through the
@@ -305,6 +309,7 @@ func try_abduction() -> bool:
 	GameState.add_stat("coworkers_lost")
 	_set_disguise(_identity_for(victim_name))
 	_teleport(_snap_to_nav(spot))
+	stalk_left = STALK_TIME
 	_set_state(DISGUISED_ROAM)
 	return true
 
@@ -436,7 +441,7 @@ func _tick_rules(delta: float) -> void:
 	# Rule 3: make sure the player has seen it at least once by the deadline.
 	if rules.should_stage_sighting(hour) and try_stage_sighting():
 		return
-	if state != DISGUISED_ROAM:
+	if state != DISGUISED_ROAM or stalk_left > 0.0:
 		return
 	if rules.abduction_due():
 		if try_abduction():
@@ -498,6 +503,9 @@ func _enter_disguised_roam() -> void:
 
 
 func _tick_disguised_roam(delta: float) -> void:
+	if stalk_left > 0.0 and _player != null:
+		_tick_stalk(delta)
+		return
 	if not _pending_manager_task_zone.is_empty():
 		var zone := _pending_manager_task_zone
 		_pending_manager_task_zone = &""
@@ -516,6 +524,24 @@ func _tick_disguised_roam(delta: float) -> void:
 		_phase = 0
 		_face_point = null
 		_anim_override = &""
+		_go_to(_pick_roam_point(), DISGUISED_SPEED)
+
+
+## After an abduction: heads straight for the player wearing the victim's face until
+## rule 2 makes it turn (or STALK_TIME runs out, then it goes back to roaming).
+func _tick_stalk(delta: float) -> void:
+	stalk_left -= delta
+	if _stare_if_lingered():
+		return
+	_phase = 0
+	_face_point = null
+	_anim_override = &""
+	if _player_distance > ARRIVE_DISTANCE + 1.0:
+		_go_to(_player.global_position, STALK_SPEED)
+	else:
+		_stop()
+	if stalk_left <= 0.0:
+		stalk_left = 0.0
 		_go_to(_pick_roam_point(), DISGUISED_SPEED)
 
 
@@ -559,6 +585,7 @@ func _tick_lure(delta: float) -> void:
 ## A disguised body transforms first (reveal); one already in its true form
 ## does not transform again, it roars and charges.
 func _begin_hunt() -> void:
+	stalk_left = 0.0
 	if not _true_form_active:
 		_set_state(REVEAL)
 		return
