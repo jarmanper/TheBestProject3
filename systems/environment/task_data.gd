@@ -16,23 +16,9 @@ var station: Node3D                  ## the TaskStation that completes it
 var assigned_to: StringName = &""    ## employee name, &"YOU", or empty for shared work
 var claimed_by: Node                 ## coworker currently walking to / doing it
 
-enum TaskPriority {
-	NORMAL = 0,
-	MANAGER_BONUS = 1
-}
 
-enum TaskCategory {
-	GENERIC_OPENING,
-	GENERIC_CLOSING,
-	MANAGER_ASSIGNED
-}
-
-@export var category: TaskCategory = TaskCategory.GENERIC_CLOSING
-@export var priority: TaskPriority = TaskPriority.NORMAL
-@export var required_tool: String = ""
-
-func requires_tool() -> bool:
-	return not required_tool.is_empty()
+func is_open() -> bool:
+	return not completed and not failed
 
 
 ## The player can help anyone; AI workers stick to their own basic assignments.

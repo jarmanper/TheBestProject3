@@ -14,7 +14,6 @@ var _door_tween: Tween
 func _ready() -> void:
 	super()
 	add_to_group(&"hiding_spot")
-	register_to_environment_system()
 
 
 func is_occupied() -> bool:
@@ -123,13 +122,3 @@ func _find_door() -> Node3D:
 	if door == null:
 		door = find_child("Door", true, false) as Node3D   # inside the locker.glb model
 	return door
-
-func is_spot_available() -> bool:
-	return not is_occupied
-
-# Register to task_manager group if not already present
-func register_to_environment_system() -> void:
-	add_to_group("hiding_spots")
-	var mgr = get_tree().get_first_node_in_group("task_manager")
-	if mgr and mgr.has_method("register_hiding_spot"):
-		mgr.register_hiding_spot(self)
